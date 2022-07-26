@@ -1,2 +1,2 @@
-rootProject.name = "sithlock"
+rootProject.name = "siths"
 
