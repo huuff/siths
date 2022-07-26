@@ -3,6 +3,8 @@ package xyz.haff.siths
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -23,8 +25,8 @@ class SithLockKtTest : FunSpec({
         poolFromContainer(container).resource.use { jedis -> jedis.flushAll() }
     }
 
-    // TODO: Assert something?
     test("without locking") {
+        val values = mutableListOf<String>()
         val tasks = (1..10).map {
             Thread {
                 poolFromContainer(container).resource.use { redis ->
@@ -32,27 +34,33 @@ class SithLockKtTest : FunSpec({
                     redis.incrBy("key", 1)
                     Thread.sleep(100)
                     redis.incrBy("key", -1)
+                    values += redis["key"]
                 }
             }
         }
         tasks.forEach { it.start() }
         tasks.forEach { it.join() }
+
+        values.distinct().size shouldNotBe 1
     }
 
     test("with locking") {
+        val values = mutableListOf<String>()
         val tasks = (1..10).map {
             Thread {
                 poolFromContainer(container).resource.use { redis ->
                     val lockIdentifier = redis.acquireLock("lock")
                     redis.incrBy("key", 1)
-                    println(redis["key"])
                     Thread.sleep(100)
                     redis.incrBy("key", -1)
+                    values += redis["key"]
                     redis.releaseLock("lock", lockIdentifier)
                 }
             }
         }
         tasks.forEach { it.start() }
         tasks.forEach { it.join() }
+
+        values.distinct() shouldBe listOf("0")
     }
 })
