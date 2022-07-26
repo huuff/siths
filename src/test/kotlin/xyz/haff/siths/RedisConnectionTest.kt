@@ -1,4 +1,4 @@
-package xyz.haff.sithlock
+package xyz.haff.siths
 
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
@@ -8,7 +8,7 @@ import redis.clients.jedis.JedisPool
 
 class RedisConnectionTest : FunSpec({
     val container = install(TestContainerExtension("redis:5.0.3-alpine")) {
-        startupAttempts = 1
+        startupAttempts = 1 // TODO: Try to remove it
         withExposedPorts(6379)
     }
 
