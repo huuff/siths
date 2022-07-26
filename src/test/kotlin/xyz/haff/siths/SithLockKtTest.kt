@@ -19,15 +19,17 @@ class SithLockKtTest : FunSpec({
         withExposedPorts(6379)
     }
 
-    // TODO: Flush db between tests
+    afterEach {
+        poolFromContainer(container).resource.use { jedis -> jedis.flushAll() }
+    }
+
     // TODO: Assert something?
     test("without locking") {
         val tasks = (1..10).map {
             Thread {
-                JedisPool(container.host, container.firstMappedPort).resource.use { redis ->
+                poolFromContainer(container).resource.use { redis ->
                     // ACT
                     redis.incrBy("key", 1)
-                    println(redis["key"])
                     Thread.sleep(100)
                     redis.incrBy("key", -1)
                 }
@@ -40,7 +42,7 @@ class SithLockKtTest : FunSpec({
     test("with locking") {
         val tasks = (1..10).map {
             Thread {
-                JedisPool(container.host, container.firstMappedPort).resource.use { redis ->
+                poolFromContainer(container).resource.use { redis ->
                     val lockIdentifier = redis.acquireLock("lock")
                     redis.incrBy("key", 1)
                     println(redis["key"])
