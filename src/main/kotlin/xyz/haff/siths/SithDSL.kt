@@ -29,8 +29,16 @@ fun Jedis.setExpiration(key: String, expiration: Duration) {
     pexpire(key, expiration.toMillis())
 }
 
-fun Jedis.withMulti(f: Transaction.() -> Any): List<Any> {
+inline fun Jedis.withMulti(f: Transaction.() -> Any): List<Any> {
     val transaction = multi()
     transaction.f()
     return transaction.exec()
+}
+
+inline fun <T> Jedis.withWatch(key: String, f: Jedis.() -> T): T {
+    watch(key)
+    val result = f()
+    unwatch()
+
+    return result
 }

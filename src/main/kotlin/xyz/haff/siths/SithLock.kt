@@ -7,7 +7,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
 
-class RedisLockTimeoutException(msg: String): RuntimeException(msg)
+class RedisLockTimeoutException(msg: String) : RuntimeException(msg)
 
 // TODO: TEST ALL TIMEOUTS
 
@@ -23,6 +23,7 @@ fun Jedis.acquireLock(
     val identifier = UUID.randomUUID().toString()
     val endTime = LocalDateTime.now(clock) + acquireTimeout
 
+    // TODO: Function to run some code for some duration, in koy
     while (LocalDateTime.now(clock) < endTime) {
         val lockKey = buildLockKey(lockName)
         if (setWithParams(lockKey, identifier, expiration = lockTimeout, notExistent = true)) {
@@ -39,25 +40,24 @@ fun Jedis.acquireLock(
 fun Jedis.releaseLock(lockName: String, identifier: String): Boolean {
     val lockKey = buildLockKey(lockName)
 
+    // TODO: Function to loop forever, in koy
     while (true) {
         try {
-            watch(lockKey)
-            if (get(lockKey) == identifier) {
-                withMulti { del(lockKey) }
-                return true
+            withWatch(lockKey) {
+                if (get(lockKey) == identifier) {
+                    withMulti { del(lockKey) }
+                    return true
+                }
             }
-            unwatch()
-            break
+            return false
         } catch (e: JedisException) { // TODO: Find the correct exception
             // Ignore it and keep trying
         }
     }
-
-    return false
 }
 
 @JvmOverloads
-fun <T> Jedis.withLock(lockName: String, timeout: Duration = Duration.ofSeconds(10), f: Jedis.() -> T) : T {
+inline fun <T> Jedis.withLock(lockName: String, timeout: Duration = Duration.ofSeconds(10), f: Jedis.() -> T): T {
     val lockIdentifier = acquireLock(lockName, timeout)
 
     val result = f()
