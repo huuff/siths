@@ -12,7 +12,6 @@ class RedisLockTimeoutException(msg: String): RuntimeException(msg)
 // TODO: TEST ALL TIMEOUTS
 // TODO: Func to build lockName
 
-// TODO: Time out locks
 @JvmOverloads
 fun Jedis.acquireLock(
     lockName: String,
