@@ -9,25 +9,32 @@ import java.util.*
 
 class RedisLockTimeoutException(msg: String): RuntimeException(msg)
 
+// TODO: TEST ALL TIMEOUTS
+// TODO: Func to build lockName
+
 // TODO: Time out locks
 @JvmOverloads
 fun Jedis.acquireLock(
     lockName: String,
-    timeout: Duration = Duration.ofSeconds(10),
+    acquireTimeout: Duration = Duration.ofSeconds(10),
+    lockTimeout: Duration = Duration.ofSeconds(10),
     clock: Clock = Clock.systemDefaultZone()
 ): String {
     val identifier = UUID.randomUUID().toString()
-    val endTime = LocalDateTime.now(clock) + timeout
+    val endTime = LocalDateTime.now(clock) + acquireTimeout
 
     while (LocalDateTime.now(clock) < endTime) {
-        val numberOfRowsSet = this.setnx("lock:$lockName", identifier)
-        if (numberOfRowsSet == 1L) {
+
+        val result = this.setWithParams("lock:$lockName", identifier, expiration = lockTimeout, notExistent = true)
+        if (result == "OK") {
             return identifier
+        } else if (this.ttl("lock:$lockName") == 0L) {
+            this.pexpire("lock:$lockName", lockTimeout.toMillis())
         }
         Thread.sleep(1)
     }
 
-    throw RedisLockTimeoutException("Timed out waiting for $lockName after $timeout")
+    throw RedisLockTimeoutException("Timed out waiting for $lockName after $acquireTimeout")
 }
 
 fun Jedis.releaseLock(lockName: String, identifier: String): Boolean {
