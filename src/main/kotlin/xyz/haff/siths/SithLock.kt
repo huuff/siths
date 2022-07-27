@@ -51,3 +51,11 @@ fun Jedis.releaseLock(lockName: String, identifier: String): Boolean {
 
     return false
 }
+
+@JvmOverloads
+fun <T> Jedis.withLock(lockName: String, timeout: Duration = Duration.ofSeconds(10), f: Jedis.() -> T) : T {
+    val lockIdentifier = acquireLock(lockName, timeout)
+    val result = f()
+    releaseLock(lockName, lockIdentifier)
+    return result
+}
