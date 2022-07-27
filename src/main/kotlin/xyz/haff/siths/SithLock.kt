@@ -9,8 +9,6 @@ import java.util.*
 
 class RedisLockTimeoutException(msg: String) : RuntimeException(msg)
 
-// TODO: TEST ALL TIMEOUTS
-
 private fun buildLockKey(lockName: String) = "lock$lockName"
 
 @JvmOverloads
