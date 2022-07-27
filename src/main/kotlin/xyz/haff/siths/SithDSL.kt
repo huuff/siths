@@ -10,7 +10,7 @@ fun Jedis.setWithParams(
     value: String,
     expiration: Duration? = null,
     notExistent: Boolean = false,
-): String {
+): Boolean {
     val params = SetParams()
     if (expiration != null) {
         params.px(expiration.toMillis())
@@ -20,7 +20,13 @@ fun Jedis.setWithParams(
         params.nx()
     }
 
-    return this.set(key, value, params)
+    return this.set(key, value, params) == "OK"
+}
+
+fun Jedis.hasExpiration(key: String) = ttl(key) != 0L
+
+fun Jedis.setExpiration(key: String, expiration: Duration) {
+    pexpire(key, expiration.toMillis())
 }
 
 fun Jedis.withMulti(f: Transaction.() -> Any): List<Any> {

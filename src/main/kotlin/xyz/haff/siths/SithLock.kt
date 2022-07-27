@@ -25,11 +25,10 @@ fun Jedis.acquireLock(
 
     while (LocalDateTime.now(clock) < endTime) {
         val lockKey = buildLockKey(lockName)
-        val result = this.setWithParams(lockKey, identifier, expiration = lockTimeout, notExistent = true)
-        if (result == "OK") {
+        if (setWithParams(lockKey, identifier, expiration = lockTimeout, notExistent = true)) {
             return identifier
-        } else if (this.ttl(lockKey) == 0L) {
-            this.pexpire(lockKey, lockTimeout.toMillis())
+        } else if (!hasExpiration(lockKey)) {
+            setExpiration(lockKey, lockTimeout)
         }
         Thread.sleep(1)
     }
