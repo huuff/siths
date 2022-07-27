@@ -44,9 +44,7 @@ fun Jedis.releaseLock(lockName: String, identifier: String): Boolean {
         try {
             watch(lockKey)
             if (get(lockKey) == identifier) {
-                val transaction = multi()
-                transaction.del(lockKey)
-                transaction.exec()
+                withMulti { del(lockKey) }
                 return true
             }
             unwatch()
@@ -64,7 +62,7 @@ fun <T> Jedis.withLock(lockName: String, timeout: Duration = Duration.ofSeconds(
     val lockIdentifier = acquireLock(lockName, timeout)
 
     val result = f()
-    
+
     releaseLock(lockName, lockIdentifier)
     return result
 }

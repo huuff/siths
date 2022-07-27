@@ -1,6 +1,7 @@
 package xyz.haff.siths
 
 import redis.clients.jedis.Jedis
+import redis.clients.jedis.Transaction
 import redis.clients.jedis.params.SetParams
 import java.time.Duration
 
@@ -20,4 +21,10 @@ fun Jedis.setWithParams(
     }
 
     return this.set(key, value, params)
+}
+
+fun Jedis.withMulti(f: Transaction.() -> Any): List<Any> {
+    val transaction = multi()
+    transaction.f()
+    return transaction.exec()
 }
