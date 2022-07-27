@@ -8,7 +8,6 @@ import redis.clients.jedis.JedisPool
 
 class RedisConnectionTest : FunSpec({
     val container = install(TestContainerExtension("redis:5.0.3-alpine")) {
-        startupAttempts = 1 // TODO: Try to remove it
         withExposedPorts(6379)
     }
 

@@ -17,7 +17,6 @@ import java.util.concurrent.Future
 
 class SithLockKtTest : FunSpec({
     val container = install(TestContainerExtension("redis:5.0.3-alpine")) {
-        startupAttempts = 1 // TODO: Try to remove it
         withExposedPorts(6379)
     }
 
@@ -30,7 +29,6 @@ class SithLockKtTest : FunSpec({
         val tasks = (1..10).map {
             Thread {
                 poolFromContainer(container).resource.use { redis ->
-                    // ACT
                     redis.incrBy("key", 1)
                     Thread.sleep(100)
                     redis.incrBy("key", -1)
