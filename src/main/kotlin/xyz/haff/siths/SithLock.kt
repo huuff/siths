@@ -58,8 +58,9 @@ fun Jedis.releaseLock(lockName: String, identifier: String): Boolean {
 inline fun <T> Jedis.withLock(lockName: String, timeout: Duration = Duration.ofSeconds(10), f: Jedis.() -> T): T {
     val lockIdentifier = acquireLock(lockName, timeout)
 
-    val result = f()
-
-    releaseLock(lockName, lockIdentifier)
-    return result
+    return try {
+        f()
+    } finally {
+        releaseLock(lockName, lockIdentifier)
+    }
 }
