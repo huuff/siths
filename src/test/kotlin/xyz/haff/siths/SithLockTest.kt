@@ -14,7 +14,7 @@ import redis.clients.jedis.Jedis
 import java.time.Duration
 
 class SithLockTest : FunSpec({
-    val container = install(TestContainerExtension("redis:5.0.3-alpine")) {
+    val container = install(TestContainerExtension("redis:7.0.4-alpine")) {
         withExposedPorts(6379)
     }
 
