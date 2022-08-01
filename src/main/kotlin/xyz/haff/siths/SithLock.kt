@@ -29,7 +29,6 @@ fun Jedis.acquireLock(
                 return redis.call("psetex", KEYS[1], unpack(ARGV))
              end
         """.trimIndent(), listOf(lockKey), listOf(lockTimeout.toMillis().toString(), identifier))
-        println(result)
         if (result == "OK") {
             return identifier
         }
