@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "xyz.haff"
-version = "0.2.1"
+version = "0.3.0"
 
 repositories {
     mavenCentral()
@@ -84,6 +84,7 @@ val kotestVersion = "5.3.1"
 dependencies {
     implementation(kotlin("stdlib"))
     implementation("redis.clients:jedis:4.2.3")
+    implementation("commons-codec:commons-codec:1.15")
 
     testImplementation(kotlin("test"))
     testImplementation("org.testcontainers:testcontainers:1.17.3")

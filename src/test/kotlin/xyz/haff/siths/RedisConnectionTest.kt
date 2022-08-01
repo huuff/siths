@@ -12,7 +12,7 @@ class RedisConnectionTest : FunSpec({
     }
 
     test("we can set and get a value") {
-        JedisPool(container.host, container.firstMappedPort).resource.use { redis ->
+        poolFromContainer(container).resource.use { redis ->
             // ACT
             redis["key"] = "value"
 
