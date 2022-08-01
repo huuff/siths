@@ -9,7 +9,7 @@ import redis.clients.jedis.exceptions.JedisNoScriptException
  */
 fun Jedis.runScript(script: RedisScript, keys: List<String> = listOf(), args: List<String> = listOf()): Any? {
     return try {
-        evalsha(script.sha)
+        evalsha(script.sha, keys, args)
     } catch (e: JedisNoScriptException) {
         scriptLoad(script.code)
         evalsha(script.sha, keys, args)
