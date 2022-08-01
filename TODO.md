@@ -4,3 +4,4 @@
 * Set `codecov.io`
 * Maybe a builder for a jedis pool
 * Put up a nice badge to Maven Central
+* A class that holds a script and its SHA1, tries to execute it and in case it fails, loads it and executes it. In the best case, the class would calculate the SHA1 without needing to send it to redis.

@@ -63,12 +63,8 @@ class SithLockTest : FunSpec({
 
     test("acquire times out if it cant acquire the lock") {
         // ARRANGE
-        mockkStatic(Jedis::setWithParams)
-        mockkStatic(Jedis::hasExpiration)
-
         val redis = mockk<Jedis> {
-            every { setWithParams(any(), any(), any(), any()) } returns false // Can never set it
-            every { hasExpiration(any()) } returns true // It always has some timeout
+            every { eval(any(), any<List<String>>(), any<List<String>>()) } returns null
         }
 
         // ACT & ASSERT

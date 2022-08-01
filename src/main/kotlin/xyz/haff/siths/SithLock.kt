@@ -24,10 +24,14 @@ fun Jedis.acquireLock(
     // TODO: Function to run some code for some duration, in koy
     while (LocalDateTime.now(clock) < endTime) {
         val lockKey = buildLockKey(lockName)
-        if (setWithParams(lockKey, identifier, expiration = lockTimeout, notExistent = true)) {
+        val result = this.eval("""
+            if redis.call("exists", KEYS[1]) == 0 then
+                return redis.call("psetex", KEYS[1], unpack(ARGV))
+             end
+        """.trimIndent(), listOf(lockKey), listOf(lockTimeout.toMillis().toString(), identifier))
+        println(result)
+        if (result == "OK") {
             return identifier
-        } else if (!hasExpiration(lockKey)) {
-            setExpiration(lockKey, lockTimeout)
         }
         Thread.sleep(1)
     }
@@ -35,24 +39,12 @@ fun Jedis.acquireLock(
     throw RedisLockTimeoutException("Timed out waiting for $lockName after $acquireTimeout")
 }
 
-fun Jedis.releaseLock(lockName: String, identifier: String): Boolean {
-    val lockKey = buildLockKey(lockName)
-
-    // TODO: Function to loop forever, in koy
-    while (true) {
-        try {
-            withWatch(lockKey) {
-                if (get(lockKey) == identifier) {
-                    withMulti { del(lockKey) }
-                    return true
-                }
-            }
-            return false
-        } catch (e: JedisException) { // TODO: Find the correct exception
-            // Ignore it and keep trying
-        }
-    }
-}
+fun Jedis.releaseLock(lockName: String, identifier: String): Boolean
+    = eval("""
+        if redis.call("get", KEYS[1]) == ARGV[1] then
+           return redis.call("del", KEYS[1]) or true
+        end
+    """.trimIndent(), listOf(buildLockKey(lockName)), listOf(identifier)) == "OK"
 
 @JvmOverloads
 inline fun <T> Jedis.withLock(lockName: String, timeout: Duration = Duration.ofSeconds(10), f: Jedis.() -> T): T {
