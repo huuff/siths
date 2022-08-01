@@ -7,12 +7,12 @@ import redis.clients.jedis.exceptions.JedisNoScriptException
 /**
  * Runs a Redis Lua script optimistically: Tries to run it, and if it isn't present, loads it.
  */
-fun Jedis.runScript(script: RedisScript): Any {
+fun Jedis.runScript(script: RedisScript, keys: List<String> = listOf(), args: List<String> = listOf()): Any? {
     return try {
         evalsha(script.sha)
     } catch (e: JedisNoScriptException) {
         scriptLoad(script.code)
-        evalsha(script.sha)
+        evalsha(script.sha, keys, args)
     }
 }
 

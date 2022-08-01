@@ -63,8 +63,10 @@ class SithLockTest : FunSpec({
 
     test("acquire times out if it cant acquire the lock") {
         // ARRANGE
+        mockkStatic(Jedis::runScript)
+
         val redis = mockk<Jedis> {
-            every { eval(any(), any<List<String>>(), any<List<String>>()) } returns null
+            every { runScript(any(), any(), any()) } returns null
         }
 
         // ACT & ASSERT
