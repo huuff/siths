@@ -13,10 +13,9 @@ class RedisCache<Key, Value>(
     private val name: String = "cache",
     private val serializingFunction: (Value) -> String,
     private val deserializingFunction: (String) -> Value,
-    private val loadingFunction: (Key) -> Value,
 ) {
 
-    operator fun get(key: Key): CacheResult<Value> {
+     fun getOrLoad(key: Key, loadingFunction: (Key) -> Value): CacheResult<Value> {
         val keyHash = CRC32().apply { update(key.toString().toByteArray()) }.value.toString()
         val keyName = "$name:$keyHash"
 
