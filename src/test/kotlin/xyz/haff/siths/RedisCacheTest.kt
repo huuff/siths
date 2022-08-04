@@ -10,7 +10,6 @@ import io.mockk.verify
 import java.time.Duration
 import java.util.*
 
-// TODO: Actually implement it
 class RedisCacheTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
         withExposedPorts(6379)

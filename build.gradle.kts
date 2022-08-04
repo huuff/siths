@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "xyz.haff"
-version = "0.6.0"
+version = "0.7.0"
 
 repositories {
     mavenCentral()
@@ -85,6 +85,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("redis.clients:jedis:4.2.3")
     implementation("commons-codec:commons-codec:1.15")
+    implementation("io.ktor:ktor-network:2.0.3")
 
     testImplementation(kotlin("test"))
     testImplementation("org.testcontainers:testcontainers:1.17.3")
