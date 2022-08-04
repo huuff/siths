@@ -34,13 +34,18 @@ class SithConnection private constructor(
 
         val firstResponse = receiveChannel.readUTF8Line()!!
 
+        // TODO: Arrays
         return when (firstResponse[0]) {
             '+' -> RespSimpleString(firstResponse.drop(1))
             '-' -> RespError(firstResponse.drop(1))
             ':' -> RespInteger(firstResponse.drop(1).toInt())
             '$' -> {
                 val length = firstResponse.drop(1).toInt()
-                return RespBulkString(receiveChannel.readUTF8Line(length + 2)!!) // String length plus carriage return and newline
+                if (length == -1) {
+                    return RespNullResponse
+                } else {
+                    return RespBulkString(receiveChannel.readUTF8Line(length + 2)!!) // String length plus carriage return and newline
+                }
             }
             else -> throw RuntimeException("Incapable of deciding the resp type of $firstResponse")
         }
