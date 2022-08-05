@@ -4,7 +4,6 @@ import redis.clients.jedis.JedisPool
 import java.time.Duration
 import java.util.zip.CRC32
 
-// TODO: Test
 data class CacheResult<T>(val contents: T, val hit: Boolean, val keyHash: String)
 class RedisCache<Key, Value>(
     private val lockTimeout: Duration,
