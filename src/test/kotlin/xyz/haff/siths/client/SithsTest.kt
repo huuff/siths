@@ -41,7 +41,7 @@ class SithsTest : FunSpec({
             val script = RedisScript(code = """return 'Hello World!' """)
 
             // ACT
-            val returnedSha = siths.scriptLoad(script)
+            val returnedSha = siths.scriptLoad(script.code)
 
             // ASSERT
             returnedSha shouldBe script.sha
@@ -51,7 +51,7 @@ class SithsTest : FunSpec({
             // ARRANGE
             val siths = Siths(makeSithsPool(container))
             val script = RedisScript(code = """return 'Hello World!' """)
-            val sha = siths.scriptLoad(script)
+            val sha = siths.scriptLoad(script.code)
 
             // ACT
             val response = siths.evalSha(sha)
@@ -68,6 +68,18 @@ class SithsTest : FunSpec({
            shouldThrow<RedisScriptNotLoadedException> {
                siths.evalSha("b16b7ff836ae87a150204570d9d82178ece81c8e")
            }
+        }
+
+        test("loads and runs missing script") {
+            // ARRANGE
+            val siths = Siths(makeSithsPool(container))
+            val script = RedisScript(code = """return 'Hello World!!?'""")
+
+            // ACT
+            val response = siths.runScript(script)
+
+            // ASSERT
+            response shouldBe "Hello World!!?"
         }
     }
 })

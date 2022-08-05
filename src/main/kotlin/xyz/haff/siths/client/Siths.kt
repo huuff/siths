@@ -1,5 +1,6 @@
 package xyz.haff.siths.client
 
+import redis.clients.jedis.exceptions.JedisNoScriptException
 import xyz.haff.siths.scripts.RedisScript
 
 class Siths(
@@ -28,8 +29,8 @@ class Siths(
     suspend fun get(key: String): String = getOrNull(key) ?: throw RuntimeException("Key $key does not exist!")
 
     // TODO: What about scripts with double quotes?
-    suspend fun scriptLoad(script: RedisScript): String =
-        when (val response = pool.pooled { command("SCRIPT LOAD \"${script.code}\"") }) {
+    suspend fun scriptLoad(script: String): String =
+        when (val response = pool.pooled { command("SCRIPT LOAD \"$script\"") }) {
             is RespBulkString -> response.value
             is RespSimpleString -> response.value
             is RespError -> response.throwAsException()
@@ -44,4 +45,16 @@ class Siths(
             is RespError -> response.throwAsException()
             else -> throw RuntimeException("Unknown response $response")
         }
+
+    /**
+     * Tries to run script, and, if not loaded, loads it, then runs it again
+     */
+    suspend fun runScript(script: RedisScript, keys: List<String> = listOf(), args: List<String> = listOf()): String {
+        return try {
+            evalSha(script.sha, keys, args)
+        } catch (e: RedisScriptNotLoadedException) {
+            scriptLoad(script.code)
+            evalSha(script.sha, keys, args)
+        }
+    }
 }
