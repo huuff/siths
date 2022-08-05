@@ -34,6 +34,20 @@ class SithsTest : FunSpec({
         siths.getOrNull("non-existent") shouldBe null
     }
 
+    test("weird strings work as intended") {
+        // ARRANGE
+        val siths = Siths(makeSithsPool(container))
+        val key = """ "&%/·)!$ "%&·"& """
+        val value = """ dsf asfd ·"!!·/$ """
+
+        // ACT
+        siths.set(key, value)
+        val savedValue = siths.get(key)
+
+        // ASSERT
+        savedValue shouldBe value
+    }
+
     context("scripts") {
         test("correctly loads script") {
             // ARRANGE

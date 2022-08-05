@@ -1,16 +1,16 @@
 package xyz.haff.siths.client
 
-import redis.clients.jedis.exceptions.JedisNoScriptException
 import xyz.haff.siths.scripts.RedisScript
+
+// TODO: This somewhere else?
+private fun escape(string: String) = string.replace("\"", "\\\"")
 
 class Siths(
     private val pool: SithsPool,
 ) {
 
     suspend fun set(key: String, value: String) {
-        // TODO: Some escaping to prevent injection
-        // TODO: What about keys with spaces?
-        val response = pool.pooled { command("SET $key $value") }
+        val response = pool.pooled { command("SET \"${escape(key)}\" \"${escape(value)}\"") }
 
         if (response is RespError) {
             response.throwAsException()
@@ -18,8 +18,7 @@ class Siths(
     }
 
     // TODO: What about getting ints? Or other types
-    // TODO: What about keys with spaces?
-    suspend fun getOrNull(key: String): String? = when (val response = pool.pooled { command("GET $key") }) {
+    suspend fun getOrNull(key: String): String? = when (val response = pool.pooled { command("GET \"${escape(key)}\"") }) {
         is RespBulkString -> response.value
         is RespNullResponse -> null
         is RespError -> response.throwAsException()
@@ -28,9 +27,8 @@ class Siths(
 
     suspend fun get(key: String): String = getOrNull(key) ?: throw RuntimeException("Key $key does not exist!")
 
-    // TODO: What about scripts with double quotes?
     suspend fun scriptLoad(script: String): String =
-        when (val response = pool.pooled { command("SCRIPT LOAD \"$script\"") }) {
+        when (val response = pool.pooled { command("SCRIPT LOAD \"${escape(script)}\"") }) {
             is RespBulkString -> response.value
             is RespSimpleString -> response.value
             is RespError -> response.throwAsException()
@@ -38,6 +36,7 @@ class Siths(
         }
 
     // TODO: What about getting ints? Or other types
+    // TODO: Escape strings here
     suspend fun evalSha(sha: String, keys: List<String> = listOf(), args: List<String> = listOf()): String =
         when (val response = pool.pooled { command("EVALSHA $sha ${keys.size} ${keys.joinToString(separator = " ")} ${args.joinToString(separator = " ")}") }) {
             is RespBulkString -> response.value

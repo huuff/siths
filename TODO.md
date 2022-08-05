@@ -9,6 +9,5 @@
 * Maybe a builder for a jedis pool
 
 ## Siths
-* String escaping? At least ensure injection attacks are not possible
 * A distributed hash-map that takes a key prefix (i.e. such as `cache`) and implements `MutableMap`, operating on all elements `cache:«key»`
 * Seems like Siths is considerably slower than Jedis... find out why!
