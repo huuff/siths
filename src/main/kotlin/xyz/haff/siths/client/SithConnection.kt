@@ -32,7 +32,7 @@ class SithConnection private constructor(
         sendChannel.writeStringUtf8("$command\r\n")
         receiveChannel.awaitContent()
 
-        val firstResponse = receiveChannel.readUTF8Line()!!
+        val firstResponse = readLine()
 
         // TODO: Arrays
         return when (firstResponse[0]) {
