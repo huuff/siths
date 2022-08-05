@@ -52,6 +52,7 @@ class SithConnection private constructor(
         }
     }
 
+    // TODO: Do something with this (mark the connection as closed? remove from pools?)
     fun close() {
         socket.close()
         selectorManager.close()

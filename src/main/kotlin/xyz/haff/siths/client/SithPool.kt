@@ -1,5 +1,6 @@
 package xyz.haff.siths.client
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.time.Duration
 import java.time.LocalDateTime
@@ -14,7 +15,7 @@ class SithPool(
     private val freeConnections = Collections.synchronizedList(mutableListOf<SithConnection>())
     private val usedConnections = Collections.synchronizedList(mutableListOf<SithConnection>())
 
-    fun getConnection(): SithConnection {
+    suspend fun getConnection(): SithConnection {
         val deadline = LocalDateTime.now() + acquireTimeout
 
         while (LocalDateTime.now() < deadline) {
@@ -25,11 +26,11 @@ class SithPool(
                 return connection
             } else {
                 if (freeConnections.size + usedConnections.size < maxConnections) {
-                    val connection = runBlocking { SithConnection.open(host, port) }
+                    val connection = SithConnection.open(host, port)
                     usedConnections += connection
                     return connection
                 } else {
-                    Thread.sleep(10)
+                    delay(10)
                     continue
                 }
             }
@@ -44,7 +45,7 @@ class SithPool(
         freeConnections += connection
     }
 
-    inline fun <T> pooled(f: SithConnection.() -> T): T {
+    suspend inline fun <T> pooled(f: SithConnection.() -> T): T {
         val connection = getConnection()
         return try {
             connection.f()
