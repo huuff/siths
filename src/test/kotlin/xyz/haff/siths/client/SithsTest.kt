@@ -13,7 +13,7 @@ class SithsTest : FunSpec({
 
     test("can set and get a value") {
         // ARRANGE
-        val siths = Siths(SithConnection.open(container.host, container.firstMappedPort))
+        val siths = Siths(SithPool(container.host, container.firstMappedPort))
 
         // ACT
         siths.set("key", "value")
@@ -25,7 +25,7 @@ class SithsTest : FunSpec({
 
     test("correct handling when the value doesn't exist") {
         // ARRANGE
-        val siths = Siths(SithConnection.open(container.host, container.firstMappedPort))
+        val siths = Siths(SithPool(container.host, container.firstMappedPort))
 
         // ACT && ASSERT
         siths.getOrNull("non-existent") shouldBe null

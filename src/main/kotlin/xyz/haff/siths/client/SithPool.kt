@@ -44,4 +44,13 @@ class SithPool(
         freeConnections += connection
     }
 
+    inline fun <T> pooled(f: SithConnection.() -> T): T {
+        val connection = getConnection()
+        return try {
+            connection.f()
+        } finally {
+            releaseConnection(connection)
+        }
+    }
+
 }

@@ -1,17 +1,17 @@
 package xyz.haff.siths.client
 
 class Siths(
-    private val connection: SithConnection,
+    private val pool: SithPool,
 ) {
 
     suspend fun set(key: String, value: String) {
         // TODO: Some escaping to prevent injection
-        val response = connection.command("SET $key $value")
+        val response = pool.pooled { command("SET $key $value") }
 
         if (response is RespError) { response.throwAsException() }
     }
 
-    suspend fun getOrNull(key: String): String? =  when (val response = connection.command("GET $key")) {
+    suspend fun getOrNull(key: String): String? =  when (val response = pool.pooled { command("GET $key") }) {
             is RespBulkString -> response.value
             is RespNullResponse -> null
             is RespError -> response.throwAsException()

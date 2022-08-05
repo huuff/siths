@@ -17,14 +17,11 @@ class SithPoolTest : FunSpec({
         val pool = SithPool(host = container.host, port = container.firstMappedPort)
 
         threaded(100) { i ->
-            val connection = pool.getConnection()
             val randomValue = UUID.randomUUID().toString()
-            val siths = Siths(connection)
-            runBlocking { siths.set("key:$i", randomValue) }
-            val retrievedValue = runBlocking { siths.get("key:$i") }
+            runBlocking { pool.pooled { command("SET key:$i $randomValue") } }
+            val retrievedValue = runBlocking { pool.pooled { command("GET key:$i") } }
 
             retrievedValue shouldBe randomValue
-            pool.releaseConnection(connection)
         }
     }
 
