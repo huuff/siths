@@ -6,8 +6,8 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
-import xyz.haff.siths.RedisScript
 import xyz.haff.siths.makeSithsPool
+import xyz.haff.siths.scripts.RedisScript
 
 class SithsTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {

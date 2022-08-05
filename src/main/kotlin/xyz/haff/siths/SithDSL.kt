@@ -2,7 +2,9 @@ package xyz.haff.siths
 
 import redis.clients.jedis.Jedis
 import redis.clients.jedis.Transaction
+import redis.clients.jedis.exceptions.JedisNoScriptException
 import redis.clients.jedis.params.SetParams
+import xyz.haff.siths.scripts.RedisScript
 import java.time.Duration
 
 // TODO: Test these
@@ -43,4 +45,16 @@ inline fun <T> Jedis.withWatch(key: String, f: Jedis.() -> T): T {
     unwatch()
 
     return result
+}
+
+/**
+ * Runs a Redis Lua script optimistically: Tries to run it, and if it isn't present, loads it.
+ */
+fun Jedis.runScript(script: RedisScript, keys: List<String> = listOf(), args: List<String> = listOf()): Any? {
+    return try {
+        evalsha(script.sha, keys, args)
+    } catch (e: JedisNoScriptException) {
+        scriptLoad(script.code)
+        evalsha(script.sha, keys, args)
+    }
 }

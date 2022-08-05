@@ -1,6 +1,6 @@
 package xyz.haff.siths.client
 
-import xyz.haff.siths.RedisScript
+import xyz.haff.siths.scripts.RedisScript
 
 class Siths(
     private val pool: SithsPool,

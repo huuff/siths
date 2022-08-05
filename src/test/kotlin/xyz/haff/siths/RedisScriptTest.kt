@@ -4,6 +4,7 @@ import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
+import xyz.haff.siths.scripts.RedisScript
 
 class RedisScriptTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine")) {
