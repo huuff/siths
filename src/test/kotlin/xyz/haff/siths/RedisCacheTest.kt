@@ -20,7 +20,7 @@ class RedisCacheTest : FunSpec({
         val cache = RedisCache<String, String>(
             lockTimeout = Duration.ofSeconds(10),
             keyTtl = Duration.ofSeconds(10),
-            jedisPool = poolFromContainer(container),
+            jedisPool = makeJedisPool(container),
             serializingFunction = { it },
             deserializingFunction = { it }
         )

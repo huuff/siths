@@ -4,12 +4,9 @@ import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
+import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.suspended
-import xyz.haff.siths.threaded
 import java.util.*
-import kotlin.coroutines.suspendCoroutine
 
 class SithPoolTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine")) {
@@ -17,7 +14,7 @@ class SithPoolTest : FunSpec({
     }
 
     test("pooling works correctly") {
-        val pool = SithPool(host = container.host, port = container.firstMappedPort)
+        val pool = makeSithsPool(container)
 
         suspended(100) { i ->
             val randomValue = UUID.randomUUID().toString()

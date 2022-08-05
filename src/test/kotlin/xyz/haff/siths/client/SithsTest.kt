@@ -6,6 +6,7 @@ import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.RedisScript
+import xyz.haff.siths.makeSithsPool
 
 class SithsTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
@@ -14,7 +15,7 @@ class SithsTest : FunSpec({
 
     test("can set and get a value") {
         // ARRANGE
-        val siths = Siths(SithPool(container.host, container.firstMappedPort))
+        val siths = Siths(makeSithsPool(container))
 
         // ACT
         siths.set("key", "value")
@@ -26,16 +27,17 @@ class SithsTest : FunSpec({
 
     test("correct handling when the value doesn't exist") {
         // ARRANGE
-        val siths = Siths(SithPool(container.host, container.firstMappedPort))
+        val siths = Siths(makeSithsPool(container))
 
         // ACT && ASSERT
         siths.getOrNull("non-existent") shouldBe null
     }
 
+    // TODO: Test nonexistent script (in evalsha)
     context("scripts") {
         test("correctly loads script") {
             // ARRANGE
-            val siths = Siths(SithPool(container.host, container.firstMappedPort))
+            val siths = Siths(makeSithsPool(container))
             val script = RedisScript(code = """return 'Hello World!' """)
 
             // ACT
@@ -47,7 +49,7 @@ class SithsTest : FunSpec({
 
         test("correctly runs script") {
             // ARRANGE
-            val siths = Siths(SithPool(container.host, container.firstMappedPort))
+            val siths = Siths(makeSithsPool(container))
             val script = RedisScript(code = """return 'Hello World!' """)
             val sha = siths.scriptLoad(script)
 

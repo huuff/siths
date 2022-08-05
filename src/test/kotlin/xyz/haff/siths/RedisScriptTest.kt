@@ -11,12 +11,12 @@ class RedisScriptTest : FunSpec({
     }
 
     afterEach {
-        poolFromContainer(container).resource.use { redis -> redis.flushAll() }
+        makeJedisPool(container).resource.use { redis -> redis.flushAll() }
     }
 
     context("SHA tests") {
         test("one-liner SHA is correct") {
-            poolFromContainer(container).resource.use { redis ->
+            makeJedisPool(container).resource.use { redis ->
                 // ARRANGE
                 val script = """return "Hello World!" """
                 val scriptObject = RedisScript(code = script)
@@ -30,7 +30,7 @@ class RedisScriptTest : FunSpec({
         }
 
         test("complex-er script SHA is correct") {
-            poolFromContainer(container).resource.use { redis ->
+            makeJedisPool(container).resource.use { redis ->
                 // ARRANGE
                 val script = """
                     local world = "World"
@@ -48,7 +48,7 @@ class RedisScriptTest : FunSpec({
     }
 
     test("script runs correctly, even if it wasn't previously loaded") {
-        poolFromContainer(container).resource.use { redis ->
+        makeJedisPool(container).resource.use { redis ->
             // ARRANGE
             val scriptObject = RedisScript(code = """ return "Hello World!!!" """)
 

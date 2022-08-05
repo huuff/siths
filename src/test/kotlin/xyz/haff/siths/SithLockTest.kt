@@ -20,7 +20,7 @@ class SithLockTest : FunSpec({
     }
 
     afterEach {
-        poolFromContainer(container).resource.use { jedis -> jedis.flushAll() }
+        makeJedisPool(container).resource.use { jedis -> jedis.flushAll() }
         clearAllMocks()
     }
 
@@ -28,7 +28,7 @@ class SithLockTest : FunSpec({
         val values = Collections.synchronizedList(mutableListOf<String>())
 
         threaded(10) {
-            poolFromContainer(container).resource.use { redis ->
+            makeJedisPool(container).resource.use { redis ->
                 redis.incrBy("key", 1)
                 Thread.sleep(100)
                 redis.incrBy("key", -1)
@@ -43,7 +43,7 @@ class SithLockTest : FunSpec({
         val values = Collections.synchronizedList(mutableListOf<String>())
 
         threaded(10) {
-            poolFromContainer(container).resource.use { redis ->
+            makeJedisPool(container).resource.use { redis ->
                 redis.withLock("lock") {
                     redis.incrBy("key", 1)
                     Thread.sleep(100)

@@ -13,7 +13,7 @@ class SithConnectionTest : FunSpec({
 
     test("can set and get a value") {
         // ARRANGE
-        val connection = SithConnection.open(container.host, container.firstMappedPort)
+        val connection = SithsConnection.open(container.host, container.firstMappedPort)
 
         // ACT
         connection.command("SET key value")

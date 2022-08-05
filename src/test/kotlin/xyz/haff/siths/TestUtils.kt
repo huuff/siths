@@ -4,8 +4,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.testcontainers.containers.GenericContainer
 import redis.clients.jedis.JedisPool
+import xyz.haff.siths.client.SithsPool
 
-fun poolFromContainer(container: GenericContainer<Nothing>) = JedisPool(container.host, container.firstMappedPort)
+fun makeJedisPool(container: GenericContainer<*>) = JedisPool(container.host, container.firstMappedPort)
+fun makeSithsPool(container: GenericContainer<*>) = SithsPool(container.host, container.firstMappedPort)
+
 
 inline fun threaded(threadNumber: Int, crossinline f: (threadIndex: Int) -> Unit) = (0 until threadNumber).map { threadIndex ->
     Thread {

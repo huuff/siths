@@ -5,7 +5,7 @@ import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 
-class SithConnection private constructor(
+class SithsConnection private constructor(
     private val selectorManager: SelectorManager,
     private val socket: Socket,
 ) {
@@ -13,10 +13,10 @@ class SithConnection private constructor(
     private val receiveChannel = socket.openReadChannel()
 
     companion object {
-        suspend fun open(host: String = "localhost", port: Int = 6379): SithConnection {
+        suspend fun open(host: String = "localhost", port: Int = 6379): SithsConnection {
             val selectorManager = SelectorManager(Dispatchers.IO)
 
-            return SithConnection(
+            return SithsConnection(
                 selectorManager = selectorManager,
                 socket = aSocket(selectorManager).tcp().connect(host, port)
             )

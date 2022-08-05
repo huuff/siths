@@ -3,7 +3,7 @@ package xyz.haff.siths.client
 import xyz.haff.siths.RedisScript
 
 class Siths(
-    private val pool: SithPool,
+    private val pool: SithsPool,
 ) {
 
     suspend fun set(key: String, value: String) {
