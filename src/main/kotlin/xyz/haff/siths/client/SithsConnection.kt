@@ -41,6 +41,7 @@ class SithsConnection private constructor(
         return when (firstResponse[0]) {
             '+' -> RespSimpleString(firstResponse.drop(1))
             '-' -> {
+                // TODO: `firstWord` function in koy
                 val errorMessage = firstResponse.drop(1)
                 val errorType = firstWordRegex.find(errorMessage)!!.value
                 RespError(type = errorType, value = errorMessage.drop(errorType.length))
