@@ -11,6 +11,5 @@
 ## Siths
 * String escaping? At least ensure injection attacks are not possible
 * A distributed hash-map that takes a key prefix (i.e. such as `cache`) and implements `MutableMap`, operating on all elements `cache:«key»`
-* Implement `EVALSHA`
 * Allow working with the `RedisScript` class.
 * Do a benchmark between Jedis and Siths.

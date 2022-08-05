@@ -32,15 +32,30 @@ class SithsTest : FunSpec({
         siths.getOrNull("non-existent") shouldBe null
     }
 
-    test("correctly loads script") {
-        // ARRANGE
-        val siths = Siths(SithPool(container.host, container.firstMappedPort))
-        val script = RedisScript(code = """return 'Hello World!' """)
+    context("scripts") {
+        test("correctly loads script") {
+            // ARRANGE
+            val siths = Siths(SithPool(container.host, container.firstMappedPort))
+            val script = RedisScript(code = """return 'Hello World!' """)
 
-        // ACT
-        val returnedSha = siths.scriptLoad(script)
+            // ACT
+            val returnedSha = siths.scriptLoad(script)
 
-        // ASSERT
-        returnedSha shouldBe script.sha
+            // ASSERT
+            returnedSha shouldBe script.sha
+        }
+
+        test("correctly runs script") {
+            // ARRANGE
+            val siths = Siths(SithPool(container.host, container.firstMappedPort))
+            val script = RedisScript(code = """return 'Hello World!' """)
+            val sha = siths.scriptLoad(script)
+
+            // ACT
+            val response = siths.evalSha(sha)
+
+            // ASSERT
+            response shouldBe "Hello World!"
+        }
     }
 })
