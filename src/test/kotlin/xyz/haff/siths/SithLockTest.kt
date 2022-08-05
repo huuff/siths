@@ -12,6 +12,7 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import redis.clients.jedis.Jedis
 import java.time.Duration
+import java.util.*
 
 class SithLockTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine")) {
@@ -24,10 +25,26 @@ class SithLockTest : FunSpec({
     }
 
     test("execution gets interleaved without locking") {
-        val values = mutableListOf<String>()
-        val tasks = (1..10).map {
-            Thread {
-                poolFromContainer(container).resource.use { redis ->
+        val values = Collections.synchronizedList(mutableListOf<String>())
+
+        threaded(10) {
+            poolFromContainer(container).resource.use { redis ->
+                redis.incrBy("key", 1)
+                Thread.sleep(100)
+                redis.incrBy("key", -1)
+                values += redis["key"]
+            }
+        }
+
+        values.distinct().size shouldNotBe 1
+    }
+
+    test("execution is orderly with locking") {
+        val values = Collections.synchronizedList(mutableListOf<String>())
+
+        threaded(10) {
+            poolFromContainer(container).resource.use { redis ->
+                redis.withLock("lock") {
                     redis.incrBy("key", 1)
                     Thread.sleep(100)
                     redis.incrBy("key", -1)
@@ -35,28 +52,6 @@ class SithLockTest : FunSpec({
                 }
             }
         }
-        tasks.forEach { it.start() }
-        tasks.forEach { it.join() }
-
-        values.distinct().size shouldNotBe 1
-    }
-
-    test("execution is orderly with locking") {
-        val values = mutableListOf<String>()
-        val tasks = (1..10).map {
-            Thread {
-                poolFromContainer(container).resource.use { redis ->
-                    redis.withLock("lock") {
-                        redis.incrBy("key", 1)
-                        Thread.sleep(100)
-                        redis.incrBy("key", -1)
-                        values += redis["key"]
-                    }
-                }
-            }
-        }
-        tasks.forEach { it.start() }
-        tasks.forEach { it.join() }
 
         values.distinct() shouldBe listOf("0")
     }

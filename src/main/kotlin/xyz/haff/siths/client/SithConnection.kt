@@ -23,9 +23,10 @@ class SithConnection private constructor(
         }
     }
 
-    private suspend fun readLine(): String {
+    // TODO: Some way (through slf4j or something) of logging all responses if DEBUG is enabled
+    private suspend fun readLine(length: Int = Int.MAX_VALUE): String {
         receiveChannel.awaitContent()
-        return receiveChannel.readUTF8Line()!!
+        return receiveChannel.readUTF8Line(length)!!
     }
 
     suspend fun command(command: String): RespType<*> {
@@ -44,7 +45,7 @@ class SithConnection private constructor(
                 if (length == -1) {
                     return RespNullResponse
                 } else {
-                    return RespBulkString(receiveChannel.readUTF8Line(length + 2)!!) // String length plus carriage return and newline
+                    return RespBulkString(readLine(length + 2)) // String length plus carriage return and newline
                 }
             }
             else -> throw RuntimeException("Incapable of deciding the resp type of $firstResponse")
