@@ -7,9 +7,12 @@ sealed interface RespType<T> {
 data class RespSimpleString(override val value: String) : RespType<String> {
     fun isOk() = value == "OK"
 }
-data class RespError(override val value: String): RespType<String> {
+data class RespError(val type: String, override val value: String): RespType<String> {
     fun throwAsException(): Nothing {
-        throw RuntimeException(value)
+        when (type) {
+            "NOSCRIPT" -> throw RedisScriptNotLoadedException()
+            else -> throw RuntimeException("$type:$value")
+        }
     }
 }
 data class RespInteger(override val value: Int): RespType<Int>

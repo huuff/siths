@@ -1,5 +1,6 @@
 package xyz.haff.siths.client
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
@@ -33,7 +34,6 @@ class SithsTest : FunSpec({
         siths.getOrNull("non-existent") shouldBe null
     }
 
-    // TODO: Test nonexistent script (in evalsha)
     context("scripts") {
         test("correctly loads script") {
             // ARRANGE
@@ -58,6 +58,16 @@ class SithsTest : FunSpec({
 
             // ASSERT
             response shouldBe "Hello World!"
+        }
+
+        test("fails when script doesn't exist") {
+            // ARRANGE
+            val siths = Siths(makeSithsPool(container))
+
+            // ACT & ASSERT
+           shouldThrow<RedisScriptNotLoadedException> {
+               siths.evalSha("b16b7ff836ae87a150204570d9d82178ece81c8e")
+           }
         }
     }
 })

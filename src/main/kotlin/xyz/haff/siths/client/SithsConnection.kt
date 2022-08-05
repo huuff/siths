@@ -5,6 +5,8 @@ import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 
+private val firstWordRegex = Regex("""\w+""")
+
 class SithsConnection private constructor(
     private val selectorManager: SelectorManager,
     private val socket: Socket,
@@ -38,7 +40,11 @@ class SithsConnection private constructor(
         // TODO: Arrays
         return when (firstResponse[0]) {
             '+' -> RespSimpleString(firstResponse.drop(1))
-            '-' -> RespError(firstResponse.drop(1))
+            '-' -> {
+                val errorMessage = firstResponse.drop(1)
+                val errorType = firstWordRegex.find(errorMessage)!!.value
+                RespError(type = errorType, value = errorMessage.drop(errorType.length))
+            }
             ':' -> RespInteger(firstResponse.drop(1).toInt())
             '$' -> {
                 val length = firstResponse.drop(1).toInt()
