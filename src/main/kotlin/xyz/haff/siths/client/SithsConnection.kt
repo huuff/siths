@@ -5,6 +5,7 @@ import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 
+// TODO: Somewhere else
 private val firstWordRegex = Regex("""\w+""")
 
 class SithsConnection private constructor(
