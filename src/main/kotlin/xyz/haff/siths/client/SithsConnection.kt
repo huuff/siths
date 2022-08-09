@@ -34,7 +34,6 @@ class SithsConnection private constructor(
 
     suspend fun command(command: String): RespType<*> {
         sendChannel.writeStringUtf8("$command\r\n")
-        receiveChannel.awaitContent()
 
         val firstResponse = readLine()
 
