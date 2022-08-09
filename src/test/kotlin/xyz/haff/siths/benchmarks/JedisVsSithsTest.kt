@@ -24,7 +24,7 @@ class JedisVsSithsTest : FunSpec({
             val endTime = System.currentTimeMillis() + 60_000 // 10s
 
             runBlocking {
-                (1..10).forEach {
+                repeat(10) {
                     launch {
                         while (System.currentTimeMillis() < endTime) {
                             val randomKey = (0..100_000_000).random()
@@ -45,7 +45,7 @@ class JedisVsSithsTest : FunSpec({
             val endTime = System.currentTimeMillis() + 60_000 // 10s
 
             runBlocking {
-                (1..10).forEach {
+                repeat(10) {
                     launch {
                         while (System.currentTimeMillis() < endTime) {
                             val randomKey = (0..100_000_000).random()

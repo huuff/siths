@@ -15,9 +15,9 @@ class SithsPool(
     private val usedConnections = Collections.synchronizedList(mutableListOf<SithsConnection>())
 
     suspend fun getConnection(): SithsConnection {
-        val deadline = LocalDateTime.now() + acquireTimeout
+        val deadline = System.currentTimeMillis() + acquireTimeout.toMillis()
 
-        while (LocalDateTime.now() < deadline) {
+        while (System.currentTimeMillis() < deadline) {
             if (freeConnections.isNotEmpty()) {
                 val connection = freeConnections[0]
                 freeConnections -= connection
