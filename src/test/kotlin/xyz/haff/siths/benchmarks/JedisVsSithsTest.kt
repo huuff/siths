@@ -76,5 +76,20 @@ class JedisVsSithsTest : FunSpec({
 
             println("Total writes: ${writes.get()}")
         }
+
+        test("jedis performance") {
+            val jedis = JedisPooled(container.host, container.firstMappedPort)
+            val writes = AtomicInteger()
+            val endTime = System.currentTimeMillis() + 60_000 // 10s
+
+            while (System.currentTimeMillis() < endTime) {
+                val randomKey = (0..100_000_000).random()
+                val randomValue = (0..100_000_000).random()
+                jedis.set("key:$randomKey", randomValue.toString())
+                writes.incrementAndGet()
+            }
+
+            println("Total writes: ${writes.get()}")
+        }
     }
 })
