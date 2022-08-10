@@ -36,13 +36,12 @@ class SithsDSL(private val pool: SithsPool) {
         lockName: String,
         acquireTimeout: Duration = Duration.ofSeconds(10),
         lockTimeout: Duration = Duration.ofSeconds(10),
-        clock: Clock = Clock.systemDefaultZone()
     ): String {
         val identifier = UUID.randomUUID().toString()
-        val endTime = LocalDateTime.now(clock) + acquireTimeout // TODO: Use System.currentTimeMillis!! It's much faster
+        val endTime = System.currentTimeMillis() + acquireTimeout.toMillis()
 
         // TODO: Function to run some code for some duration, in koy
-        while (LocalDateTime.now(clock) < endTime) {
+        while (System.currentTimeMillis() < endTime) {
             if (runScript(RedisScripts.ACQUIRE_LOCK, listOf(buildLockKey(lockName)), listOf(lockTimeout.toMillis().toString(), identifier)).isOk()) {
                 return identifier
             }

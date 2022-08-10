@@ -7,6 +7,7 @@ package xyz.haff.siths.client
  *  * Convert the responses to the appropriate Kotlin types
  */
 interface Siths {
+    // TODO: Add parameters such as EX, XX, etc
     suspend fun set(key: String, value: String): Unit
     suspend fun getOrNull(key: String): String?
     suspend fun get(key: String): String

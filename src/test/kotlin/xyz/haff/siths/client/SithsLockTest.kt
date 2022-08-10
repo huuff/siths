@@ -6,10 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.mockk.clearAllMocks
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkStatic
+import io.mockk.*
 import redis.clients.jedis.Jedis
 import xyz.haff.siths.jedis.acquireLock
 import xyz.haff.siths.jedis.runScript
@@ -61,16 +58,17 @@ class SithsLockTest : FunSpec({
         values.distinct() shouldBe listOf("0")
     }
 
-    // TODO: Use siths
-    xtest("acquire times out if it cant acquire the lock") {
+    test("acquire times out if it cant acquire the lock") {
         // ARRANGE
-        mockkStatic(Jedis::runScript)
-
-        val redis = mockk<Jedis> {
-            every { runScript(any(), any(), any()) } returns null
+        val fakePool = mockk<SithsPool>(relaxed = true) {
+            coEvery { getConnection().command(any()) } returns RespNullResponse
         }
 
         // ACT & ASSERT
-        shouldThrow<RedisLockTimeoutException> { redis.acquireLock("lock", acquireTimeout = Duration.ofMillis(10)) }
+        shouldThrow<RedisLockTimeoutException> {
+            withRedis(fakePool) {
+                acquireLock("lock", acquireTimeout = Duration.ofMillis(10))
+            }
+        }
     }
 })
