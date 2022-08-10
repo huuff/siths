@@ -18,8 +18,8 @@ class SithPoolTest : FunSpec({
 
         suspended(100) { i ->
             val randomValue = UUID.randomUUID().toString()
-            pool.pooled { command("SET key:$i $randomValue") }
-            val retrievedValue = pool.pooled { command("GET key:$i") }
+            pool.getConnection().use { conn -> conn.command("SET key:$i $randomValue") }
+            val retrievedValue = pool.getConnection().use { conn -> conn.command("GET key:$i") }
 
             retrievedValue.value shouldBe randomValue
         }

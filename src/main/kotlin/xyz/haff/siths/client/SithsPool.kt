@@ -43,15 +43,4 @@ class SithsPool(
         usedConnections -= connection
         freeConnections += connection
     }
-
-    // TODO: Maybe this should be part of some AutoCloseable implementation in the connection!
-    suspend inline fun <T> pooled(f: SithsConnection.() -> T): T {
-        val connection = getConnection()
-        return try {
-            connection.f()
-        } finally {
-            releaseConnection(connection)
-        }
-    }
-
 }

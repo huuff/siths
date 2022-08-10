@@ -5,7 +5,7 @@ package xyz.haff.siths.client
  *  * Sending a command and getting an abstract representation of the RESP response in return
  *  * Closing the connection
  */
-interface SithsConnection {
+interface SithsConnection: AutoCloseable {
     suspend fun command(command: String): RespType<*>
-    fun close(): Unit
+    override fun close(): Unit
 }
