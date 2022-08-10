@@ -11,6 +11,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
 
+// TODO: Implement Siths? Delegate it? To avoid using a context receiver
 class SithsDSL(private val pool: SithsPool) {
     // TODO: This should be a context receiver when that API stabilizes
     val redis = PooledSiths(pool)
