@@ -10,3 +10,4 @@
 
 ## Siths
 * A distributed hash-map that takes a key prefix (i.e. such as `cache`) and implements `MutableMap`, operating on all elements `cache:«key»`
+* Transactions, inside a block, with optional `WATCH`ing of keys
