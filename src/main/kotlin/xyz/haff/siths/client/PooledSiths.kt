@@ -24,8 +24,4 @@ class PooledSiths(
     override suspend fun evalSha(sha: String, keys: List<String>, args: List<String>): String {
         return pool.getConnection().use { conn -> StandaloneSiths(conn).evalSha(sha, keys, args) }
     }
-
-    override suspend fun runScript(script: RedisScript, keys: List<String>, args: List<String>): String {
-       return pool.getConnection().use { conn -> StandaloneSiths(conn).runScript(script, keys, args) }
-    }
 }

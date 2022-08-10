@@ -45,16 +45,4 @@ value class StandaloneSiths(
             is RespError -> response.throwAsException()
             else -> throw RuntimeException("Unknown response $response")
         }
-
-    /**
-     * Tries to run script, and, if not loaded, loads it, then runs it again
-     */
-    override suspend fun runScript(script: RedisScript, keys: List<String>, args: List<String>): String {
-        return try {
-            evalSha(script.sha, keys, args)
-        } catch (e: RedisScriptNotLoadedException) {
-            scriptLoad(script.code)
-            evalSha(script.sha, keys, args)
-        }
-    }
 }

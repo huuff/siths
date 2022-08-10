@@ -83,17 +83,5 @@ class SithsTest : FunSpec({
                siths.evalSha("b16b7ff836ae87a150204570d9d82178ece81c8e")
            }
         }
-
-        test("loads and runs missing script") {
-            // ARRANGE
-            val siths = PooledSiths(makeSithsPool(container))
-            val script = RedisScript(code = """return 'Hello World!!?'""")
-
-            // ACT
-            val response = siths.runScript(script)
-
-            // ASSERT
-            response shouldBe "Hello World!!?"
-        }
     }
 })
