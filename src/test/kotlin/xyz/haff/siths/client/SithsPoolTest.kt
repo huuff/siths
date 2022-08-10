@@ -8,7 +8,7 @@ import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.suspended
 import java.util.*
 
-class SithPoolTest : FunSpec({
+class SithsPoolTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine")) {
         withExposedPorts(6379)
     }

@@ -1,7 +1,5 @@
 package xyz.haff.siths.client
 
-import xyz.haff.siths.scripts.RedisScript
-
 class PooledSiths(
     private val pool: SithsPool
 ): Siths {
@@ -21,7 +19,11 @@ class PooledSiths(
         return pool.getConnection().use { conn -> StandaloneSiths(conn).scriptLoad(script) }
     }
 
-    override suspend fun evalSha(sha: String, keys: List<String>, args: List<String>): String {
+    override suspend fun evalSha(sha: String, keys: List<String>, args: List<String>): RespType<*> {
         return pool.getConnection().use { conn -> StandaloneSiths(conn).evalSha(sha, keys, args) }
+    }
+
+    override suspend fun incrBy(key: String, value: Long): Long {
+        return pool.getConnection().use { conn -> StandaloneSiths(conn).incrBy(key, value) }
     }
 }

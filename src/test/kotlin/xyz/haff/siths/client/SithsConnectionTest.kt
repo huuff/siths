@@ -6,7 +6,7 @@ import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 
-class SithConnectionTest : FunSpec({
+class SithsConnectionTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
         withExposedPorts(6379)
     }

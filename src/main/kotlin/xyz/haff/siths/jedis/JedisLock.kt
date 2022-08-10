@@ -1,15 +1,13 @@
 package xyz.haff.siths.jedis
 
 import redis.clients.jedis.Jedis
+import xyz.haff.siths.client.RedisLockTimeoutException
+import xyz.haff.siths.common.buildLockKey
 import xyz.haff.siths.scripts.RedisScripts
 import java.time.Clock
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
-
-class RedisLockTimeoutException(msg: String) : RuntimeException(msg)
-
-private fun buildLockKey(lockName: String) = "lock$lockName"
 
 @JvmOverloads
 fun Jedis.acquireLock(
@@ -29,7 +27,7 @@ fun Jedis.acquireLock(
         Thread.sleep(1)
     }
 
-    throw RedisLockTimeoutException("Timed out waiting for $lockName after $acquireTimeout")
+    throw RedisLockTimeoutException(lockName, acquireTimeout)
 }
 
 fun Jedis.releaseLock(lockName: String, identifier: String): Boolean

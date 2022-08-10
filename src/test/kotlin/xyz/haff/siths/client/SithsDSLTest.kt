@@ -22,7 +22,7 @@ class SithsDSLTest : FunSpec({
         val response = withRedis(pool) { runScript(script) }
 
         // ASSERT
-        response shouldBe "Hello World!!?"
+        response.value shouldBe "Hello World!!?"
     }
 
 })

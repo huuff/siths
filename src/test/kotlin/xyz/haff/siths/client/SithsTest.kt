@@ -71,7 +71,7 @@ class SithsTest : FunSpec({
             val response = siths.evalSha(sha)
 
             // ASSERT
-            response shouldBe "Hello World!"
+            response.value shouldBe "Hello World!"
         }
 
         test("fails when script doesn't exist") {

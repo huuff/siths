@@ -50,7 +50,7 @@ class StandaloneSithsConnection private constructor(
                 val errorType = firstWordRegex.find(errorMessage)!!.value
                 RespError(type = errorType, value = errorMessage.drop(errorType.length))
             }
-            ':' -> RespInteger(firstResponse.drop(1).toInt())
+            ':' -> RespInteger(firstResponse.drop(1).toLong())
             '$' -> {
                 val length = firstResponse.drop(1).toInt()
                 if (length == -1) {
