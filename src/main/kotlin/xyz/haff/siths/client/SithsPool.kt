@@ -25,7 +25,7 @@ class SithsPool(
                 return connection
             } else {
                 if (freeConnections.size + usedConnections.size < maxConnections) {
-                    val connection = SithsConnection.open(host, port)
+                    val connection = PooledSithsConnection.open(this, host, port)
                     usedConnections += connection
                     return connection
                 } else {
@@ -44,6 +44,7 @@ class SithsPool(
         freeConnections += connection
     }
 
+    // TODO: Maybe this should be part of some AutoCloseable implementation in the connection!
     suspend inline fun <T> pooled(f: SithsConnection.() -> T): T {
         val connection = getConnection()
         return try {

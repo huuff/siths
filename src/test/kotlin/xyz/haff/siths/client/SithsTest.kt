@@ -16,7 +16,7 @@ class SithsTest : FunSpec({
 
     test("can set and get a value") {
         // ARRANGE
-        val siths = Siths(makeSithsPool(container))
+        val siths = PooledSiths(makeSithsPool(container))
 
         // ACT
         siths.set("key", "value")
@@ -28,7 +28,7 @@ class SithsTest : FunSpec({
 
     test("correct handling when the value doesn't exist") {
         // ARRANGE
-        val siths = Siths(makeSithsPool(container))
+        val siths = PooledSiths(makeSithsPool(container))
 
         // ACT && ASSERT
         siths.getOrNull("non-existent") shouldBe null
@@ -36,7 +36,7 @@ class SithsTest : FunSpec({
 
     test("weird strings work as intended") {
         // ARRANGE
-        val siths = Siths(makeSithsPool(container))
+        val siths = PooledSiths(makeSithsPool(container))
         val key = """ "&%/·)!$ "%&·"& """
         val value = """ dsf asfd ·"!!·/$ """
 
@@ -51,7 +51,7 @@ class SithsTest : FunSpec({
     context("scripts") {
         test("correctly loads script") {
             // ARRANGE
-            val siths = Siths(makeSithsPool(container))
+            val siths = PooledSiths(makeSithsPool(container))
             val script = RedisScript(code = """return 'Hello World!' """)
 
             // ACT
@@ -63,7 +63,7 @@ class SithsTest : FunSpec({
 
         test("correctly runs script") {
             // ARRANGE
-            val siths = Siths(makeSithsPool(container))
+            val siths = PooledSiths(makeSithsPool(container))
             val script = RedisScript(code = """return 'Hello World!' """)
             val sha = siths.scriptLoad(script.code)
 
@@ -76,7 +76,7 @@ class SithsTest : FunSpec({
 
         test("fails when script doesn't exist") {
             // ARRANGE
-            val siths = Siths(makeSithsPool(container))
+            val siths = PooledSiths(makeSithsPool(container))
 
             // ACT & ASSERT
            shouldThrow<RedisScriptNotLoadedException> {
@@ -86,7 +86,7 @@ class SithsTest : FunSpec({
 
         test("loads and runs missing script") {
             // ARRANGE
-            val siths = Siths(makeSithsPool(container))
+            val siths = PooledSiths(makeSithsPool(container))
             val script = RedisScript(code = """return 'Hello World!!?'""")
 
             // ACT
