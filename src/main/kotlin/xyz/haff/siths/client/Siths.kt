@@ -5,7 +5,8 @@ import xyz.haff.siths.scripts.RedisScript
 // TODO: This somewhere else?
 private fun escape(string: String) = string.replace("\"", "\\\"")
 
-class Siths(
+@JvmInline
+value class Siths(
     private val pool: SithsPool,
 ) {
 

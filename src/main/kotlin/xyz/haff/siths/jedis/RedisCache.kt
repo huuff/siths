@@ -1,4 +1,4 @@
-package xyz.haff.siths
+package xyz.haff.siths.jedis
 
 import redis.clients.jedis.JedisPool
 import java.time.Duration

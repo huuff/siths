@@ -1,4 +1,4 @@
-package xyz.haff.siths
+package xyz.haff.siths.jedis
 
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
@@ -7,6 +7,7 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import io.mockk.spyk
 import io.mockk.verify
+import xyz.haff.siths.makeJedisPool
 import java.time.Duration
 import java.util.*
 

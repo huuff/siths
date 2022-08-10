@@ -1,11 +1,12 @@
-package xyz.haff.siths
+package xyz.haff.siths.jedis
 
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
+import xyz.haff.siths.makeJedisPool
 
-class RedisConnectionTest : FunSpec({
+class JedisConnectionTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine")) {
         withExposedPorts(6379)
     }

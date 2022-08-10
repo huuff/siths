@@ -1,9 +1,10 @@
-package xyz.haff.siths
+package xyz.haff.siths.jedis
 
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
+import xyz.haff.siths.makeJedisPool
 import xyz.haff.siths.scripts.RedisScript
 
 class RedisScriptTest : FunSpec({

@@ -1,4 +1,4 @@
-package xyz.haff.siths
+package xyz.haff.siths.jedis
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
@@ -11,10 +11,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import redis.clients.jedis.Jedis
+import xyz.haff.siths.makeJedisPool
+import xyz.haff.siths.threaded
 import java.time.Duration
 import java.util.*
 
-class SithLockTest : FunSpec({
+class JedisLockTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine")) {
         withExposedPorts(6379)
     }
