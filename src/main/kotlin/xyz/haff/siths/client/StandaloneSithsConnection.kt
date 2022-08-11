@@ -35,11 +35,23 @@ class StandaloneSithsConnection private constructor(
     }
 
     // TODO: Some way (through slf4j or something) of logging all responses if DEBUG is enabled
+    // TODO: Optimize reading! Maybe I could read ByteBuffers and use the lengths to know exactly how much to consume,
+    // also skipping these here? I don't know, I must investigate it further
     private suspend fun readLine(length: Int = Int.MAX_VALUE): String {
         receiveChannel.awaitContent()
         return receiveChannel.readUTF8Line(length)!!
     }
 
+    // TODO: Maybe I should send commands as arrays of parts of the command, and prepend each one with its length,
+    // for example, when interacting directly with Redis through TCP, a SET key value would be
+    // $3\r\n
+    // SET\r\n
+    // $3\r\n
+    // key\r\n
+    // $5\r\n
+    // value\r\n
+    // Of course this is much more data! but maybe specifying the exact amount of data will, for example, allow me to
+    // skip the escaping of strings, which is kind of a headache
     override suspend fun command(command: String): RespType<*> {
         val commandBytes = command.toByteArray(Charsets.UTF_8)
         val message = ByteBuffer.allocateDirect(commandBytes.size + CRLF.size).apply {
