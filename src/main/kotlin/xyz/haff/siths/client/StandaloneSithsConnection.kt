@@ -3,8 +3,8 @@ package xyz.haff.siths.client
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
-import io.ktor.utils.io.core.*
 import kotlinx.coroutines.Dispatchers
+import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import kotlin.text.toByteArray
 
@@ -37,9 +37,27 @@ class StandaloneSithsConnection private constructor(
     // TODO: Some way (through slf4j or something) of logging all responses if DEBUG is enabled
     // TODO: Optimize reading! Maybe I could read ByteBuffers and use the lengths to know exactly how much to consume,
     // also skipping these here? I don't know, I must investigate it further
-    private suspend fun readLine(length: Int = Int.MAX_VALUE): String {
+    private suspend fun readSingleResp(): RespType<*> {
         receiveChannel.awaitContent()
-        return receiveChannel.readUTF8Line(length)!!
+
+        return when (val responseType = Char(receiveChannel.readByte().toInt())) {
+            '+' -> RespSimpleString(receiveChannel.readUTF8Line()!!)
+            '-' -> {
+                // TODO: `firstWord` function in koy
+                val errorMessage = receiveChannel.readUTF8Line()!!
+                val errorType = firstWordRegex.find(errorMessage)!!.value
+                RespError(type = errorType, value = errorMessage.drop(errorType.length))
+            }
+            ':' -> RespInteger(receiveChannel.readUTF8Line()!!.toLong())
+            '$' -> {
+                val length = receiveChannel.readUTF8Line()!!.toInt()
+                if (length == -1)
+                    return RespNullResponse
+                else
+                    return RespBulkString(receiveChannel.readUTF8Line(length + 2)!!) // +2 for CLRF
+            }
+            else -> throw RuntimeException("Unknown response type: '$responseType'")
+        }
     }
 
     // TODO: Maybe I should send commands as arrays of parts of the command, and prepend each one with its length,
@@ -61,28 +79,8 @@ class StandaloneSithsConnection private constructor(
         sendChannel.writeFully(message.flip())
         sendChannel.flush()
 
-        val firstResponse = readLine()
-
         // TODO: Arrays
-        return when (firstResponse[0]) {
-            '+' -> RespSimpleString(firstResponse.drop(1))
-            '-' -> {
-                // TODO: `firstWord` function in koy
-                val errorMessage = firstResponse.drop(1)
-                val errorType = firstWordRegex.find(errorMessage)!!.value
-                RespError(type = errorType, value = errorMessage.drop(errorType.length))
-            }
-            ':' -> RespInteger(firstResponse.drop(1).toLong())
-            '$' -> {
-                val length = firstResponse.drop(1).toInt()
-                if (length == -1) {
-                    return RespNullResponse
-                } else {
-                    return RespBulkString(readLine(length + 2)) // String length plus carriage return and newline
-                }
-            }
-            else -> throw RuntimeException("Incapable of deciding the resp type of $firstResponse")
-        }
+        return readSingleResp()
     }
 
     // TODO: Do something with this (mark the connection as closed?)

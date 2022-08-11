@@ -9,6 +9,12 @@ import xyz.haff.siths.client.SithsPool
 fun makeJedisPool(container: GenericContainer<*>) = JedisPool(container.host, container.firstMappedPort)
 fun makeSithsPool(container: GenericContainer<*>) = SithsPool(container.host, container.firstMappedPort)
 
+/**
+ * For when I want to test with containers deployed on my machine instead of testcontainers, so I can use MONITOR and
+ * inspect it closely
+ */
+fun makeLocalSithsPool() = SithsPool("localhost", 6379)
+
 
 inline fun threaded(threadNumber: Int, crossinline f: (threadIndex: Int) -> Unit) = (0 until threadNumber).map { threadIndex ->
     Thread {

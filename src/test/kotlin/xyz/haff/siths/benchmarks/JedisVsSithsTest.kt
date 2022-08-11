@@ -13,6 +13,7 @@ import xyz.haff.siths.client.StandaloneSiths
 import xyz.haff.siths.makeSithsPool
 import java.util.concurrent.atomic.AtomicInteger
 
+@Ignored
 class JedisVsSithsTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.EveryTest)) {
         withExposedPorts(6379)
