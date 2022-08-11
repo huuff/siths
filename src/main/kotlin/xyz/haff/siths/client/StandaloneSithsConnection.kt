@@ -3,10 +3,14 @@ package xyz.haff.siths.client
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
+import io.ktor.utils.io.core.*
 import kotlinx.coroutines.Dispatchers
+import java.nio.ByteBuffer
+import kotlin.text.toByteArray
 
 // TODO: Somewhere else
 private val firstWordRegex = Regex("""\w+""")
+private val CRLF = "\r\n".toByteArray(Charsets.UTF_8)
 
 /**
  * This connection is "standalone", which means that it isn't associated to any pool. (Or rather, if it is, it has no
@@ -16,7 +20,7 @@ class StandaloneSithsConnection private constructor(
     private val selectorManager: SelectorManager,
     private val socket: Socket,
 ): SithsConnection {
-    private val sendChannel = socket.openWriteChannel(autoFlush = true)
+    private val sendChannel = socket.openWriteChannel(autoFlush = false)
     private val receiveChannel = socket.openReadChannel()
 
     companion object {
@@ -37,7 +41,13 @@ class StandaloneSithsConnection private constructor(
     }
 
     override suspend fun command(command: String): RespType<*> {
-        sendChannel.writeStringUtf8("$command\r\n")
+        val commandBytes = command.toByteArray(Charsets.UTF_8)
+        val message = ByteBuffer.allocateDirect(commandBytes.size + CRLF.size).apply {
+            put(commandBytes)
+            put(CRLF)
+        }
+        sendChannel.writeFully(message.flip())
+        sendChannel.flush()
 
         val firstResponse = readLine()
 
