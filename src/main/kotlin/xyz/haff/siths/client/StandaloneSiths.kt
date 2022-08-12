@@ -7,8 +7,8 @@ value class StandaloneSiths(
     private val connection: SithsConnection,
 ): Siths {
 
-    override suspend fun set(key: String, value: String) {
-        val response = connection.command("SET \"${key.escape()}\" \"${value.escape()}\"")
+    override suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode?) {
+        val response = connection.command("SET \"${key.escape()}\" \"${value.escape()}\" ${exclusiveMode?.name ?: ""}")
 
         if (response is RespError) {
             response.throwAsException()

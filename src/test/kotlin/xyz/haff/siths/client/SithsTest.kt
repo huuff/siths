@@ -8,6 +8,7 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.scripts.RedisScript
+import xyz.haff.siths.client.ExclusiveMode.*
 
 class SithsTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
@@ -46,6 +47,32 @@ class SithsTest : FunSpec({
 
         // ASSERT
         savedValue shouldBe value
+    }
+
+    context("set parameters") {
+        context("SET ... (NX|XX)") {
+            test("SET ... NX does not set if the key exists") {
+                // ARRANGE
+                val siths = PooledSiths(makeSithsPool(container))
+                siths.set("nxkey", "test1")
+
+                // ACT
+                siths.set("nxkey", "test2", exclusiveMode = NX)
+
+                // ASSERT
+                siths.get("nxkey") shouldBe "test1"
+            }
+        }
+        test("SET ... XX does not set if the key does not exist") {
+            // ARRANGE
+            val siths = PooledSiths(makeSithsPool(container))
+
+            // ACT
+            siths.set("xxkey", "testvalue", exclusiveMode = XX)
+
+            // ASSERT
+            siths.getOrNull("xxkey") shouldBe null
+        }
     }
 
     context("scripts") {

@@ -3,8 +3,8 @@ package xyz.haff.siths.client
 class PooledSiths(
     private val pool: SithsPool
 ): Siths {
-    override suspend fun set(key: String, value: String) {
-        pool.getConnection().use { conn -> StandaloneSiths(conn).set(key, value) }
+    override suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode?) {
+        pool.getConnection().use { conn -> StandaloneSiths(conn).set(key, value, exclusiveMode) }
     }
 
     override suspend fun getOrNull(key: String): String? {
