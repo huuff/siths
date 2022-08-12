@@ -2,15 +2,24 @@ package xyz.haff.siths.client
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
+import io.ktor.util.*
 import io.ktor.utils.io.*
+import io.ktor.utils.io.charsets.*
 import kotlinx.coroutines.Dispatchers
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
+import kotlin.text.Charsets
 import kotlin.text.toByteArray
 
 // TODO: Somewhere else
 private val firstWordRegex = Regex("""\w+""")
+
 private val CRLF = "\r\n".toByteArray(Charsets.UTF_8)
+private val PLUS = "+".toByteArray(Charsets.UTF_8)[0]
+private val MINUS = "-".toByteArray(Charsets.UTF_8)[0]
+private val COLON = ":".toByteArray(Charsets.UTF_8)[0]
+private val DOLLAR = "$".toByteArray(Charsets.UTF_8)[0]
+
 
 /**
  * This connection is "standalone", which means that it isn't associated to any pool. (Or rather, if it is, it has no
@@ -40,16 +49,17 @@ class StandaloneSithsConnection private constructor(
     private suspend fun readSingleResp(): RespType<*> {
         receiveChannel.awaitContent()
 
-        return when (val responseType = Char(receiveChannel.readByte().toInt())) {
-            '+' -> RespSimpleString(receiveChannel.readUTF8Line()!!)
-            '-' -> {
+
+        return when (val responseType = receiveChannel.readByte()) {
+            PLUS -> RespSimpleString(receiveChannel.readUTF8Line()!!)
+            MINUS -> {
                 // TODO: `firstWord` function in koy
                 val errorMessage = receiveChannel.readUTF8Line()!!
                 val errorType = firstWordRegex.find(errorMessage)!!.value
                 RespError(type = errorType, value = errorMessage.drop(errorType.length))
             }
-            ':' -> RespInteger(receiveChannel.readUTF8Line()!!.toLong())
-            '$' -> {
+            COLON -> RespInteger(receiveChannel.readUTF8Line()!!.toLong())
+            DOLLAR -> {
                 val length = receiveChannel.readUTF8Line()!!.toInt()
                 if (length == -1)
                     return RespNullResponse
