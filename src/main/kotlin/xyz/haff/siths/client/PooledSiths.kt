@@ -1,10 +1,16 @@
 package xyz.haff.siths.client
 
+import java.time.Duration
+
 class PooledSiths(
     private val pool: SithsPool
 ): Siths {
-    override suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode?) {
-        pool.getConnection().use { conn -> StandaloneSiths(conn).set(key, value, exclusiveMode) }
+    override suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode?, timeToLive: Duration?) {
+        pool.getConnection().use { conn -> StandaloneSiths(conn).set(key, value, exclusiveMode, timeToLive) }
+    }
+
+    override suspend fun ttl(key: String): Duration? {
+        return pool.getConnection().use { conn -> StandaloneSiths(conn).ttl(key) }
     }
 
     override suspend fun getOrNull(key: String): String? {

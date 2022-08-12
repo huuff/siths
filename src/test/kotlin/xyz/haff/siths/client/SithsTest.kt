@@ -5,10 +5,15 @@ import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
+import io.kotest.matchers.comparables.shouldBeGreaterThan
+import io.kotest.matchers.comparables.shouldBeGreaterThanOrEqualTo
+import io.kotest.matchers.comparables.shouldBeLessThanOrEqualTo
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.client.ExclusiveMode.*
+import java.time.Duration
 
 class SithsTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
@@ -62,16 +67,33 @@ class SithsTest : FunSpec({
                 // ASSERT
                 siths.get("nxkey") shouldBe "test1"
             }
+            test("SET ... XX does not set if the key does not exist") {
+                // ARRANGE
+                val siths = PooledSiths(makeSithsPool(container))
+
+                // ACT
+                siths.set("xxkey", "testvalue", exclusiveMode = XX)
+
+                // ASSERT
+                siths.getOrNull("xxkey") shouldBe null
+            }
         }
-        test("SET ... XX does not set if the key does not exist") {
+
+        test("timeToLive sets ttl") {
             // ARRANGE
             val siths = PooledSiths(makeSithsPool(container))
 
             // ACT
-            siths.set("xxkey", "testvalue", exclusiveMode = XX)
+            siths.set("ttledkey", "ttlvalue", timeToLive = Duration.ofSeconds(10))
+            val ttl = siths.ttl("ttledkey")
 
             // ASSERT
-            siths.getOrNull("xxkey") shouldBe null
+            ttl shouldNotBe null
+            ttl!!
+            // XXX: Assuming no more than two seconds pass between setting and checking...
+            // TODO: Can I make a generic `shouldBeInRange` kotest matcher?
+            ttl shouldBeGreaterThanOrEqualTo  Duration.ofSeconds(8)
+            ttl shouldBeLessThanOrEqualTo  Duration.ofSeconds(10)
         }
     }
 
