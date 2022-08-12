@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/xyz.haff/siths/badge.svg?style=flat)](https://search.maven.org/artifact/xyz.haff/siths)
+
 # Siths
 *As in, "The opposite of Jedis"*
 
