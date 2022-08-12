@@ -3,7 +3,6 @@
 * Use SLF4J to do some debug logging
 * Setup CircleCI to publish to maven central 
 * Set `codecov.io`
-* Put up a nice badge to Maven Central
 
 ## Jedis tools
 * Maybe a builder for a jedis pool
