@@ -22,8 +22,8 @@ class SithsConnectionTest : FunSpec({
         val connection = StandaloneSithsConnection.open(container.host, container.firstMappedPort)
 
         // ACT
-        connection.command("SET key value")
-        val value = connection.command("GET key")
+        connection.command(RedisCommand("SET", "key", "value"))
+        val value = connection.command(RedisCommand("GET", "key"))
 
         // ASSERT
         value.value shouldBe "value"

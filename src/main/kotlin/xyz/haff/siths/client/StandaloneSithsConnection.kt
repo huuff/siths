@@ -49,7 +49,6 @@ class StandaloneSithsConnection private constructor(
     private suspend fun readSingleResp(): RespType<*> {
         receiveChannel.awaitContent()
 
-
         return when (val responseType = receiveChannel.readByte()) {
             PLUS -> RespSimpleString(receiveChannel.readUTF8Line()!!)
             MINUS -> {
@@ -70,23 +69,8 @@ class StandaloneSithsConnection private constructor(
         }
     }
 
-    // TODO: Maybe I should send commands as arrays of parts of the command, and prepend each one with its length,
-    // for example, when interacting directly with Redis through TCP, a SET key value would be
-    // $3\r\n
-    // SET\r\n
-    // $3\r\n
-    // key\r\n
-    // $5\r\n
-    // value\r\n
-    // Of course this is much more data! but maybe specifying the exact amount of data will, for example, allow me to
-    // skip the escaping of strings, which is kind of a headache
-    override suspend fun command(command: String): RespType<*> {
-        val commandBytes = command.toByteArray(Charsets.UTF_8)
-        val message = ByteBuffer.allocateDirect(commandBytes.size + CRLF.size).apply {
-            put(commandBytes)
-            put(CRLF)
-        }
-        sendChannel.writeFully(message.flip())
+    override suspend fun command(command: RedisCommand): RespType<*> {
+        sendChannel.writeFully(command.toResp().toByteArray(Charsets.UTF_8))
         sendChannel.flush()
 
         // TODO: Arrays

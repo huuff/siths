@@ -43,8 +43,8 @@ class SithsTest : FunSpec({
     test("weird strings work as intended") {
         // ARRANGE
         val siths = PooledSiths(makeSithsPool(container))
-        val key = """ "&%/·)!$ "%&·"& """
-        val value = """ dsf asfd ·"!!·/$ """
+        val key = """ as${'$'} d"f"2"""
+        val value = """fd's2${'$'} """
 
         // ACT
         siths.set(key, value)

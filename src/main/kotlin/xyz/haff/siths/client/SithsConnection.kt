@@ -6,6 +6,6 @@ package xyz.haff.siths.client
  *  * Closing the connection
  */
 interface SithsConnection: AutoCloseable {
-    suspend fun command(command: String): RespType<*>
+    suspend fun command(command: RedisCommand): RespType<*>
     override fun close(): Unit
 }
