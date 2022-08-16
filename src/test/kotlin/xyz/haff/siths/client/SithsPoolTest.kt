@@ -18,8 +18,8 @@ class SithsPoolTest : FunSpec({
 
         suspended(100) { i ->
             val randomValue = UUID.randomUUID().toString()
-            pool.getConnection().use { conn -> conn.command(RedisCommand("SET", "key:$i", randomValue)) }
-            val retrievedValue = pool.getConnection().use { conn -> conn.command(RedisCommand("GET", "key:$i")) }
+            pool.getConnection().use { conn -> conn.runCommand(RedisCommand("SET", "key:$i", randomValue)) }
+            val retrievedValue = pool.getConnection().use { conn -> conn.runCommand(RedisCommand("GET", "key:$i")) }
 
             retrievedValue.value shouldBe randomValue
         }

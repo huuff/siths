@@ -69,12 +69,19 @@ class StandaloneSithsConnection private constructor(
         }
     }
 
-    override suspend fun command(command: RedisCommand): RespType<*> {
+    override suspend fun runCommand(command: RedisCommand): RespType<*> {
         sendChannel.writeFully(command.toResp().toByteArray(Charsets.UTF_8))
         sendChannel.flush()
 
         // TODO: Arrays
         return readSingleResp()
+    }
+
+    override suspend fun runPipeline(pipeline: RedisPipeline): List<RespType<*>> {
+        sendChannel.writeFully(pipeline.toResp().toByteArray(Charsets.UTF_8))
+        sendChannel.flush()
+
+        return (1..pipeline.commands.size).map { readSingleResp() }
     }
 
     // TODO: Do something with this (mark the connection as closed?)

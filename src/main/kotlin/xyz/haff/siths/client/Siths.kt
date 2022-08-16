@@ -9,7 +9,7 @@ import java.time.Duration
  *  * Convert the responses to the appropriate Kotlin types
  */
 interface Siths {
-    suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode? = null, timeToLive: Duration? = null): Unit
+    suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode? = null, timeToLive: Duration? = null)
     suspend fun ttl(key: String): Duration?
     suspend fun getOrNull(key: String): String?
     suspend fun get(key: String): String

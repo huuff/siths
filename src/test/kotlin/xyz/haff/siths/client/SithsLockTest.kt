@@ -7,9 +7,6 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.*
-import redis.clients.jedis.Jedis
-import xyz.haff.siths.jedis.acquireLock
-import xyz.haff.siths.jedis.runScript
 import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.suspended
 import java.time.Duration
@@ -61,7 +58,7 @@ class SithsLockTest : FunSpec({
     test("acquire times out if it cant acquire the lock") {
         // ARRANGE
         val fakePool = mockk<SithsPool>(relaxed = true) {
-            coEvery { getConnection().command(any()) } returns RespNullResponse
+            coEvery { getConnection().runCommand(any()) } returns RespNullResponse
         }
 
         // ACT & ASSERT

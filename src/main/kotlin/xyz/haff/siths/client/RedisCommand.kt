@@ -14,5 +14,4 @@ data class RedisCommand(
     }
 
     operator fun plus(other: RedisCommand) = RedisCommand(this.parts + other.parts)
-
 }

@@ -7,7 +7,6 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
-import io.ktor.util.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 import java.nio.ByteBuffer
@@ -22,13 +21,14 @@ class SithsConnectionTest : FunSpec({
         val connection = StandaloneSithsConnection.open(container.host, container.firstMappedPort)
 
         // ACT
-        connection.command(RedisCommand("SET", "key", "value"))
-        val value = connection.command(RedisCommand("GET", "key"))
+        connection.runCommand(RedisCommand("SET", "key", "value"))
+        val value = connection.runCommand(RedisCommand("GET", "key"))
 
         // ASSERT
         value.value shouldBe "value"
     }
 
+    // TODO: Not really a siths test since it doesn't use the interface...
     test("can send a byte buffer") {
         // ARRANGE
         val selectorManager = SelectorManager(Dispatchers.IO)
@@ -46,5 +46,27 @@ class SithsConnectionTest : FunSpec({
 
         // ASSERT
         response shouldBe "+PONG"
+    }
+
+    test("can pipeline commands") {
+        // ARRANGE
+        val connection = StandaloneSithsConnection.open(container.host, container.firstMappedPort)
+        val pipeline = RedisPipeline(
+            RedisCommand("PING"),
+            RedisCommand("SET", "pipeline-key", "pipeline-value"),
+            RedisCommand("PING"),
+            RedisCommand("GET", "pipeline-key"),
+        )
+
+        // ACT
+        val response = connection.runPipeline(pipeline)
+
+        // ASSERT
+        response shouldBe listOf(
+            RespSimpleString("PONG"),
+            RespSimpleString("OK"),
+            RespSimpleString("PONG"),
+            RespBulkString("pipeline-value"),
+        )
     }
 })
