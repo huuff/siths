@@ -10,3 +10,6 @@
 ## Siths
 * A distributed hash-map that takes a key prefix (i.e. such as `cache`) and implements `MutableMap`, operating on all elements `cache:«key»`
 * Transactions, inside a block, with optional `WATCH`ing of keys
+* Add authentication at the connection level
+* A pipeline builder
+* Some way to detect and heal broken connections in the pool
