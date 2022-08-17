@@ -49,4 +49,15 @@ class SithsConnectionTest : FunSpec({
             RespBulkString("pipeline-value"),
         )
     }
+
+    test("connection is named") {
+        // ARRANGE
+        val connection = StandaloneSithsConnection.open(container.host, container.firstMappedPort, name = "test-connection-name")
+
+        // ACT
+        val receivedName = connection.runCommand(RedisCommand("CLIENT", "GETNAME"))
+
+        // ASSERT
+        receivedName.value shouldBe "test-connection-name"
+    }
 })

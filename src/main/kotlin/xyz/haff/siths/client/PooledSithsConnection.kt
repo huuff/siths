@@ -1,21 +1,28 @@
 package xyz.haff.siths.client
 
 import io.ktor.utils.io.errors.*
+import java.util.*
 
 /**
  * This Siths connection is pooled. Actually, just a decorator around a StandaloneSithsConnection, that instead of
  * closing the underlying socket, only releases it to the pool.
  */
-class PooledSithsConnection(
+class PooledSithsConnection private constructor(
     private val connection: StandaloneSithsConnection,
     private val pool: SithsPool,
+    override val name: String,
 ) : SithsConnection {
 
     companion object {
-        suspend fun open( pool: SithsPool, host: String = "localhost", port: Int = 6379)
+        suspend fun open(
+            pool: SithsPool,
+            host: String = "localhost",
+            port: Int = 6379,
+            name: String = UUID.randomUUID().toString())
             = PooledSithsConnection(
                 connection = StandaloneSithsConnection.open(host = host, port = port),
                 pool = pool,
+                name = name,
             )
     }
 
