@@ -1,5 +1,5 @@
 package xyz.haff.siths.client
-
+// TODO: Store everything?
 data class RedisClient(
     val id: String,
     val name: String,
