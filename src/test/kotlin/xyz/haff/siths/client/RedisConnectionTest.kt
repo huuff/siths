@@ -35,22 +35,4 @@ class RedisConnectionTest : FunSpec({
         // ASSERT
         response shouldBe "+PONG"
     }
-
-    // TODO: Remove
-    xtest("checking connection until it breaks") {
-        // ARRANGE
-        val selectorManager = SelectorManager(Dispatchers.IO)
-        val socket = aSocket(selectorManager).tcp().connect("localhost", 6379)
-        val sendChannel = socket.openWriteChannel(autoFlush = false)
-        val receiveChannel = socket.openReadChannel()
-
-        // ACT
-        while (true) {
-            sendChannel.writeStringUtf8("PING\r\n")
-            sendChannel.flush()
-            receiveChannel.awaitContent()
-            println(receiveChannel.readUTF8Line())
-            delay(500)
-        }
-    }
 })
