@@ -42,8 +42,10 @@ class SithsPool(
     }
 
     fun releaseConnection(connection: SithsConnection) {
-        usedConnections -= connection
-        freeConnections += connection
+        if (connection in usedConnections) {
+            usedConnections -= connection
+            freeConnections += connection
+        }
     }
 
     /**

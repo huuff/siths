@@ -27,10 +27,9 @@ class SithsPoolTest : FunSpec({
         }
     }
 
-    // TODO: Use container
-    xcontext("self-healing pool") {
-        val host = "localhost"
-        val port = 6379
+    context("self-healing pool") {
+        val host = container.host
+        val port = container.firstMappedPort
         val pool = SithsPool(host = host, port = port, maxConnections = 1)
         val killedConnection = pool.getConnection()
 
@@ -42,9 +41,11 @@ class SithsPoolTest : FunSpec({
         test("calling the killed connection throws an exception") {
             // We kill the connection
             val killerConnection = StandaloneSithsConnection.open(host = host, port = port)
-            println("Killer connection name: ${killerConnection.name}")
-            println(killerConnection.runCommand(RedisCommand("INFO")))
-            println(killerConnection.runCommand(RedisCommand("CLIENT", "KILL", killedConnection.name))) // TODO: Wont work! must use ID
+            val clientListResponse = killerConnection.runCommand(RedisCommand("CLIENT", "LIST"))
+            val connectedClients = parseClientList(clientListResponse.value as String)
+            val idToKill = connectedClients.find { it.name == killedConnection.name }!!.id
+
+            killerConnection.runCommand(RedisCommand("CLIENT", "KILL", "ID", idToKill))
 
             shouldThrow<BrokenRedisConnectionException> {
                 killedConnection.use { it.runCommand(RedisCommand("PING")) }
