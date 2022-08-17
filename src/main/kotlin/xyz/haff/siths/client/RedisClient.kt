@@ -1,6 +1,8 @@
 package xyz.haff.siths.client
 
 import io.ktor.network.sockets.*
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 data class RedisClient(
     val id: String,
@@ -8,9 +10,8 @@ data class RedisClient(
     val addr: InetSocketAddress,
     val laddr: InetSocketAddress,
     val fd: Int,
-    // TODO: Should the following two be durations?
-    val age: Int,
-    val idle: Int,
+    val age: Duration,
+    val idle: Duration,
     val flags: String, // TODO: Is there a better representation?
     val db: Int,
     val sub: Int,
@@ -44,8 +45,8 @@ data class RedisClient(
                     laddr = stringToAddr(map["laddr"]!!),
                     fd = map["fd"]!!.toInt(),
                     name = map["name"],
-                    age = map["age"]!!.toInt(),
-                    idle = map["idle"]!!.toInt(),
+                    age = map["age"]!!.toInt().seconds,
+                    idle = map["idle"]!!.toInt().seconds,
                     flags = map["flags"]!!,
                     db = map["db"]!!.toInt(),
                     sub = map["sub"]!!.toInt(),

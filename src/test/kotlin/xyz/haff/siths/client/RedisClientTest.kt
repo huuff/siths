@@ -3,6 +3,7 @@ package xyz.haff.siths.client
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.network.sockets.*
+import kotlin.time.Duration.Companion.seconds
 
 class RedisClientTest : FunSpec({
 
@@ -20,8 +21,8 @@ class RedisClientTest : FunSpec({
             laddr = InetSocketAddress("172.17.0.2", 6379),
             fd = 9,
             name = null,
-            age = 25639,
-            idle = 0,
+            age = 25639.seconds,
+            idle = 0.seconds,
             flags = "N",
             db = 0,
             sub = 0,

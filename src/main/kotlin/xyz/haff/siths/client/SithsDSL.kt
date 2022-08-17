@@ -35,7 +35,7 @@ class SithsDSL(private val pool: SithsPool) {
     // TODO: Maybe the following two should be offloaded to some RedisLock class?
     suspend fun acquireLock(
         lockName: String,
-        acquireTimeout: Duration = Duration.ofSeconds(10),
+        acquireTimeout: Duration = Duration.ofSeconds(10), // TODO: Use kotlin duration
         lockTimeout: Duration = Duration.ofSeconds(10),
     ): String {
         val identifier = UUID.randomUUID().toString()
