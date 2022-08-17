@@ -12,4 +12,4 @@
 * Transactions, inside a block, with optional `WATCH`ing of keys
 * Add authentication at the connection level
 * A pipeline builder
-* Some way to detect and heal broken connections in the pool
+* Some way to detect and heal broken connections in the pool. UPDATE: Test that the pool truly self-heals

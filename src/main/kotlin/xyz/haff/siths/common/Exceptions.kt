@@ -10,3 +10,5 @@ class RedisLockTimeoutException(
 ) : RuntimeException("Timed out waiting for $lockName after $acquireTimeout")
 
 class UnexpectedRespResponse(response: RespType<*>): RuntimeException("Unexpected RESP response: $response")
+
+class BrokenRedisConnectionException(cause: Throwable) : RuntimeException(cause)

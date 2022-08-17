@@ -43,4 +43,12 @@ class SithsPool(
         usedConnections -= connection
         freeConnections += connection
     }
+
+    /**
+     * Remove connection from the pool, because p.e. it is broken. This allows the pool to heal by creating a new one.
+     */
+    fun removeConnection(connection: SithsConnection) {
+        usedConnections -= connection
+        freeConnections -= connection
+    }
 }

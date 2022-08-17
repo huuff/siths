@@ -28,26 +28,6 @@ class SithsConnectionTest : FunSpec({
         value.value shouldBe "value"
     }
 
-    // TODO: Not really a siths test since it doesn't use the interface...
-    test("can send a byte buffer") {
-        // ARRANGE
-        val selectorManager = SelectorManager(Dispatchers.IO)
-        val socket = aSocket(selectorManager).tcp().connect(container.host, container.firstMappedPort)
-        val sendChannel = socket.openWriteChannel(autoFlush = false)
-        val receiveChannel = socket.openReadChannel()
-
-        // ACT
-        val command = "PING\r\n".toByteArray(Charsets.UTF_8)
-        val message = ByteBuffer.allocateDirect(command.size).apply { put(command) }
-        sendChannel.writeFully(message.flip())
-        sendChannel.flush()
-        receiveChannel.awaitContent()
-        val response = receiveChannel.readUTF8Line()
-
-        // ASSERT
-        response shouldBe "+PONG"
-    }
-
     test("can pipeline commands") {
         // ARRANGE
         val connection = StandaloneSithsConnection.open(container.host, container.firstMappedPort)
