@@ -13,3 +13,4 @@
 * Add authentication at the connection level
 * A pipeline builder
 * Some way to detect and heal broken connections in the pool. UPDATE: Test that the pool truly self-heals
+* Test that we can't go over the max number of connections in a pool because I think we can now

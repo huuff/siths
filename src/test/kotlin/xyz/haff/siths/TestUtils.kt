@@ -7,7 +7,8 @@ import redis.clients.jedis.JedisPool
 import xyz.haff.siths.client.SithsPool
 
 fun makeJedisPool(container: GenericContainer<*>) = JedisPool(container.host, container.firstMappedPort)
-fun makeSithsPool(container: GenericContainer<*>) = SithsPool(container.host, container.firstMappedPort)
+fun makeSithsPool(container: GenericContainer<*>, maxConnections: Int = 10)
+    = SithsPool(container.host, container.firstMappedPort, maxConnections = maxConnections)
 
 /**
  * For when I want to test with containers deployed on my machine instead of testcontainers, so I can use MONITOR and

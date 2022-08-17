@@ -59,6 +59,7 @@ class StandaloneSithsConnection private constructor(
     // TODO: Some way (through slf4j or something) of logging all responses if DEBUG is enabled
     // TODO: Optimize reading! Maybe I could read ByteBuffers and use the lengths to know exactly how much to consume,
     // also skipping these here? I don't know, I must investigate it further
+    // TODO: Doesn't work with responses with newlines such as "INFO" or "CLIENT LIST"
     private suspend fun readSingleResp(): RespType<*> {
         receiveChannel.awaitContent()
 

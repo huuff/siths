@@ -14,6 +14,8 @@ class SithsPool(
     private val freeConnections = Collections.synchronizedList(mutableListOf<SithsConnection>())
     private val usedConnections = Collections.synchronizedList(mutableListOf<SithsConnection>())
 
+    internal val totalConnections get() = freeConnections.size + usedConnections.size
+
     suspend fun getConnection(): SithsConnection {
         val deadline = System.currentTimeMillis() + acquireTimeout.toMillis()
 
@@ -24,7 +26,7 @@ class SithsPool(
                 usedConnections += connection
                 return connection
             } else {
-                if (freeConnections.size + usedConnections.size < maxConnections) {
+                if (totalConnections < maxConnections) {
                     val connection = PooledSithsConnection.open(this, host, port)
                     usedConnections += connection
                     return connection
