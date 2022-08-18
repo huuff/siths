@@ -46,7 +46,6 @@ class SithsDSL(val pool: SithsPool) {
         pipelineBuilder.f()
         val actualPipelineCommands = pipelineBuilder.length
 
-        val commandBuilder = RedisCommandBuilder()
         val pipeline = RedisCommand("MULTI") + (pipelineBuilder.build() + RedisCommand("EXEC"))
         val response = pool.getConnection().use {
             it.runPipeline(pipeline)

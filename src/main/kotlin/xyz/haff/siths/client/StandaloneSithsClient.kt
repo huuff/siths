@@ -7,7 +7,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class StandaloneSithsClient(
     private val connection: SithsConnection,
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder()
-): SithsClient {
+) : SithsClient {
 
     override suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode?, timeToLive: Duration?) {
         val command = commandBuilder.set(key, value, exclusiveMode, timeToLive)
@@ -19,18 +19,24 @@ class StandaloneSithsClient(
         }
     }
 
-    override suspend fun ttl(key: String): Duration? = when (val response = connection.runCommand(commandBuilder.ttl(key))) {
-            is RespInteger -> if (response.value < 0) { null } else { response.value.milliseconds }
+    override suspend fun ttl(key: String): Duration? =
+        when (val response = connection.runCommand(commandBuilder.ttl(key))) {
+            is RespInteger -> if (response.value < 0) {
+                null
+            } else {
+                response.value.milliseconds
+            }
             is RespError -> response.throwAsException()
             else -> throw RedisUnexpectedRespResponse(response)
         }
 
-    override suspend fun getOrNull(key: String): String? = when (val response = connection.runCommand(commandBuilder.get(key))) {
-        is RespBulkString -> response.value
-        is RespNullResponse -> null
-        is RespError -> response.throwAsException()
-        else -> throw RedisUnexpectedRespResponse(response)
-    }
+    override suspend fun getOrNull(key: String): String? =
+        when (val response = connection.runCommand(commandBuilder.get(key))) {
+            is RespBulkString -> response.value
+            is RespNullResponse -> null
+            is RespError -> response.throwAsException()
+            else -> throw RedisUnexpectedRespResponse(response)
+        }
 
     override suspend fun get(key: String): String = getOrNull(key) ?: throw RuntimeException("Key $key does not exist!")
 
@@ -54,13 +60,43 @@ class StandaloneSithsClient(
             else -> response
         }
 
-    override suspend fun incrBy(key: String, value: Long) = when(val response = connection.runCommand(commandBuilder.incrBy(key, value))) {
-        is RespInteger -> response.value
-        else -> throw RedisUnexpectedRespResponse(response)
-    }
+    override suspend fun incrBy(key: String, value: Long) =
+        when (val response = connection.runCommand(commandBuilder.incrBy(key, value))) {
+            is RespInteger -> response.value
+            is RespError -> response.throwAsException()
+            else -> throw RedisUnexpectedRespResponse(response)
+        }
 
-    override suspend fun clientList(): List<RedisClient> = when(val response = connection.runCommand(commandBuilder.clientList())) {
-        is RespBulkString -> parseClientList(response.value)
-        else -> throw RedisUnexpectedRespResponse(response)
-    }
+    override suspend fun sadd(key: String, value: Any): Long =
+        when (val response = connection.runCommand(commandBuilder.sadd(key, value))) {
+            is RespInteger -> response.value
+            is RespError -> response.throwAsException()
+            else -> throw RedisUnexpectedRespResponse(response)
+        }
+
+    override suspend fun smembers(key: String): Set<String> =
+        when (val response = connection.runCommand(commandBuilder.smembers(key))) {
+            is RespArray -> response.value.map {
+                if (it is RespBulkString) {
+                    it.value
+                } else {
+                    throw RedisUnexpectedRespResponse(it)
+                }
+            }.toSet()
+            is RespError -> response.throwAsException()
+            else -> throw RedisUnexpectedRespResponse(response)
+        }
+
+    override suspend fun sismember(key: String, member: Any): Boolean =
+        when (val response = connection.runCommand(commandBuilder.sismember(key, member))) {
+            is RespInteger -> response.value == 1L
+            is RespError -> response.throwAsException()
+            else -> throw RedisUnexpectedRespResponse(response)
+        }
+
+    override suspend fun clientList(): List<RedisClient> =
+        when (val response = connection.runCommand(commandBuilder.clientList())) {
+            is RespBulkString -> parseClientList(response.value)
+            else -> throw RedisUnexpectedRespResponse(response)
+        }
 }

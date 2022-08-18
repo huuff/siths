@@ -3,7 +3,7 @@ package xyz.haff.siths.client
 import kotlin.time.Duration
 
 // TODO: Maybe test the most complex ones
-class RedisCommandBuilder : Siths<RedisCommand, RedisCommand, RedisCommand, RedisCommand, RedisCommand, RedisCommand> {
+class RedisCommandBuilder : Siths<RedisCommand, RedisCommand, RedisCommand, RedisCommand, RedisCommand, RedisCommand, RedisCommand, RedisCommand> {
 
     override suspend fun get(key: String) = RedisCommand("GET", key)
 
@@ -42,6 +42,9 @@ class RedisCommandBuilder : Siths<RedisCommand, RedisCommand, RedisCommand, Redi
         *args.toTypedArray()
     )
 
-    // XXX: Not on interface... should it?
-    fun watch(keys: List<String>) = RedisCommand("WATCH", *keys.toTypedArray())
+    override suspend fun sadd(key: String, value: Any) = RedisCommand("SADD", key, value.toString())
+
+    override suspend fun smembers(key: String): RedisCommand = RedisCommand("SMEMBERS", key)
+
+    override suspend fun sismember(key: String, member: Any) = RedisCommand("SISMEMBER", key, member.toString())
 }

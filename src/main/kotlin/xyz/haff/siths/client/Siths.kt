@@ -15,7 +15,9 @@ interface Siths<
         RespResponseType,
         LongResponseType,
         ClientListResponseType,
-        DurationResponseType
+        DurationResponseType,
+        StringSetResponseType,
+        BooleanResponseType,
         > {
     suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode? = null, timeToLive: Duration? = null): UnitResponseType
     suspend fun get(key: String): StringResponseType
@@ -24,5 +26,12 @@ interface Siths<
     suspend fun evalSha(sha: String, keys: List<String> = listOf(), args: List<String> = listOf()): RespResponseType
     suspend fun eval(script: String, keys: List<String> = listOf(), args: List<String> = listOf()): RespResponseType
     suspend fun incrBy(key: String, value: Long): LongResponseType
+
+    // SETS
+    // TODO: Add option to add more than one element! As that is what the response indicates, and the command allows it
+    suspend fun sadd(key: String, value: Any): LongResponseType
+    suspend fun smembers(key: String): StringSetResponseType
+    suspend fun sismember(key: String, member: Any): BooleanResponseType
+
     suspend fun clientList(): ClientListResponseType
 }

@@ -38,6 +38,18 @@ class PooledSithsClient(
         return pool.getConnection().use { conn -> StandaloneSithsClient(conn).incrBy(key, value) }
     }
 
+    override suspend fun sadd(key: String, value: Any): Long {
+        return pool.getConnection().use { conn -> StandaloneSithsClient(conn).sadd(key, value) }
+    }
+
+    override suspend fun smembers(key: String): Set<String> {
+        return pool.getConnection().use { conn -> StandaloneSithsClient(conn).smembers(key) }
+    }
+
+    override suspend fun sismember(key: String, member: Any): Boolean {
+        return pool.getConnection().use { conn -> StandaloneSithsClient(conn).sismember(key, member) }
+    }
+
     override suspend fun clientList(): List<RedisClient> {
         return pool.getConnection().use { conn -> StandaloneSithsClient(conn).clientList() }
     }

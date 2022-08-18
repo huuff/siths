@@ -172,4 +172,22 @@ class SithsClientTest : FunSpec({
            }
         }
     }
+
+    context("sets") {
+        val siths = PooledSithsClient(makeSithsPool(container))
+
+        test("we can add to the set") {
+            siths.sadd("test-set", "test1") shouldBe 1
+            siths.sadd("test-set", "test2") shouldBe 1
+        }
+
+        test("we can check for pertenence") {
+            siths.sismember("test-set", "test1") shouldBe true
+            siths.sismember("test-set", "test3") shouldBe false
+        }
+
+        test("we can get all members") {
+            siths.smembers("test-set") shouldBe setOf("test1", "test2")
+        }
+    }
 })
