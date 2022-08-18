@@ -41,17 +41,18 @@ class SithsDSL(val pool: SithsPool) {
         }
     }
 
-    // TODO: I should test the watched keys somehow! UPDATE: Actually I should watch them first
-    suspend inline fun transactional(watchedKeys: List<String> = listOf(), f: RedisPipelineBuilder.() -> Unit): RespArray {
+    suspend inline fun transactional(f: RedisPipelineBuilder.() -> Unit): RespArray {
         val pipelineBuilder = RedisPipelineBuilder()
         pipelineBuilder.f()
         val actualPipelineCommands = pipelineBuilder.length
+
+        val commandBuilder = RedisCommandBuilder()
         val pipeline = RedisCommand("MULTI") + (pipelineBuilder.build() + RedisCommand("EXEC"))
         val response = pool.getConnection().use {
             it.runPipeline(pipeline)
-        }.drop(actualPipelineCommands + 1) // Drop the OK response to the multi and all QUEUED responses, since they won't matter to the client
-        val firstResponse = response[0] // Since it's an EXEC ... MULTI we know the response must be a RespArray
+        }.drop(actualPipelineCommands + 1) // Drop the OK response to the MULTI and all QUEUED responses, since they won't matter to the client
 
+        val firstResponse = response[0] // Since it's an EXEC ... MULTI we know the response must be a RespArray
         if (firstResponse is RespArray) {
             return firstResponse
         } else {

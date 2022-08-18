@@ -30,6 +30,10 @@ class PooledSithsClient(
         return pool.getConnection().use { conn -> StandaloneSithsClient(conn).evalSha(sha, keys, args) }
     }
 
+    override suspend fun eval(script: String, keys: List<String>, args: List<String>): RespType<*> {
+        return pool.getConnection().use { conn -> StandaloneSithsClient(conn).eval(script, keys, args)}
+    }
+
     override suspend fun incrBy(key: String, value: Long): Long {
         return pool.getConnection().use { conn -> StandaloneSithsClient(conn).incrBy(key, value) }
     }

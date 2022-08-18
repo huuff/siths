@@ -37,4 +37,7 @@ class RedisPipelineBuilder(
     }
 
     fun build() = RedisPipeline(commandList)
+    override suspend fun eval(script: String, keys: List<String>, args: List<String>) {
+        commandList += commandBuilder.eval(script, keys, args)
+    }
 }

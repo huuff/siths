@@ -22,6 +22,7 @@ interface Siths<
     suspend fun ttl(key: String): DurationResponseType?
     suspend fun scriptLoad(script: String): StringResponseType
     suspend fun evalSha(sha: String, keys: List<String> = listOf(), args: List<String> = listOf()): RespResponseType
+    suspend fun eval(script: String, keys: List<String> = listOf(), args: List<String> = listOf()): RespResponseType
     suspend fun incrBy(key: String, value: Long): LongResponseType
     suspend fun clientList(): ClientListResponseType
 }

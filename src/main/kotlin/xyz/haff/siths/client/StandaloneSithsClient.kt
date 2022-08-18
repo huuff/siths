@@ -48,6 +48,13 @@ class StandaloneSithsClient(
             else -> response
         }
 
+    // TODO: Test
+    override suspend fun eval(script: String, keys: List<String>, args: List<String>): RespType<*> =
+        when (val response = connection.runCommand(commandBuilder.eval(script, keys, args))) {
+            is RespError -> response.throwAsException()
+            else -> response
+        }
+
     override suspend fun incrBy(key: String, value: Long) = when(val response = connection.runCommand(commandBuilder.incrBy(key, value))) {
         is RespInteger -> response.value
         else -> throw RedisUnexpectedRespResponse(response)

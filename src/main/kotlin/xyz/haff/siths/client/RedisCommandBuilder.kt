@@ -34,5 +34,14 @@ class RedisCommandBuilder : Siths<RedisCommand, RedisCommand, RedisCommand, Redi
 
     override suspend fun clientList() = RedisCommand("CLIENT", "LIST")
 
+    override suspend fun eval(script: String, keys: List<String>, args: List<String>) = RedisCommand(
+        "EVAL",
+        script,
+        keys.size.toString(),
+        *keys.toTypedArray(),
+        *args.toTypedArray()
+    )
+
+    // XXX: Not on interface... should it?
     fun watch(keys: List<String>) = RedisCommand("WATCH", *keys.toTypedArray())
 }

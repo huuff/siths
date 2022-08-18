@@ -5,6 +5,8 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.scripts.RedisScript
 
@@ -48,7 +50,6 @@ class SithsDSLTest : FunSpec({
         )
     }
 
-    // TODO: Test "watch"
     test("correctly makes transaction") {
         // ARRANGE
         val pool = makeSithsPool(container)
@@ -73,5 +74,4 @@ class SithsDSLTest : FunSpec({
             )
         )
     }
-
 })
