@@ -5,6 +5,8 @@ import kotlin.time.Duration
 
 class RedisScriptNotLoadedException() : RuntimeException()
 
+class RedisException(val type: String, override val message: String): RuntimeException(message)
+
 class RedisLockTimeoutException(
     lockName: String,
     acquireTimeout: Duration
@@ -15,3 +17,5 @@ class RedisUnexpectedRespResponse(response: RespType<*>): RuntimeException("Unex
 class RedisBrokenConnectionException(cause: Throwable) : RuntimeException(cause)
 
 class RedisPoolOutOfConnections(): RuntimeException("All Redis connections of this pool are currently used")
+
+class RedisAuthException(response: RespType<*>): RuntimeException("Unable to authenticate. Redis response: $response")

@@ -23,9 +23,11 @@ class PooledSithsConnection private constructor(
             pool: SithsPool,
             host: String = "localhost",
             port: Int = 6379,
+            user: String? = null,
+            password: String? = null,
             name: String = UUID.randomUUID().toString())
             = PooledSithsConnection(
-                connection = StandaloneSithsConnection.open(host = host, port = port, name = name),
+                connection = StandaloneSithsConnection.open(host = host, port = port, name = name, user = user, password = password),
                 pool = pool,
                 name = name,
             )

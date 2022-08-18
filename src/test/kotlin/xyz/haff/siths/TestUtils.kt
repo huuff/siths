@@ -10,7 +10,7 @@ import kotlin.time.Duration.Companion.seconds
 
 fun makeJedisPool(container: GenericContainer<*>) = JedisPool(container.host, container.firstMappedPort)
 fun makeSithsPool(container: GenericContainer<*>, maxConnections: Int = 10, acquireTimeout: Duration = 10.seconds)
-    = SithsPool(container.host, container.firstMappedPort, maxConnections = maxConnections, acquireTimeout)
+    = SithsPool(container.host, container.firstMappedPort, maxConnections = maxConnections, acquireTimeout = acquireTimeout)
 
 /**
  * For when I want to test with containers deployed on my machine instead of testcontainers, so I can use MONITOR and

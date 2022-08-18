@@ -4,6 +4,7 @@ import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
+import xyz.haff.siths.common.RedisAuthException
 import xyz.haff.siths.common.RedisUnexpectedRespResponse
 import java.nio.ByteBuffer
 import java.util.*
@@ -36,6 +37,8 @@ class StandaloneSithsConnection private constructor(
         suspend fun open(
             host: String = "localhost",
             port: Int = 6379,
+            user: String? = null,
+            password: String? = null,
             name: String = UUID.randomUUID().toString(),
         ): StandaloneSithsConnection {
             val selectorManager = SelectorManager(Dispatchers.IO)
@@ -45,9 +48,19 @@ class StandaloneSithsConnection private constructor(
                 socket = aSocket(selectorManager).tcp().connect(host, port),
                 name = name,
             ).also {
+                if (password != null) {
+                    val response = it.runCommand(RedisCommand("AUTH", user, password))
+                    if (!response.isOk()) {
+                        throw RedisAuthException(response)
+                    }
+                } else if (user != null) {
+                    throw IllegalArgumentException("Can't create a connection with an username but without a password")
+                }
+
                 val response = it.runCommand(RedisCommand("CLIENT", "SETNAME", name))
                 if (!response.isOk()) {
-                    throw RedisUnexpectedRespResponse(response) // Maybe a better error?
+                    if (response is RespError) { response.throwAsException() }
+                    else { throw RedisUnexpectedRespResponse(response) } // Maybe a better error?
                 }
             }
         }

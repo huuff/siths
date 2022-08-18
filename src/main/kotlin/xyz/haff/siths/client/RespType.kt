@@ -1,5 +1,6 @@
 package xyz.haff.siths.client
 
+import xyz.haff.siths.common.RedisException
 import xyz.haff.siths.common.RedisScriptNotLoadedException
 
 sealed interface RespType<T> {
@@ -13,7 +14,7 @@ data class RespError(val type: String, override val value: String): RespType<Str
     fun throwAsException(): Nothing {
         when (type) {
             "NOSCRIPT" -> throw RedisScriptNotLoadedException()
-            else -> throw RuntimeException("$type:$value")
+            else -> throw RedisException(type, value)
         }
     }
 }

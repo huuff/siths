@@ -9,6 +9,8 @@ import kotlin.time.Duration.Companion.seconds
 class SithsPool(
     private val host: String = "localhost",
     private val port: Int = 6379,
+    private val user: String? = null,
+    private val password: String? = null,
     private val maxConnections: Int = 10,
     private val acquireTimeout: Duration = 10.seconds
 ) {
@@ -28,7 +30,7 @@ class SithsPool(
                 return connection
             } else {
                 if (totalConnections < maxConnections) {
-                    val connection = PooledSithsConnection.open(this, host, port)
+                    val connection = PooledSithsConnection.open(pool = this, host = host, port = port, user = user, password = password)
                     usedConnections += connection
                     return connection
                 } else {
