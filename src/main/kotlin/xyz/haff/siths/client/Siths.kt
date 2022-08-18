@@ -16,4 +16,5 @@ interface Siths {
     suspend fun scriptLoad(script: String): String
     suspend fun evalSha(sha: String, keys: List<String> = listOf(), args: List<String> = listOf()): RespType<*>
     suspend fun incrBy(key: String, value: Long): Long
+    suspend fun clientList(): List<RedisClient>
 }

@@ -52,4 +52,9 @@ value class StandaloneSiths(
         is RespInteger -> response.value
         else -> throw RedisUnexpectedRespResponse(response)
     }
+
+    override suspend fun clientList(): List<RedisClient> = when(val response = connection.runCommand(RedisCommand("CLIENT", "LIST"))) {
+        is RespBulkString -> parseClientList(response.value)
+        else -> throw RedisUnexpectedRespResponse(response)
+    }
 }

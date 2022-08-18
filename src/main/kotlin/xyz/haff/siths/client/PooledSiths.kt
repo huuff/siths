@@ -32,4 +32,8 @@ class PooledSiths(
     override suspend fun incrBy(key: String, value: Long): Long {
         return pool.getConnection().use { conn -> StandaloneSiths(conn).incrBy(key, value) }
     }
+
+    override suspend fun clientList(): List<RedisClient> {
+        return pool.getConnection().use { conn -> StandaloneSiths(conn).clientList() }
+    }
 }

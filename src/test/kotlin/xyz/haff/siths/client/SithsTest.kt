@@ -34,6 +34,20 @@ class SithsTest : FunSpec({
         value shouldBe "value"
     }
 
+    test("clientList contains current connection") {
+        StandaloneSithsConnection.open(host = container.host, port = container.firstMappedPort).use { connection ->
+            // ARRANGE
+            val siths = StandaloneSiths(connection)
+
+            // ACT
+            val clients = siths.clientList()
+
+            // ASSERT
+            clients.find { it.name == connection.name } shouldNotBe null
+        }
+    }
+
+
     test("correct handling when the value doesn't exist") {
         // ARRANGE
         val siths = PooledSiths(makeSithsPool(container))
