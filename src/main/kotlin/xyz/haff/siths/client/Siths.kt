@@ -10,9 +10,9 @@ import kotlin.time.Duration
  */
 interface Siths {
     suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode? = null, timeToLive: Duration? = null)
-    suspend fun ttl(key: String): Duration?
-    suspend fun getOrNull(key: String): String?
     suspend fun get(key: String): String
+    suspend fun getOrNull(key: String): String?
+    suspend fun ttl(key: String): Duration?
     suspend fun scriptLoad(script: String): String
     suspend fun evalSha(sha: String, keys: List<String> = listOf(), args: List<String> = listOf()): RespType<*>
     suspend fun incrBy(key: String, value: Long): Long

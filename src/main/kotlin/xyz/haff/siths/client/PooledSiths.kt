@@ -2,6 +2,7 @@ package xyz.haff.siths.client
 
 import kotlin.time.Duration
 
+// TODO: Improve it so it doesn't create a new StandaloneSiths every time!
 class PooledSiths(
     private val pool: SithsPool
 ): Siths {
