@@ -1,14 +1,13 @@
 package xyz.haff.siths.client
 
 import kotlinx.coroutines.delay
-import redis.clients.jedis.Jedis
+import xyz.haff.siths.common.RedisLockTimeoutException
+import xyz.haff.siths.common.RedisScriptNotLoadedException
 import xyz.haff.siths.common.buildLockKey
-import xyz.haff.siths.jedis.runScript
 import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.scripts.RedisScripts
-import java.time.Clock
-import java.time.Duration
-import java.time.LocalDateTime
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import java.util.*
 
 // TODO: Implement Siths? Delegate it? To avoid using a context receiver
@@ -35,15 +34,15 @@ class SithsDSL(private val pool: SithsPool) {
     // TODO: Maybe the following two should be offloaded to some RedisLock class?
     suspend fun acquireLock(
         lockName: String,
-        acquireTimeout: Duration = Duration.ofSeconds(10), // TODO: Use kotlin duration
-        lockTimeout: Duration = Duration.ofSeconds(10),
+        acquireTimeout: Duration = 10.seconds,
+        lockTimeout: Duration = 10.seconds,
     ): String {
         val identifier = UUID.randomUUID().toString()
-        val endTime = System.currentTimeMillis() + acquireTimeout.toMillis()
+        val endTime = System.currentTimeMillis() + acquireTimeout.inWholeMilliseconds
 
         // TODO: Function to run some code for some duration, in koy
         while (System.currentTimeMillis() < endTime) {
-            if (runScript(RedisScripts.ACQUIRE_LOCK, listOf(buildLockKey(lockName)), listOf(lockTimeout.toMillis().toString(), identifier)).isOk()) {
+            if (runScript(RedisScripts.ACQUIRE_LOCK, listOf(buildLockKey(lockName)), listOf(lockTimeout.inWholeMilliseconds.toString(), identifier)).isOk()) {
                 return identifier
             }
             delay(10)
@@ -55,7 +54,7 @@ class SithsDSL(private val pool: SithsPool) {
     suspend fun releaseLock(lockName: String, identifier: String): Boolean
             = runScript(RedisScripts.RELEASE_LOCK, listOf(buildLockKey(lockName)), listOf(identifier)).isOk()
 
-    suspend inline fun <T> withLock(lockName: String, timeout: Duration = Duration.ofSeconds(10), f: SithsDSL.() -> T): T {
+    suspend inline fun <T> withLock(lockName: String, timeout: Duration = 10.seconds, f: SithsDSL.() -> T): T {
         val lockIdentifier = acquireLock(lockName, timeout)
 
         return try {

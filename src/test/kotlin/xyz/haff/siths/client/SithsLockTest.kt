@@ -7,11 +7,11 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.*
+import xyz.haff.siths.common.RedisLockTimeoutException
 import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.suspended
-import java.time.Duration
 import java.util.*
-
+import kotlin.time.Duration.Companion.milliseconds
 
 class SithsLockTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine")) {
@@ -64,7 +64,7 @@ class SithsLockTest : FunSpec({
         // ACT & ASSERT
         shouldThrow<RedisLockTimeoutException> {
             withRedis(fakePool) {
-                acquireLock("lock", acquireTimeout = Duration.ofMillis(10))
+                acquireLock("lock", acquireTimeout = 10.milliseconds)
             }
         }
     }

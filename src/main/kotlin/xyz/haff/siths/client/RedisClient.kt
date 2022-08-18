@@ -75,7 +75,6 @@ data class RedisClient(
 
 private fun stringToAddr(string: String) = string.split(":").let { (ip, port) -> InetSocketAddress(ip, port.toInt()) }
 private val SPACES_REGEX = Regex("\\s+")
-// TODO: Test
 fun parseClientList(response: String): List<RedisClient> = response.split("\n")
     .filter { it.isNotBlank() }
     .map { RedisClient.fromString(it) }

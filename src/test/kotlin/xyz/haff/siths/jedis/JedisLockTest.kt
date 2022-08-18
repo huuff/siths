@@ -11,7 +11,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import redis.clients.jedis.Jedis
-import xyz.haff.siths.client.RedisLockTimeoutException
+import xyz.haff.siths.common.RedisLockTimeoutException
 import xyz.haff.siths.makeJedisPool
 import xyz.haff.siths.threaded
 import java.time.Duration

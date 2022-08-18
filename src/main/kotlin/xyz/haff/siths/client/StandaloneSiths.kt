@@ -1,5 +1,6 @@
 package xyz.haff.siths.client
 
+import xyz.haff.siths.common.UnexpectedRespResponse
 import java.time.Duration
 
 @JvmInline

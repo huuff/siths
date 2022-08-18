@@ -2,12 +2,9 @@ package xyz.haff.siths.client
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
-import io.ktor.util.*
 import io.ktor.utils.io.*
-import io.ktor.utils.io.charsets.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import java.io.ByteArrayOutputStream
+import xyz.haff.siths.common.UnexpectedRespResponse
 import java.nio.ByteBuffer
 import java.util.*
 import kotlin.text.Charsets

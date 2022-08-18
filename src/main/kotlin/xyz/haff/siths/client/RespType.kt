@@ -1,5 +1,7 @@
 package xyz.haff.siths.client
 
+import xyz.haff.siths.common.RedisScriptNotLoadedException
+
 sealed interface RespType<T> {
     val value: T
 

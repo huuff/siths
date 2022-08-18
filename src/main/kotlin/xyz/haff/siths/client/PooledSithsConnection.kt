@@ -3,6 +3,7 @@ package xyz.haff.siths.client
 import io.ktor.utils.io.errors.*
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.ClosedSendChannelException
+import xyz.haff.siths.common.BrokenRedisConnectionException
 import java.util.*
 
 

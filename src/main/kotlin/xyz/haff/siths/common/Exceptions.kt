@@ -1,6 +1,7 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.common
 
-import java.time.Duration
+import xyz.haff.siths.client.RespType
+import kotlin.time.Duration
 
 class RedisScriptNotLoadedException() : RuntimeException()
 

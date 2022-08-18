@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import xyz.haff.siths.common.BrokenRedisConnectionException
 import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.suspended
 import java.util.*

@@ -1,13 +1,14 @@
 package xyz.haff.siths.jedis
 
 import redis.clients.jedis.Jedis
-import xyz.haff.siths.client.RedisLockTimeoutException
+import xyz.haff.siths.common.RedisLockTimeoutException
 import xyz.haff.siths.common.buildLockKey
 import xyz.haff.siths.scripts.RedisScripts
 import java.time.Clock
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.time.toKotlinDuration
 
 @JvmOverloads
 fun Jedis.acquireLock(
@@ -27,7 +28,7 @@ fun Jedis.acquireLock(
         Thread.sleep(1)
     }
 
-    throw RedisLockTimeoutException(lockName, acquireTimeout)
+    throw RedisLockTimeoutException(lockName, acquireTimeout.toKotlinDuration())
 }
 
 fun Jedis.releaseLock(lockName: String, identifier: String): Boolean
