@@ -33,4 +33,6 @@ class RedisCommandBuilder : Siths<RedisCommand, RedisCommand, RedisCommand, Redi
     override suspend fun incrBy(key: String, value: Long) = RedisCommand("INCRBY", key, value)
 
     override suspend fun clientList() = RedisCommand("CLIENT", "LIST")
+
+    fun watch(keys: List<String>) = RedisCommand("WATCH", *keys.toTypedArray())
 }

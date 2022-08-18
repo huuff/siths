@@ -6,6 +6,7 @@ class RedisPipelineBuilder(
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder(),
 ): Siths<Unit, Unit, Unit, Unit, Unit, Unit> {
     private val commandList = mutableListOf<RedisCommand>()
+    val length get() = commandList.size
 
     override suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode?, timeToLive: Duration?) {
         commandList += commandBuilder.set(key, value, exclusiveMode, timeToLive)

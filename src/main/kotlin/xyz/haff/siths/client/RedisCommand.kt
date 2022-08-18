@@ -14,4 +14,6 @@ data class RedisCommand(
     }
 
     operator fun plus(other: RedisCommand) = RedisCommand(this.parts + other.parts)
+
+    operator fun plus(pipeline: RedisPipeline) = RedisPipeline(listOf(this) + pipeline.commands)
 }

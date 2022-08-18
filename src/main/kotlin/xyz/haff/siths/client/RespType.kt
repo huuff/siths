@@ -20,6 +20,9 @@ data class RespError(val type: String, override val value: String): RespType<Str
 }
 data class RespInteger(override val value: Long): RespType<Long>
 data class RespBulkString(override val value: String): RespType<String>
+
+data class RespArray(override val value: List<RespType<*>>): RespType<List<RespType<*>>>
+
 object RespNullResponse: RespType<Nothing> {
     override val value: Nothing
         get() = throw RuntimeException("Empty response from Redis")

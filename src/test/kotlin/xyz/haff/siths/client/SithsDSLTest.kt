@@ -48,4 +48,30 @@ class SithsDSLTest : FunSpec({
         )
     }
 
+    // TODO: Test "watch"
+    test("correctly makes transaction") {
+        // ARRANGE
+        val pool = makeSithsPool(container)
+
+        // ACT
+        val pipelineResult = withRedis(pool) {
+            transactional {
+                set("pipelined-key", 0)
+                get("pipelined-key")
+                incrBy("pipelined-key", 1)
+                get("pipelined-key")
+            }
+        }
+
+        // ASSERT
+        pipelineResult shouldBe RespArray(
+            value = listOf(
+                RespSimpleString("OK"),
+                RespBulkString("0"),
+                RespInteger(1),
+                RespBulkString("1")
+            )
+        )
+    }
+
 })

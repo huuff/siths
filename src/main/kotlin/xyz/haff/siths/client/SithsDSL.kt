@@ -3,6 +3,7 @@ package xyz.haff.siths.client
 import kotlinx.coroutines.delay
 import xyz.haff.siths.common.RedisLockTimeoutException
 import xyz.haff.siths.common.RedisScriptNotLoadedException
+import xyz.haff.siths.common.RedisUnexpectedRespResponse
 import xyz.haff.siths.common.buildLockKey
 import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.scripts.RedisScripts
@@ -37,6 +38,24 @@ class SithsDSL(val pool: SithsPool) {
         pipelineBuilder.f()
         return pool.getConnection().use {
             it.runPipeline(pipelineBuilder.build())
+        }
+    }
+
+    // TODO: I should test the watched keys somehow! UPDATE: Actually I should watch them first
+    suspend inline fun transactional(watchedKeys: List<String> = listOf(), f: RedisPipelineBuilder.() -> Unit): RespArray {
+        val pipelineBuilder = RedisPipelineBuilder()
+        pipelineBuilder.f()
+        val actualPipelineCommands = pipelineBuilder.length
+        val pipeline = RedisCommand("MULTI") + (pipelineBuilder.build() + RedisCommand("EXEC"))
+        val response = pool.getConnection().use {
+            it.runPipeline(pipeline)
+        }.drop(actualPipelineCommands + 1) // Drop the OK response to the multi and all QUEUED responses, since they won't matter to the client
+        val firstResponse = response[0] // Since it's an EXEC ... MULTI we know the response must be a RespArray
+
+        if (firstResponse is RespArray) {
+            return firstResponse
+        } else {
+            throw RedisUnexpectedRespResponse(firstResponse)
         }
     }
 
