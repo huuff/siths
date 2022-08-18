@@ -1,12 +1,14 @@
 package xyz.haff.siths.client
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import xyz.haff.siths.common.BrokenRedisConnectionException
+import xyz.haff.siths.common.RedisBrokenConnectionException
+import xyz.haff.siths.common.RedisPoolOutOfConnections
 import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.suspended
 import java.util.*
@@ -26,6 +28,18 @@ class SithsPoolTest : FunSpec({
 
             retrievedValue.value shouldBe randomValue
         }
+    }
+
+    test("can't go over the max number of connections") {
+        // ARRANGE
+        val pool = makeSithsPool(container, maxConnections = 3)
+
+        // ACT
+        repeat(3) { pool.getConnection() }
+
+        // ASSERT
+        shouldThrow<RedisPoolOutOfConnections> { pool.getConnection() }
+        pool.totalConnections shouldBe 3
     }
 
     context("self-healing pool") {
@@ -48,7 +62,7 @@ class SithsPoolTest : FunSpec({
 
             killerConnection.runCommand(RedisCommand("CLIENT", "KILL", "ID", idToKill))
 
-            shouldThrow<BrokenRedisConnectionException> {
+            shouldThrow<RedisBrokenConnectionException> {
                 killedConnection.use { it.runCommand(RedisCommand("PING")) }
             }
         }

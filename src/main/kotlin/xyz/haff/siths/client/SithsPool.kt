@@ -1,6 +1,7 @@
 package xyz.haff.siths.client
 
 import kotlinx.coroutines.delay
+import xyz.haff.siths.common.RedisPoolOutOfConnections
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
@@ -37,8 +38,7 @@ class SithsPool(
             }
         }
 
-        // TODO: A specific exception
-        throw RuntimeException("Unable to acquire connection! All busy")
+        throw RedisPoolOutOfConnections()
     }
 
     fun releaseConnection(connection: SithsConnection) {

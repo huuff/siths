@@ -1,6 +1,6 @@
 package xyz.haff.siths.client
 
-import xyz.haff.siths.common.UnexpectedRespResponse
+import xyz.haff.siths.common.RedisUnexpectedRespResponse
 import java.time.Duration
 
 @JvmInline
@@ -22,14 +22,14 @@ value class StandaloneSiths(
     override suspend fun ttl(key: String): Duration? = when (val response = connection.runCommand(RedisCommand("PTTL", key))) {
             is RespInteger -> if (response.value < 0) { null } else { Duration.ofMillis(response.value) }
             is RespError -> response.throwAsException()
-            else -> throw UnexpectedRespResponse(response)
+            else -> throw RedisUnexpectedRespResponse(response)
         }
 
     override suspend fun getOrNull(key: String): String? = when (val response = connection.runCommand(RedisCommand("GET", key))) {
         is RespBulkString -> response.value
         is RespNullResponse -> null
         is RespError -> response.throwAsException()
-        else -> throw UnexpectedRespResponse(response)
+        else -> throw RedisUnexpectedRespResponse(response)
     }
 
     override suspend fun get(key: String): String = getOrNull(key) ?: throw RuntimeException("Key $key does not exist!")
@@ -39,7 +39,7 @@ value class StandaloneSiths(
             is RespBulkString -> response.value
             is RespSimpleString -> response.value
             is RespError -> response.throwAsException()
-            else -> throw UnexpectedRespResponse(response)
+            else -> throw RedisUnexpectedRespResponse(response)
         }
 
     override suspend fun evalSha(sha: String, keys: List<String>, args: List<String>): RespType<*> =
@@ -51,6 +51,6 @@ value class StandaloneSiths(
     // TODO: Test
     override suspend fun incrBy(key: String, value: Long) = when(val response = connection.runCommand(RedisCommand("INCRBY", key, value.toString()))) {
         is RespInteger -> response.value
-        else -> throw UnexpectedRespResponse(response)
+        else -> throw RedisUnexpectedRespResponse(response)
     }
 }

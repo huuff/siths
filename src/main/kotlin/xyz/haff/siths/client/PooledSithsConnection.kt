@@ -3,7 +3,7 @@ package xyz.haff.siths.client
 import io.ktor.utils.io.errors.*
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.ClosedSendChannelException
-import xyz.haff.siths.common.BrokenRedisConnectionException
+import xyz.haff.siths.common.RedisBrokenConnectionException
 import java.util.*
 
 
@@ -52,7 +52,7 @@ class PooledSithsConnection private constructor(
             // Connection is broken, so we notify the pool to discard it and maybe create a new one that works
             connection.close()
             pool.removeConnection(this)
-            throw BrokenRedisConnectionException(e)
+            throw RedisBrokenConnectionException(e)
         }
         else -> throw e
     }

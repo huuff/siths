@@ -13,5 +13,4 @@
 * Add authentication at the connection level
 * A pipeline builder
 * A method to get a list of `RedisClient`s from `Siths`
-* Test that we can't go over the max number of connections in a pool because I think we can now
 * Test with some huge key or value
