@@ -83,8 +83,8 @@ class StandaloneSithsClient(
             else -> throw RedisUnexpectedRespResponse(response)
         }
 
-    override suspend fun sadd(key: String, value: Any): Long =
-        when (val response = connection.runCommand(commandBuilder.sadd(key, value))) {
+    override suspend fun sadd(key: String, value: Any, vararg rest: Any): Long =
+        when (val response = connection.runCommand(commandBuilder.sadd(key, value, *rest))) {
             is RespInteger -> response.value
             is RespError -> response.throwAsException()
             else -> throw RedisUnexpectedRespResponse(response)

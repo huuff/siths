@@ -9,8 +9,14 @@ class SithsSet<T: Any>(
 ) : MutableSet<T> {
     override fun add(element: T): Boolean = runBlocking { sithsClient.sadd(name, element) == 1L }
 
+    // TODO: Not ergonomic at all!! I have to separate the first element from the rest because I made my Siths methods
+    // so to force that they get at least one parameter... also using a stream to get an array... I see various issues with this code
     override fun addAll(elements: Collection<T>): Boolean {
-        TODO("Not yet implemented")
+        val uniqueElements = elements.toSet().stream().toArray()
+        val firstElement = uniqueElements[0]
+        val rest = uniqueElements.copyOfRange(1, uniqueElements.size)
+        val addedCount = runBlocking { sithsClient.sadd(name, firstElement, *rest) }
+        return addedCount.toInt() == uniqueElements.size
     }
 
     override fun clear() {

@@ -46,8 +46,8 @@ class RedisPipelineBuilder(
         commandList += commandBuilder.eval(script, keys, args)
     }
 
-    override suspend fun sadd(key: String, value: Any) {
-        commandList += commandBuilder.sadd(key, value)
+    override suspend fun sadd(key: String, value: Any, vararg rest: Any) {
+        commandList += commandBuilder.sadd(key, value, *rest)
     }
 
     override suspend fun smembers(key: String) {

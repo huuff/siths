@@ -46,8 +46,8 @@ class PooledSithsClient(
         return pool.getConnection().use { conn -> StandaloneSithsClient(conn).exists(key, *rest) }
     }
 
-    override suspend fun sadd(key: String, value: Any): Long {
-        return pool.getConnection().use { conn -> StandaloneSithsClient(conn).sadd(key, value) }
+    override suspend fun sadd(key: String, value: Any, vararg rest: Any): Long {
+        return pool.getConnection().use { conn -> StandaloneSithsClient(conn).sadd(key, value, *rest) }
     }
 
     override suspend fun smembers(key: String): Set<String> {

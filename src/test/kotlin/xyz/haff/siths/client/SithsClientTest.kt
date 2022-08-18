@@ -193,8 +193,7 @@ class SithsClientTest : FunSpec({
         val siths = PooledSithsClient(makeSithsPool(container))
 
         test("we can add to the set") {
-            siths.sadd("test-set", "test1") shouldBe 1
-            siths.sadd("test-set", "test2") shouldBe 1
+            siths.sadd("test-set", "test1", "test2") shouldBe 2
         }
 
         test("the cardinality is correct") {

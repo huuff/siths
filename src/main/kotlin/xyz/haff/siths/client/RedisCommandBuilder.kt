@@ -48,7 +48,12 @@ class RedisCommandBuilder : Siths<RedisCommand, RedisCommand, RedisCommand, Redi
         *args.toTypedArray()
     )
 
-    override suspend fun sadd(key: String, value: Any) = RedisCommand("SADD", key, value.toString())
+    override suspend fun sadd(key: String, value: Any, vararg rest: Any) = RedisCommand(
+        "SADD",
+        key,
+        value.toString(),
+        *rest.map { it.toString() }.toTypedArray()
+    )
 
     override suspend fun smembers(key: String): RedisCommand = RedisCommand("SMEMBERS", key)
 

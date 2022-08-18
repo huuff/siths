@@ -30,8 +30,7 @@ interface Siths<
     suspend fun exists(key: String, vararg rest: String): BooleanResponseType
 
     // SETS
-    // TODO: Add option to add more than one element! As that is what the response indicates, and the command allows it
-    suspend fun sadd(key: String, value: Any): LongResponseType
+    suspend fun sadd(key: String, value: Any, vararg rest: Any): LongResponseType
     suspend fun smembers(key: String): StringSetResponseType
     suspend fun sismember(key: String, member: Any): BooleanResponseType
     suspend fun scard(key: String): LongResponseType
