@@ -3,7 +3,7 @@ package xyz.haff.siths.client
 data class RedisCommand(
     private val parts: List<String>,
 ) {
-    constructor(vararg parts: String) : this(parts.asList())
+    constructor(vararg parts: String?) : this(parts.filterNotNull())
 
     fun toResp(): String = buildString {
         append("*${parts.size}\r\n")

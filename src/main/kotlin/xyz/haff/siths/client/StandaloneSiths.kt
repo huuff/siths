@@ -10,10 +10,9 @@ value class StandaloneSiths(
 ): Siths {
 
     override suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode?, timeToLive: Duration?) {
-        val exclusiveModeSubCommand = exclusiveMode?.name?.let { RedisCommand(it) } ?: RedisCommand()
         val ttlSubCommand = timeToLive?.let { RedisCommand("PX", timeToLive.inWholeMilliseconds.toString()) } ?: RedisCommand()
 
-        val response = connection.runCommand(RedisCommand("SET", key, value.toString()) + exclusiveModeSubCommand + ttlSubCommand)
+        val response = connection.runCommand(RedisCommand("SET", key, value.toString(), exclusiveMode?.name) + ttlSubCommand)
 
         if (response is RespError) {
             response.throwAsException()
