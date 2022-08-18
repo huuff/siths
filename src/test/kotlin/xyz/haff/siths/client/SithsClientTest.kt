@@ -181,6 +181,10 @@ class SithsClientTest : FunSpec({
             siths.sadd("test-set", "test2") shouldBe 1
         }
 
+        test("the cardinality is correct") {
+            siths.scard("test-set") shouldBe 2
+        }
+
         test("we can check for pertenence") {
             siths.sismember("test-set", "test1") shouldBe true
             siths.sismember("test-set", "test3") shouldBe false

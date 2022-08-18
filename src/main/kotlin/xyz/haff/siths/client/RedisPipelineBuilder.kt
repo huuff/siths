@@ -53,4 +53,8 @@ class RedisPipelineBuilder(
     override suspend fun sismember(key: String, member: Any) {
         commandList += commandBuilder.sismember(key, member)
     }
+
+    override suspend fun scard(key: String) {
+        commandList += commandBuilder.scard(key)
+    }
 }

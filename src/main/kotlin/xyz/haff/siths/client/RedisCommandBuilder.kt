@@ -47,4 +47,5 @@ class RedisCommandBuilder : Siths<RedisCommand, RedisCommand, RedisCommand, Redi
     override suspend fun smembers(key: String): RedisCommand = RedisCommand("SMEMBERS", key)
 
     override suspend fun sismember(key: String, member: Any) = RedisCommand("SISMEMBER", key, member.toString())
+    override suspend fun scard(key: String): RedisCommand = RedisCommand("SCARD", key)
 }

@@ -50,6 +50,10 @@ class PooledSithsClient(
         return pool.getConnection().use { conn -> StandaloneSithsClient(conn).sismember(key, member) }
     }
 
+    override suspend fun scard(key: String): Long {
+        return pool.getConnection().use { conn -> StandaloneSithsClient(conn).scard(key) }
+    }
+
     override suspend fun clientList(): List<RedisClient> {
         return pool.getConnection().use { conn -> StandaloneSithsClient(conn).clientList() }
     }

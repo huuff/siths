@@ -32,6 +32,7 @@ interface Siths<
     suspend fun sadd(key: String, value: Any): LongResponseType
     suspend fun smembers(key: String): StringSetResponseType
     suspend fun sismember(key: String, member: Any): BooleanResponseType
+    suspend fun scard(key: String): LongResponseType
 
     suspend fun clientList(): ClientListResponseType
 }
