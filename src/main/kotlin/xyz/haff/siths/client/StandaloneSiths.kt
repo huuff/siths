@@ -1,7 +1,8 @@
 package xyz.haff.siths.client
 
 import xyz.haff.siths.common.RedisUnexpectedRespResponse
-import java.time.Duration
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 @JvmInline
 value class StandaloneSiths(
@@ -10,7 +11,7 @@ value class StandaloneSiths(
 
     override suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode?, timeToLive: Duration?) {
         val exclusiveModeSubCommand = exclusiveMode?.name?.let { RedisCommand(it) } ?: RedisCommand()
-        val ttlSubCommand = timeToLive?.let { RedisCommand("PX", timeToLive.toMillis().toString()) } ?: RedisCommand()
+        val ttlSubCommand = timeToLive?.let { RedisCommand("PX", timeToLive.inWholeMilliseconds.toString()) } ?: RedisCommand()
 
         val response = connection.runCommand(RedisCommand("SET", key, value) + exclusiveModeSubCommand + ttlSubCommand)
 
@@ -20,7 +21,7 @@ value class StandaloneSiths(
     }
 
     override suspend fun ttl(key: String): Duration? = when (val response = connection.runCommand(RedisCommand("PTTL", key))) {
-            is RespInteger -> if (response.value < 0) { null } else { Duration.ofMillis(response.value) }
+            is RespInteger -> if (response.value < 0) { null } else { response.value.milliseconds }
             is RespError -> response.throwAsException()
             else -> throw RedisUnexpectedRespResponse(response)
         }

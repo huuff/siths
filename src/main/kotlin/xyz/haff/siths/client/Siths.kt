@@ -1,6 +1,6 @@
 package xyz.haff.siths.client
 
-import java.time.Duration
+import kotlin.time.Duration
 
 /**
  * A thin wrapper over a plain redis connection. Things it does:

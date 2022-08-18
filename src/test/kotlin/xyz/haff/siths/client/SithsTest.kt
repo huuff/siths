@@ -13,7 +13,9 @@ import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.client.ExclusiveMode.*
 import xyz.haff.siths.common.RedisScriptNotLoadedException
-import java.time.Duration
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+
 
 class SithsTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
@@ -84,7 +86,7 @@ class SithsTest : FunSpec({
             val siths = PooledSiths(makeSithsPool(container))
 
             // ACT
-            siths.set("ttledkey", "ttlvalue", timeToLive = Duration.ofSeconds(10))
+            siths.set("ttledkey", "ttlvalue", timeToLive = 10.seconds)
             val ttl = siths.ttl("ttledkey")
 
             // ASSERT
@@ -92,8 +94,8 @@ class SithsTest : FunSpec({
             ttl!!
             // XXX: Assuming no more than two seconds pass between setting and checking...
             // TODO: Can I make a generic `shouldBeInRange` kotest matcher?
-            ttl shouldBeGreaterThanOrEqualTo  Duration.ofSeconds(8)
-            ttl shouldBeLessThanOrEqualTo  Duration.ofSeconds(10)
+            ttl shouldBeGreaterThanOrEqualTo  8.seconds
+            ttl shouldBeLessThanOrEqualTo  10.seconds
         }
     }
 

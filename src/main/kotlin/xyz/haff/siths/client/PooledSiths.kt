@@ -1,6 +1,6 @@
 package xyz.haff.siths.client
 
-import java.time.Duration
+import kotlin.time.Duration
 
 class PooledSiths(
     private val pool: SithsPool
