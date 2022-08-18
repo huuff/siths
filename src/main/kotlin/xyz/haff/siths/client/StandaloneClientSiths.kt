@@ -4,10 +4,10 @@ import xyz.haff.siths.common.RedisUnexpectedRespResponse
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-class StandaloneSiths(
+class StandaloneClientSiths(
     private val connection: SithsConnection,
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder()
-): Siths {
+): SithsClient {
 
     override suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode?, timeToLive: Duration?) {
         val command = commandBuilder.set(key, value, exclusiveMode, timeToLive)

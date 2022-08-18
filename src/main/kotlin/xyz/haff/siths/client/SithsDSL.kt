@@ -13,14 +13,14 @@ import java.util.*
 // TODO: Implement Siths? Delegate it? To avoid using a context receiver
 class SithsDSL(private val pool: SithsPool) {
     // TODO: This should be a context receiver when that API stabilizes
-    val redis = PooledSiths(pool)
+    val redis = PooledClientSiths(pool)
 
     /**
      * Tries to run script, and, if not loaded, loads it, then runs it again
      */
     suspend fun runScript(script: RedisScript, keys: List<String> = listOf(), args: List<String> = listOf()): RespType<*> {
         return pool.getConnection().use { conn ->
-            with (StandaloneSiths(conn)) {
+            with (StandaloneClientSiths(conn)) {
                 try {
                     evalSha(script.sha, keys, args)
                 } catch (e: RedisScriptNotLoadedException) { // TODO: Maybe we could pipeline these two commands so they happen in a single connection?

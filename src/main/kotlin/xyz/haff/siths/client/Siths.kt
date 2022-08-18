@@ -8,13 +8,19 @@ import kotlin.time.Duration
  *  * Escape the commands that are sent to Redis
  *  * Convert the responses to the appropriate Kotlin types
  */
-interface Siths {
-    suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode? = null, timeToLive: Duration? = null)
-    suspend fun get(key: String): String
-    suspend fun getOrNull(key: String): String?
-    suspend fun ttl(key: String): Duration?
-    suspend fun scriptLoad(script: String): String
-    suspend fun evalSha(sha: String, keys: List<String> = listOf(), args: List<String> = listOf()): RespType<*>
-    suspend fun incrBy(key: String, value: Long): Long
-    suspend fun clientList(): List<RedisClient>
+interface Siths<
+        UnitResponseType,
+        StringResponseType,
+        RespResponseType,
+        LongResponseType,
+        ClientListResponseType,
+        DurationResponseType
+        > {
+    suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode? = null, timeToLive: Duration? = null): UnitResponseType
+    suspend fun get(key: String): StringResponseType
+    suspend fun ttl(key: String): DurationResponseType?
+    suspend fun scriptLoad(script: String): StringResponseType
+    suspend fun evalSha(sha: String, keys: List<String> = listOf(), args: List<String> = listOf()): RespResponseType
+    suspend fun incrBy(key: String, value: Long): LongResponseType
+    suspend fun clientList(): ClientListResponseType
 }

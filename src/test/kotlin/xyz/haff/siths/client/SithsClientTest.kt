@@ -13,18 +13,17 @@ import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.client.ExclusiveMode.*
 import xyz.haff.siths.common.RedisScriptNotLoadedException
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 
-class SithsTest : FunSpec({
+class SithsClientTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
         withExposedPorts(6379)
     }
 
     test("can set and get a value") {
         // ARRANGE
-        val siths = PooledSiths(makeSithsPool(container))
+        val siths = PooledClientSiths(makeSithsPool(container))
 
         // ACT
         siths.set("key", "value")
@@ -37,7 +36,7 @@ class SithsTest : FunSpec({
     test("clientList contains current connection") {
         StandaloneSithsConnection.open(host = container.host, port = container.firstMappedPort).use { connection ->
             // ARRANGE
-            val siths = StandaloneSiths(connection)
+            val siths = StandaloneClientSiths(connection)
 
             // ACT
             val clients = siths.clientList()
@@ -50,7 +49,7 @@ class SithsTest : FunSpec({
 
     test("correct handling when the value doesn't exist") {
         // ARRANGE
-        val siths = PooledSiths(makeSithsPool(container))
+        val siths = PooledClientSiths(makeSithsPool(container))
 
         // ACT && ASSERT
         siths.getOrNull("non-existent") shouldBe null
@@ -58,7 +57,7 @@ class SithsTest : FunSpec({
 
     test("weird strings work as intended") {
         // ARRANGE
-        val siths = PooledSiths(makeSithsPool(container))
+        val siths = PooledClientSiths(makeSithsPool(container))
         val key = """ as${'$'} d"f"2"""
         val value = """fd's2${'$'} """
 
@@ -72,7 +71,7 @@ class SithsTest : FunSpec({
 
     test("incrBy works") {
         // ARRANGE
-        val siths = PooledSiths(makeSithsPool(container))
+        val siths = PooledClientSiths(makeSithsPool(container))
 
         // ACT
         siths.set("incremented-key", 0)
@@ -87,7 +86,7 @@ class SithsTest : FunSpec({
         context("SET ... (NX|XX)") {
             test("SET ... NX does not set if the key exists") {
                 // ARRANGE
-                val siths = PooledSiths(makeSithsPool(container))
+                val siths = PooledClientSiths(makeSithsPool(container))
                 siths.set("nxkey", "test1")
 
                 // ACT
@@ -98,7 +97,7 @@ class SithsTest : FunSpec({
             }
             test("SET ... XX does not set if the key does not exist") {
                 // ARRANGE
-                val siths = PooledSiths(makeSithsPool(container))
+                val siths = PooledClientSiths(makeSithsPool(container))
 
                 // ACT
                 siths.set("xxkey", "testvalue", exclusiveMode = XX)
@@ -110,7 +109,7 @@ class SithsTest : FunSpec({
 
         test("timeToLive sets ttl") {
             // ARRANGE
-            val siths = PooledSiths(makeSithsPool(container))
+            val siths = PooledClientSiths(makeSithsPool(container))
 
             // ACT
             siths.set("ttledkey", "ttlvalue", timeToLive = 10.seconds)
@@ -129,7 +128,7 @@ class SithsTest : FunSpec({
     context("scripts") {
         test("correctly loads script") {
             // ARRANGE
-            val siths = PooledSiths(makeSithsPool(container))
+            val siths = PooledClientSiths(makeSithsPool(container))
             val script = RedisScript(code = """return 'Hello World!' """)
 
             // ACT
@@ -141,7 +140,7 @@ class SithsTest : FunSpec({
 
         test("correctly runs script") {
             // ARRANGE
-            val siths = PooledSiths(makeSithsPool(container))
+            val siths = PooledClientSiths(makeSithsPool(container))
             val script = RedisScript(code = """return 'Hello World!' """)
             val sha = siths.scriptLoad(script.code)
 
@@ -154,7 +153,7 @@ class SithsTest : FunSpec({
 
         test("fails when script doesn't exist") {
             // ARRANGE
-            val siths = PooledSiths(makeSithsPool(container))
+            val siths = PooledClientSiths(makeSithsPool(container))
 
             // ACT & ASSERT
            shouldThrow<RedisScriptNotLoadedException> {
