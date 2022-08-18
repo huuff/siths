@@ -25,4 +25,27 @@ class SithsDSLTest : FunSpec({
         response.value shouldBe "Hello World!!?"
     }
 
+    test("correctly pipelines") {
+        // ARRANGE
+        val pool = makeSithsPool(container)
+
+        // ACT
+        val pipelineResult = withRedis(pool) {
+            pipelined {
+                set("pipelined-key", 0)
+                get("pipelined-key")
+                incrBy("pipelined-key", 1)
+                get("pipelined-key")
+            }
+        }
+
+        // ASSERT
+        pipelineResult shouldBe listOf(
+            RespSimpleString("OK"),
+            RespBulkString("0"),
+            RespInteger(1),
+            RespBulkString("1")
+        )
+    }
+
 })

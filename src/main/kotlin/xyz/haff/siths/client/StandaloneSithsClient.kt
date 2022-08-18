@@ -4,7 +4,7 @@ import xyz.haff.siths.common.RedisUnexpectedRespResponse
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-class StandaloneClientSiths(
+class StandaloneSithsClient(
     private val connection: SithsConnection,
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder()
 ): SithsClient {

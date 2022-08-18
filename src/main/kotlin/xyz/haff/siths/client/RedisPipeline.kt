@@ -5,5 +5,5 @@ data class RedisPipeline(
 ) {
     constructor(vararg commands: RedisCommand): this(commands.asList())
 
-    fun toResp() = commands.map { it.toResp() }.joinToString(separator = "\r\n")
+    fun toResp() = commands.joinToString(separator = "\r\n") { it.toResp() }
 }

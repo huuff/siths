@@ -27,7 +27,7 @@ class SithsLockTest : FunSpec({
 
         suspended(10) {
             makeSithsPool(container).getConnection().use { redis ->
-                val siths = StandaloneClientSiths(redis)
+                val siths = StandaloneSithsClient(redis)
                 siths.incrBy("key", 1)
                 Thread.sleep(100)
                 siths.incrBy("key", -1)

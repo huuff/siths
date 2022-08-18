@@ -23,7 +23,7 @@ class SithsClientTest : FunSpec({
 
     test("can set and get a value") {
         // ARRANGE
-        val siths = PooledClientSiths(makeSithsPool(container))
+        val siths = PooledSithsClient(makeSithsPool(container))
 
         // ACT
         siths.set("key", "value")
@@ -36,7 +36,7 @@ class SithsClientTest : FunSpec({
     test("clientList contains current connection") {
         StandaloneSithsConnection.open(host = container.host, port = container.firstMappedPort).use { connection ->
             // ARRANGE
-            val siths = StandaloneClientSiths(connection)
+            val siths = StandaloneSithsClient(connection)
 
             // ACT
             val clients = siths.clientList()
@@ -49,7 +49,7 @@ class SithsClientTest : FunSpec({
 
     test("correct handling when the value doesn't exist") {
         // ARRANGE
-        val siths = PooledClientSiths(makeSithsPool(container))
+        val siths = PooledSithsClient(makeSithsPool(container))
 
         // ACT && ASSERT
         siths.getOrNull("non-existent") shouldBe null
@@ -57,7 +57,7 @@ class SithsClientTest : FunSpec({
 
     test("weird strings work as intended") {
         // ARRANGE
-        val siths = PooledClientSiths(makeSithsPool(container))
+        val siths = PooledSithsClient(makeSithsPool(container))
         val key = """ as${'$'} d"f"2"""
         val value = """fd's2${'$'} """
 
@@ -71,7 +71,7 @@ class SithsClientTest : FunSpec({
 
     test("incrBy works") {
         // ARRANGE
-        val siths = PooledClientSiths(makeSithsPool(container))
+        val siths = PooledSithsClient(makeSithsPool(container))
 
         // ACT
         siths.set("incremented-key", 0)
@@ -86,7 +86,7 @@ class SithsClientTest : FunSpec({
         context("SET ... (NX|XX)") {
             test("SET ... NX does not set if the key exists") {
                 // ARRANGE
-                val siths = PooledClientSiths(makeSithsPool(container))
+                val siths = PooledSithsClient(makeSithsPool(container))
                 siths.set("nxkey", "test1")
 
                 // ACT
@@ -97,7 +97,7 @@ class SithsClientTest : FunSpec({
             }
             test("SET ... XX does not set if the key does not exist") {
                 // ARRANGE
-                val siths = PooledClientSiths(makeSithsPool(container))
+                val siths = PooledSithsClient(makeSithsPool(container))
 
                 // ACT
                 siths.set("xxkey", "testvalue", exclusiveMode = XX)
@@ -109,7 +109,7 @@ class SithsClientTest : FunSpec({
 
         test("timeToLive sets ttl") {
             // ARRANGE
-            val siths = PooledClientSiths(makeSithsPool(container))
+            val siths = PooledSithsClient(makeSithsPool(container))
 
             // ACT
             siths.set("ttledkey", "ttlvalue", timeToLive = 10.seconds)
@@ -128,7 +128,7 @@ class SithsClientTest : FunSpec({
     context("scripts") {
         test("correctly loads script") {
             // ARRANGE
-            val siths = PooledClientSiths(makeSithsPool(container))
+            val siths = PooledSithsClient(makeSithsPool(container))
             val script = RedisScript(code = """return 'Hello World!' """)
 
             // ACT
@@ -140,7 +140,7 @@ class SithsClientTest : FunSpec({
 
         test("correctly runs script") {
             // ARRANGE
-            val siths = PooledClientSiths(makeSithsPool(container))
+            val siths = PooledSithsClient(makeSithsPool(container))
             val script = RedisScript(code = """return 'Hello World!' """)
             val sha = siths.scriptLoad(script.code)
 
@@ -153,7 +153,7 @@ class SithsClientTest : FunSpec({
 
         test("fails when script doesn't exist") {
             // ARRANGE
-            val siths = PooledClientSiths(makeSithsPool(container))
+            val siths = PooledSithsClient(makeSithsPool(container))
 
             // ACT & ASSERT
            shouldThrow<RedisScriptNotLoadedException> {

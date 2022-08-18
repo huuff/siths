@@ -8,6 +8,7 @@ import kotlin.time.Duration
  *  * Escape the commands that are sent to Redis
  *  * Convert the responses to the appropriate Kotlin types
  */
+// TODO: Add ping! It'll be useful!
 interface Siths<
         UnitResponseType,
         StringResponseType,
