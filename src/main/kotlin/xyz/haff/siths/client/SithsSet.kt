@@ -14,7 +14,7 @@ class SithsSet<T: Any>(
     }
 
     override fun clear() {
-        TODO("Not yet implemented")
+        runBlocking { sithsClient.del(name) }
     }
 
     override fun iterator(): MutableIterator<T> {

@@ -33,6 +33,22 @@ class SithsClientTest : FunSpec({
         value shouldBe "value"
     }
 
+    test("del deletes key") {
+        // ARRANGE
+        val siths = PooledSithsClient(makeSithsPool(container))
+        siths.set("future-deleted-key1", "value")
+        siths.set("future-deleted-key2", "value")
+
+        // SANITY CHECK
+        siths.exists("future-deleted-key1", "future-deleted-key2") shouldBe true
+
+        // ACT
+        siths.del("future-deleted-key1", "future-deleted-key2") shouldBe 2
+
+        // ASSERT
+        siths.exists("future-deleted-key1", "future-deleted-key2") shouldBe false
+    }
+
     test("clientList contains current connection") {
         StandaloneSithsConnection.open(host = container.host, port = container.firstMappedPort).use { connection ->
             // ARRANGE

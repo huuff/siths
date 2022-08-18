@@ -17,6 +17,12 @@ class RedisCommandBuilder : Siths<RedisCommand, RedisCommand, RedisCommand, Redi
         }
     }
 
+    override suspend fun del(key: String, vararg rest: String) = RedisCommand(
+        "DEL",
+        key,
+        *rest
+    )
+
     override suspend fun ttl(key: String) = RedisCommand("PTTL", key)
 
     override suspend fun scriptLoad(script: String) = RedisCommand("SCRIPT", "LOAD", script)
@@ -48,4 +54,5 @@ class RedisCommandBuilder : Siths<RedisCommand, RedisCommand, RedisCommand, Redi
 
     override suspend fun sismember(key: String, member: Any) = RedisCommand("SISMEMBER", key, member.toString())
     override suspend fun scard(key: String): RedisCommand = RedisCommand("SCARD", key)
+    override suspend fun exists(key: String, vararg rest: String) = RedisCommand("EXISTS", key, *rest)
 }

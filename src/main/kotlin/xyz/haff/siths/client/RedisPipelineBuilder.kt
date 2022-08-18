@@ -18,6 +18,10 @@ class RedisPipelineBuilder(
         commandList += commandBuilder.get(key)
     }
 
+    override suspend fun del(key: String, vararg rest: String) {
+        commandList += commandBuilder.del(key, *rest)
+    }
+
     override suspend fun ttl(key: String) {
         commandList += commandBuilder.ttl(key)
     }
@@ -56,5 +60,9 @@ class RedisPipelineBuilder(
 
     override suspend fun scard(key: String) {
         commandList += commandBuilder.scard(key)
+    }
+
+    override suspend fun exists(key: String, vararg rest: String) {
+        commandList += commandBuilder.exists(key, *rest)
     }
 }

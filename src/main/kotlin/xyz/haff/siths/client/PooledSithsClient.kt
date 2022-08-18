@@ -10,6 +10,10 @@ class PooledSithsClient(
         pool.getConnection().use { conn -> StandaloneSithsClient(conn).set(key, value, exclusiveMode, timeToLive) }
     }
 
+    override suspend fun del(key: String, vararg rest: String): Long {
+        return pool.getConnection().use { conn -> StandaloneSithsClient(conn).del(key, *rest)}
+    }
+
     override suspend fun ttl(key: String): Duration? {
         return pool.getConnection().use { conn -> StandaloneSithsClient(conn).ttl(key) }
     }
@@ -36,6 +40,10 @@ class PooledSithsClient(
 
     override suspend fun incrBy(key: String, value: Long): Long {
         return pool.getConnection().use { conn -> StandaloneSithsClient(conn).incrBy(key, value) }
+    }
+
+    override suspend fun exists(key: String, vararg rest: String): Boolean {
+        return pool.getConnection().use { conn -> StandaloneSithsClient(conn).exists(key, *rest) }
     }
 
     override suspend fun sadd(key: String, value: Any): Long {

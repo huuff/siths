@@ -21,11 +21,13 @@ interface Siths<
         > {
     suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode? = null, timeToLive: Duration? = null): UnitResponseType
     suspend fun get(key: String): StringResponseType
+    suspend fun del(key: String, vararg rest: String): LongResponseType
     suspend fun ttl(key: String): DurationResponseType?
     suspend fun scriptLoad(script: String): StringResponseType
     suspend fun evalSha(sha: String, keys: List<String> = listOf(), args: List<String> = listOf()): RespResponseType
     suspend fun eval(script: String, keys: List<String> = listOf(), args: List<String> = listOf()): RespResponseType
     suspend fun incrBy(key: String, value: Long): LongResponseType
+    suspend fun exists(key: String, vararg rest: String): BooleanResponseType
 
     // SETS
     // TODO: Add option to add more than one element! As that is what the response indicates, and the command allows it

@@ -30,6 +30,22 @@ class StandaloneSithsClient(
             else -> throw RedisUnexpectedRespResponse(response)
         }
 
+    override suspend fun del(key: String, vararg rest: String): Long
+        = when (val response = connection.runCommand(commandBuilder.del(key, *rest))) {
+            is RespInteger -> response.value
+            is RespError -> response.throwAsException()
+            else -> throw RedisUnexpectedRespResponse(response)
+        }
+
+    override suspend fun exists(key: String, vararg rest: String): Boolean
+        = when (val response = connection.runCommand(commandBuilder.exists(key, *rest))) {
+            // XXX: Redis returns the number of DIFFERENT keys that exist. Since our client's semantics is `true` if all exist
+            // and `false` otherwise, we count the number of different keys and compare it to the response
+            is RespInteger -> response.value == setOf(key, *rest).size.toLong()
+            is RespError -> response.throwAsException()
+            else -> throw RedisUnexpectedRespResponse(response)
+        }
+
     override suspend fun getOrNull(key: String): String? =
         when (val response = connection.runCommand(commandBuilder.get(key))) {
             is RespBulkString -> response.value
