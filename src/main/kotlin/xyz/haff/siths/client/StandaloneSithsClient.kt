@@ -48,7 +48,6 @@ class StandaloneSithsClient(
             else -> response
         }
 
-    // TODO: Test
     override suspend fun eval(script: String, keys: List<String>, args: List<String>): RespType<*> =
         when (val response = connection.runCommand(commandBuilder.eval(script, keys, args))) {
             is RespError -> response.throwAsException()

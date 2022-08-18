@@ -126,6 +126,17 @@ class SithsClientTest : FunSpec({
     }
 
     context("scripts") {
+        test("correctly evals script") {
+            // ARRANGE
+            val siths = PooledSithsClient(makeSithsPool(container))
+
+            // ACT
+            val response = siths.eval("return 'Hello World!'")
+
+            // ASSERT
+            response.value shouldBe "Hello World!"
+        }
+
         test("correctly loads script") {
             // ARRANGE
             val siths = PooledSithsClient(makeSithsPool(container))
