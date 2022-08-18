@@ -5,7 +5,7 @@ import kotlin.time.Duration
 class PooledSiths(
     private val pool: SithsPool
 ): Siths {
-    override suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode?, timeToLive: Duration?) {
+    override suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode?, timeToLive: Duration?) {
         pool.getConnection().use { conn -> StandaloneSiths(conn).set(key, value, exclusiveMode, timeToLive) }
     }
 

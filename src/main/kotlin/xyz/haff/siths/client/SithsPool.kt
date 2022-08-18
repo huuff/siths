@@ -2,15 +2,15 @@ package xyz.haff.siths.client
 
 import kotlinx.coroutines.delay
 import xyz.haff.siths.common.RedisPoolOutOfConnections
-import java.time.Duration
-import java.time.LocalDateTime
+import kotlin.time.Duration
 import java.util.*
+import kotlin.time.Duration.Companion.seconds
 
 class SithsPool(
     private val host: String = "localhost",
     private val port: Int = 6379,
     private val maxConnections: Int = 10,
-    private val acquireTimeout: Duration = Duration.ofSeconds(10)
+    private val acquireTimeout: Duration = 10.seconds
 ) {
     private val freeConnections = Collections.synchronizedList(mutableListOf<SithsConnection>())
     private val usedConnections = Collections.synchronizedList(mutableListOf<SithsConnection>())
@@ -18,7 +18,7 @@ class SithsPool(
     internal val totalConnections get() = freeConnections.size + usedConnections.size
 
     suspend fun getConnection(): SithsConnection {
-        val deadline = System.currentTimeMillis() + acquireTimeout.toMillis()
+        val deadline = System.currentTimeMillis() + acquireTimeout.inWholeMilliseconds
 
         while (System.currentTimeMillis() < deadline) {
             if (freeConnections.isNotEmpty()) {

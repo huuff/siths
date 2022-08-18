@@ -56,6 +56,19 @@ class SithsTest : FunSpec({
         savedValue shouldBe value
     }
 
+    test("incrBy works") {
+        // ARRANGE
+        val siths = PooledSiths(makeSithsPool(container))
+
+        // ACT
+        siths.set("incremented-key", 0)
+        val response = siths.incrBy("incremented-key", 1)
+
+        // ASSERT
+        response shouldBe 1
+        siths.get("incremented-key") shouldBe "1"
+    }
+
     context("set parameters") {
         context("SET ... (NX|XX)") {
             test("SET ... NX does not set if the key exists") {

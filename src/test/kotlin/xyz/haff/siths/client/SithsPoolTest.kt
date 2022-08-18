@@ -12,6 +12,7 @@ import xyz.haff.siths.common.RedisPoolOutOfConnections
 import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.suspended
 import java.util.*
+import kotlin.time.Duration.Companion.milliseconds
 
 class SithsPoolTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine")) {
@@ -32,7 +33,7 @@ class SithsPoolTest : FunSpec({
 
     test("can't go over the max number of connections") {
         // ARRANGE
-        val pool = makeSithsPool(container, maxConnections = 3)
+        val pool = makeSithsPool(container, maxConnections = 3, acquireTimeout = 10.milliseconds)
 
         // ACT
         repeat(3) { pool.getConnection() }

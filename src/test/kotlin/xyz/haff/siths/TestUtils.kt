@@ -5,10 +5,12 @@ import kotlinx.coroutines.launch
 import org.testcontainers.containers.GenericContainer
 import redis.clients.jedis.JedisPool
 import xyz.haff.siths.client.SithsPool
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 fun makeJedisPool(container: GenericContainer<*>) = JedisPool(container.host, container.firstMappedPort)
-fun makeSithsPool(container: GenericContainer<*>, maxConnections: Int = 10)
-    = SithsPool(container.host, container.firstMappedPort, maxConnections = maxConnections)
+fun makeSithsPool(container: GenericContainer<*>, maxConnections: Int = 10, acquireTimeout: Duration = 10.seconds)
+    = SithsPool(container.host, container.firstMappedPort, maxConnections = maxConnections, acquireTimeout)
 
 /**
  * For when I want to test with containers deployed on my machine instead of testcontainers, so I can use MONITOR and

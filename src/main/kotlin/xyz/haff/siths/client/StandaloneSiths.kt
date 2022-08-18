@@ -9,11 +9,11 @@ value class StandaloneSiths(
     private val connection: SithsConnection,
 ): Siths {
 
-    override suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode?, timeToLive: Duration?) {
+    override suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode?, timeToLive: Duration?) {
         val exclusiveModeSubCommand = exclusiveMode?.name?.let { RedisCommand(it) } ?: RedisCommand()
         val ttlSubCommand = timeToLive?.let { RedisCommand("PX", timeToLive.inWholeMilliseconds.toString()) } ?: RedisCommand()
 
-        val response = connection.runCommand(RedisCommand("SET", key, value) + exclusiveModeSubCommand + ttlSubCommand)
+        val response = connection.runCommand(RedisCommand("SET", key, value.toString()) + exclusiveModeSubCommand + ttlSubCommand)
 
         if (response is RespError) {
             response.throwAsException()
@@ -49,7 +49,6 @@ value class StandaloneSiths(
             else -> response
         }
 
-    // TODO: Test
     override suspend fun incrBy(key: String, value: Long) = when(val response = connection.runCommand(RedisCommand("INCRBY", key, value.toString()))) {
         is RespInteger -> response.value
         else -> throw RedisUnexpectedRespResponse(response)
