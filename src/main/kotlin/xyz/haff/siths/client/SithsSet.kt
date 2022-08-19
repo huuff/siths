@@ -21,7 +21,7 @@ class SithsSet<T: Any>(
         val addedCount = runBlocking {
             sithsClient.sadd(name, uniqueElements[0], uniqueElements.slice(1 until uniqueElements.size))
         }
-        return addedCount.toInt() == uniqueElements.size
+        return addedCount.toInt() != 0
     }
 
     override fun clear() {
@@ -32,10 +32,26 @@ class SithsSet<T: Any>(
         TODO("Not yet implemented")
     }
 
-    override fun remove(element: T): Boolean = runBlocking { sithsClient.srem(name, element) == 1L }
+    override fun remove(element: T): Boolean = runBlocking { sithsClient.srem(name, element) != 0L }
 
     override fun removeAll(elements: Collection<T>): Boolean {
-        TODO("Not yet implemented")
+        val otherSet = elements.stream().toArray()
+        val pipelineResults = runBlocking {
+            withRedis(sithsPool) {
+                pipelined {
+                    val otherSetKey = randomUUID()
+                    sadd(otherSetKey, otherSet[0], otherSet.slice(1 until otherSet.size))
+                    sdiffstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
+                    del(otherSetKey)
+                }
+            }
+        }
+
+        return when (val sdiffstoreResponse = pipelineResults[1]) {
+            is RespInteger -> sdiffstoreResponse.value.toInt() != 0
+            is RespError -> sdiffstoreResponse.throwAsException()
+            else -> throw RedisUnexpectedRespResponse(sdiffstoreResponse)
+        }
     }
 
     override fun retainAll(elements: Collection<T>): Boolean {
@@ -48,20 +64,19 @@ class SithsSet<T: Any>(
     override fun contains(element: T): Boolean = runBlocking { sithsClient.sismember(name, element) }
 
     override fun containsAll(elements: Collection<T>): Boolean {
-        val otherSet = elements.toSet()
+        val otherSet = elements.toSet().stream().toArray()
         val pipelineResults = runBlocking {
             withRedis(sithsPool) {
                 pipelined {
                     val temporarySetKey = randomUUID()
-                    sadd(temporarySetKey, this@SithsSet.name, otherSet.stream().toArray())
+                    sadd(temporarySetKey, otherSet[0], otherSet.slice(1 until otherSet.size))
                     sintercard(this@SithsSet.name, temporarySetKey, limit = otherSet.size)
                     del(temporarySetKey)
                 }
             }
         }
 
-        val sintercardResponse = pipelineResults[1]
-        return when (sintercardResponse) {
+        return when (val sintercardResponse = pipelineResults[1]) {
             is RespInteger -> sintercardResponse.value.toInt() == otherSet.size
             is RespError -> sintercardResponse.throwAsException()
             else -> throw RedisUnexpectedRespResponse(sintercardResponse)
