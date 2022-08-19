@@ -6,6 +6,8 @@ import xyz.haff.siths.common.randomUUID
 import java.util.*
 
 // TODO: I should test this all!
+// TODO: I delete all temporary sets I make... but that's not enough, I should also set an expiration to make sure they
+// eventually get removed in case the `del` is never executed due to some error
 class SithsSet<T: Any>(
     private val sithsPool: SithsPool,
     private val name: String = "set:${UUID.randomUUID()}"
@@ -53,7 +55,7 @@ class SithsSet<T: Any>(
                     val temporarySetKey = randomUUID()
                     sadd(temporarySetKey, this@SithsSet.name, otherSet.stream().toArray())
                     sintercard(this@SithsSet.name, temporarySetKey, limit = otherSet.size)
-                    del(temporarySetKey) // TODO: Maybe also set expire, I don't want the other set to be left around if something goes wrong
+                    del(temporarySetKey)
                 }
             }
         }

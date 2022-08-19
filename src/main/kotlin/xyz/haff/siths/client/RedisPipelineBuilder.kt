@@ -73,4 +73,8 @@ class RedisPipelineBuilder(
     override suspend fun sintercard(key: String, vararg rest: String, limit: Int?) {
         commandList += commandBuilder.sintercard(key, rest = rest, limit = limit)
     }
+
+    override suspend fun sdiffstore(destination: String, key: String, vararg rest: String) {
+        commandList += commandBuilder.sdiffstore(destination, key, *rest)
+    }
 }

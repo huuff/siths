@@ -82,4 +82,7 @@ class RedisCommandBuilder : Siths<
             mainCommand + RedisCommand("LIMIT", limit)
         }
     }
+
+    override suspend fun sdiffstore(destination: String, key: String, vararg rest: String): RedisCommand
+        = RedisCommand("SDIFFSTORE", destination, key, *rest)
 }

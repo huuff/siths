@@ -230,5 +230,21 @@ class SithsClientTest : FunSpec({
             // ASSERT
             intersection shouldBe 1L
         }
+
+        test("sdiffstore") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val operand1 = randomUUID()
+            val operand2 = randomUUID()
+            val destination = randomUUID()
+            siths.sadd(operand1, "key1", "key2", "key3")
+            siths.sadd(operand2, "key1", "key3")
+
+            // ACT
+            siths.sdiffstore(destination, operand1, operand2)
+
+            // ASSERT
+            siths.smembers(destination) shouldBe setOf("key2")
+        }
     }
 })

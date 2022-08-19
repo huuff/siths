@@ -4,6 +4,8 @@ import xyz.haff.siths.common.RedisUnexpectedRespResponse
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+// TODO: I have many exact repetitions of "if error, throw as exception, else, throw a RedisUnexpectedRespResponse exception"
+// maybe I could just make a function that does this and call it in the `else` branch
 class StandaloneSithsClient(
     private val connection: SithsConnection,
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder()
@@ -76,7 +78,7 @@ class StandaloneSithsClient(
             else -> response
         }
 
-    override suspend fun incrBy(key: String, value: Long) =
+    override suspend fun incrBy(key: String, value: Long): Long =
         when (val response = connection.runCommand(commandBuilder.incrBy(key, value))) {
             is RespInteger -> response.value
             is RespError -> response.throwAsException()
@@ -119,6 +121,13 @@ class StandaloneSithsClient(
 
     override suspend fun sintercard(key: String, vararg rest: String, limit: Int?): Long =
         when (val response = connection.runCommand(commandBuilder.sintercard(key, rest = rest, limit = limit))) {
+            is RespInteger -> response.value
+            is RespError -> response.throwAsException()
+            else -> throw RedisUnexpectedRespResponse(response)
+        }
+
+    override suspend fun sdiffstore(destination: String, key: String, vararg rest: String): Long
+        = when (val response = connection.runCommand(commandBuilder.sdiffstore(destination, key, *rest))) {
             is RespInteger -> response.value
             is RespError -> response.throwAsException()
             else -> throw RedisUnexpectedRespResponse(response)
