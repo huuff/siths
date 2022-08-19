@@ -34,8 +34,10 @@ class SithsSet<T: Any>(
 
     override fun remove(element: T): Boolean = runBlocking { sithsClient.srem(name, element) != 0L }
 
+    // TODO: I'm sure I can heavily dry removeAll, retainAll and containsAll, since they differ in one or two lines at most
     override fun removeAll(elements: Collection<T>): Boolean {
         val otherSet = elements.stream().toArray()
+        val sizePriorToChange = this.size
         val pipelineResults = runBlocking {
             withRedis(sithsPool) {
                 pipelined {
@@ -48,16 +50,36 @@ class SithsSet<T: Any>(
         }
 
         return when (val sdiffstoreResponse = pipelineResults[1]) {
-            is RespInteger -> sdiffstoreResponse.value.toInt() != 0
+            is RespInteger -> sdiffstoreResponse.value.toInt() != sizePriorToChange
             is RespError -> sdiffstoreResponse.throwAsException()
             else -> throw RedisUnexpectedRespResponse(sdiffstoreResponse)
         }
     }
 
     override fun retainAll(elements: Collection<T>): Boolean {
-        TODO("Not yet implemented")
+        val otherSet = elements.stream().toArray()
+        val sizePriorToChange = this.size
+        val pipelineResults = runBlocking {
+            withRedis(sithsPool) {
+                pipelined {
+                    val otherSetKey = randomUUID()
+                    sadd(otherSetKey, otherSet[0], otherSet.slice(1 until otherSet.size))
+                    sinterstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
+                    del(otherSetKey)
+                }
+            }
+        }
+
+        return when (val sinterstoreResponse = pipelineResults[1]) {
+            is RespInteger -> sinterstoreResponse.value.toInt() != sizePriorToChange
+            is RespError -> sinterstoreResponse.throwAsException()
+            else -> throw RedisUnexpectedRespResponse(sinterstoreResponse)
+        }
     }
 
+    // TODO: Can I just cache this or manage it locally to avoid making a new roundtrip? retainAll and removeAll use them
+    // outside of the pipeline, so at minimum I can move them into the pipeline (and thus, use scard only) but maybe I just
+    // can manage the set size locally and make it very optimal to use.
     override val size: Int
         get() = runBlocking { sithsClient.scard(name).toInt() }
 

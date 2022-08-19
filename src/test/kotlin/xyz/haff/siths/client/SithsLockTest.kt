@@ -22,6 +22,7 @@ class SithsLockTest : FunSpec({
         clearAllMocks()
     }
 
+    // TODO: This test is flaky, can I mark it so somehow so it gets retried?
     test("execution gets interleaved without locking") {
         val values = Collections.synchronizedList(mutableListOf<String>())
 
