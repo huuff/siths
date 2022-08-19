@@ -189,6 +189,7 @@ class SithsClientTest : FunSpec({
         }
     }
 
+    // TODO: These tests should be independent to allow executing them independently
     context("sets") {
         val siths = PooledSithsClient(makeSithsPool(container))
 
@@ -207,6 +208,11 @@ class SithsClientTest : FunSpec({
 
         test("we can get all members") {
             siths.smembers("test-set") shouldBe setOf("test1", "test2")
+        }
+
+        test("we can remove an element") {
+            siths.srem("test-set", "test1", "test2") shouldBe 2L
+            siths.scard("test-set") shouldBe 0L
         }
     }
 })

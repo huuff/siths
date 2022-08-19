@@ -110,6 +110,13 @@ class StandaloneSithsClient(
             else -> throw RedisUnexpectedRespResponse(response)
         }
 
+    override suspend fun srem(key: String, member: Any, vararg rest: Any): Long
+        = when (val response = connection.runCommand(commandBuilder.srem(key, member, *rest))) {
+            is RespInteger -> response.value
+            is RespError -> response.throwAsException()
+            else -> throw RedisUnexpectedRespResponse(response)
+        }
+
     override suspend fun sismember(key: String, member: Any): Boolean =
         when (val response = connection.runCommand(commandBuilder.sismember(key, member))) {
             is RespInteger -> response.value == 1L

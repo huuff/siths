@@ -62,6 +62,10 @@ class RedisPipelineBuilder(
         commandList += commandBuilder.scard(key)
     }
 
+    override suspend fun srem(key: String, member: Any, vararg rest: Any) {
+        commandList += commandBuilder.srem(key, member, *rest)
+    }
+
     override suspend fun exists(key: String, vararg rest: String) {
         commandList += commandBuilder.exists(key, *rest)
     }

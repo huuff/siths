@@ -25,9 +25,7 @@ class SithsSet<T: Any>(
         TODO("Not yet implemented")
     }
 
-    override fun remove(element: T): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun remove(element: T): Boolean = runBlocking { sithsClient.srem(name, element) == 1L }
 
     override fun removeAll(elements: Collection<T>): Boolean {
         TODO("Not yet implemented")

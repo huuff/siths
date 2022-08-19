@@ -48,6 +48,8 @@ class RedisCommandBuilder : Siths<RedisCommand, RedisCommand, RedisCommand, Redi
         *args.toTypedArray()
     )
 
+    override suspend fun exists(key: String, vararg rest: String) = RedisCommand("EXISTS", key, *rest)
+
     override suspend fun sadd(key: String, value: Any, vararg rest: Any) = RedisCommand(
         "SADD",
         key,
@@ -59,5 +61,6 @@ class RedisCommandBuilder : Siths<RedisCommand, RedisCommand, RedisCommand, Redi
 
     override suspend fun sismember(key: String, member: Any) = RedisCommand("SISMEMBER", key, member.toString())
     override suspend fun scard(key: String): RedisCommand = RedisCommand("SCARD", key)
-    override suspend fun exists(key: String, vararg rest: String) = RedisCommand("EXISTS", key, *rest)
+    override suspend fun srem(key: String, member: Any, vararg rest: Any): RedisCommand
+        = RedisCommand("SREM", key, member, *rest)
 }
