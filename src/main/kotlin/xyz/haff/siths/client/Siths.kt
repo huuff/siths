@@ -37,6 +37,7 @@ interface Siths<
     suspend fun srem(key: String, member: Any, vararg rest: Any): LongResponseType
     suspend fun sintercard(key: String, vararg rest: String, limit: Int? = null): LongResponseType
     suspend fun sdiffstore(destination: String, key: String, vararg rest: String): LongResponseType
+    suspend fun sinterstore(destination: String, key: String, vararg rest: String): LongResponseType
 
     suspend fun clientList(): ClientListResponseType
 }

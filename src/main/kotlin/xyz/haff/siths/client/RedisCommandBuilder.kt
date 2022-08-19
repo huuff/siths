@@ -85,4 +85,7 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun sdiffstore(destination: String, key: String, vararg rest: String): RedisCommand
         = RedisCommand("SDIFFSTORE", destination, key, *rest)
+
+    override suspend fun sinterstore(destination: String, key: String, vararg rest: String): RedisCommand
+        = RedisCommand("SINTERSTORE", destination, key, *rest)
 }

@@ -5,7 +5,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 // TODO: I have many exact repetitions of "if error, throw as exception, else, throw a RedisUnexpectedRespResponse exception"
-// maybe I could just make a function that does this and call it in the `else` branch
+// maybe I could just make a function that does this and call it in the `else` branch. UPDATE: I also repeat this for
+// SithsSet!
 class StandaloneSithsClient(
     private val connection: SithsConnection,
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder()
@@ -128,6 +129,13 @@ class StandaloneSithsClient(
 
     override suspend fun sdiffstore(destination: String, key: String, vararg rest: String): Long
         = when (val response = connection.runCommand(commandBuilder.sdiffstore(destination, key, *rest))) {
+            is RespInteger -> response.value
+            is RespError -> response.throwAsException()
+            else -> throw RedisUnexpectedRespResponse(response)
+        }
+
+    override suspend fun sinterstore(destination: String, key: String, vararg rest: String): Long
+        = when (val response = connection.runCommand(commandBuilder.sinterstore(destination, key, *rest))) {
             is RespInteger -> response.value
             is RespError -> response.throwAsException()
             else -> throw RedisUnexpectedRespResponse(response)
