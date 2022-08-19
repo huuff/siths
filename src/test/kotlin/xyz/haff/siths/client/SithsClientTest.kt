@@ -241,9 +241,10 @@ class SithsClientTest : FunSpec({
             siths.sadd(operand2, "key1", "key3")
 
             // ACT
-            siths.sdiffstore(destination, operand1, operand2)
+            val elementNumber = siths.sdiffstore(destination, operand1, operand2)
 
             // ASSERT
+            elementNumber shouldBe 1L
             siths.smembers(destination) shouldBe setOf("key2")
         }
 
@@ -257,9 +258,10 @@ class SithsClientTest : FunSpec({
             siths.sadd(operand2, "key1", "key3")
 
             // ACT
-            siths.sinterstore(destination, operand1, operand2)
+            val elementNumber = siths.sinterstore(destination, operand1, operand2)
 
             // ASSERT
+            elementNumber shouldBe 2L
             siths.smembers(destination) shouldBe setOf("key1", "key3")
         }
     }
