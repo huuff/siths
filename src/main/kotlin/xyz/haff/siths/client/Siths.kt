@@ -35,6 +35,7 @@ interface Siths<
     suspend fun sismember(key: String, member: Any): BooleanResponseType
     suspend fun scard(key: String): LongResponseType
     suspend fun srem(key: String, member: Any, vararg rest: Any): LongResponseType
+    suspend fun sintercard(key: String, vararg rest: String, limit: Int? = null): LongResponseType
 
     suspend fun clientList(): ClientListResponseType
 }

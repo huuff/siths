@@ -13,7 +13,6 @@ import java.util.*
 
 // TODO: Implement Siths? Delegate it? To avoid using a context receiver
 class SithsDSL(val pool: SithsPool) {
-    // TODO: This should be a context receiver when that API stabilizes
     val redis = PooledSithsClient(pool)
 
     /**

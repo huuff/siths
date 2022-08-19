@@ -1,12 +1,17 @@
 package xyz.haff.siths.client
 
 import kotlinx.coroutines.runBlocking
+import xyz.haff.siths.common.RedisUnexpectedRespResponse
+import xyz.haff.siths.common.randomUUID
 import java.util.*
 
+// TODO: I should test this all!
 class SithsSet<T: Any>(
-    private val sithsClient: SithsClient,
+    private val sithsPool: SithsPool,
     private val name: String = "set:${UUID.randomUUID()}"
 ) : MutableSet<T> {
+    private val sithsClient = PooledSithsClient(sithsPool)
+
     override fun add(element: T): Boolean = runBlocking { sithsClient.sadd(name, element) == 1L }
 
     override fun addAll(elements: Collection<T>): Boolean {
@@ -41,7 +46,24 @@ class SithsSet<T: Any>(
     override fun contains(element: T): Boolean = runBlocking { sithsClient.sismember(name, element) }
 
     override fun containsAll(elements: Collection<T>): Boolean {
-        TODO("Not yet implemented")
+        val otherSet = elements.toSet()
+        val pipelineResults = runBlocking {
+            withRedis(sithsPool) {
+                pipelined {
+                    val temporarySetKey = randomUUID()
+                    sadd(temporarySetKey, this@SithsSet.name, otherSet.stream().toArray())
+                    sintercard(this@SithsSet.name, temporarySetKey, limit = otherSet.size)
+                    del(temporarySetKey) // TODO: Maybe also set expire, I don't want the other set to be left around if something goes wrong
+                }
+            }
+        }
+
+        val sintercardResponse = pipelineResults[1]
+        return when (sintercardResponse) {
+            is RespInteger -> sintercardResponse.value.toInt() == otherSet.size
+            is RespError -> sintercardResponse.throwAsException()
+            else -> throw RedisUnexpectedRespResponse(sintercardResponse)
+        }
     }
 
     override fun isEmpty(): Boolean = size == 0

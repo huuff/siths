@@ -3,7 +3,16 @@ package xyz.haff.siths.client
 import kotlin.time.Duration
 
 // TODO: Maybe test the most complex ones
-class RedisCommandBuilder : Siths<RedisCommand, RedisCommand, RedisCommand, RedisCommand, RedisCommand, RedisCommand, RedisCommand, RedisCommand> {
+class RedisCommandBuilder : Siths<
+        RedisCommand,
+        RedisCommand,
+        RedisCommand,
+        RedisCommand,
+        RedisCommand,
+        RedisCommand,
+        RedisCommand,
+        RedisCommand
+        > {
 
     override suspend fun get(key: String) = RedisCommand("GET", key)
 
@@ -63,4 +72,14 @@ class RedisCommandBuilder : Siths<RedisCommand, RedisCommand, RedisCommand, Redi
     override suspend fun scard(key: String): RedisCommand = RedisCommand("SCARD", key)
     override suspend fun srem(key: String, member: Any, vararg rest: Any): RedisCommand
         = RedisCommand("SREM", key, member, *rest)
+
+    override suspend fun sintercard(key: String, vararg rest: String, limit: Int?): RedisCommand {
+        val mainCommand = RedisCommand("SINTERCARD", 1 + rest.size, key, *rest)
+
+        return if (limit == null) {
+            mainCommand
+        } else {
+            mainCommand + RedisCommand("LIMIT", limit)
+        }
+    }
 }

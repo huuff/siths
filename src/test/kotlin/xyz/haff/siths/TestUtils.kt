@@ -4,9 +4,12 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.testcontainers.containers.GenericContainer
 import redis.clients.jedis.JedisPool
+import xyz.haff.siths.client.PooledSithsClient
 import xyz.haff.siths.client.SithsPool
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+
+fun makeSithsClient(contaier: GenericContainer<*>) = PooledSithsClient(makeSithsPool(contaier))
 
 fun makeJedisPool(container: GenericContainer<*>) = JedisPool(container.host, container.firstMappedPort)
 fun makeSithsPool(container: GenericContainer<*>, maxConnections: Int = 10, acquireTimeout: Duration = 10.seconds)

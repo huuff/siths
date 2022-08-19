@@ -46,6 +46,10 @@ class RedisPipelineBuilder(
         commandList += commandBuilder.eval(script, keys, args)
     }
 
+    override suspend fun exists(key: String, vararg rest: String) {
+        commandList += commandBuilder.exists(key, *rest)
+    }
+
     override suspend fun sadd(key: String, value: Any, vararg rest: Any) {
         commandList += commandBuilder.sadd(key, value, *rest)
     }
@@ -66,7 +70,7 @@ class RedisPipelineBuilder(
         commandList += commandBuilder.srem(key, member, *rest)
     }
 
-    override suspend fun exists(key: String, vararg rest: String) {
-        commandList += commandBuilder.exists(key, *rest)
+    override suspend fun sintercard(key: String, vararg rest: String, limit: Int?) {
+        commandList += commandBuilder.sintercard(key, rest = rest, limit = limit)
     }
 }

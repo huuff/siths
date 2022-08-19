@@ -6,6 +6,7 @@ import kotlin.time.Duration
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
+// TODO: Make it thread-safe... @Synchronized?
 class SithsPool(
     private val host: String = "localhost",
     private val port: Int = 6379,

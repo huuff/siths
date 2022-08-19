@@ -13,8 +13,9 @@ import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.client.ExclusiveMode.*
 import xyz.haff.siths.common.RedisScriptNotLoadedException
+import xyz.haff.siths.common.randomUUID
+import xyz.haff.siths.makeSithsClient
 import kotlin.time.Duration.Companion.seconds
-
 
 class SithsClientTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
@@ -213,6 +214,21 @@ class SithsClientTest : FunSpec({
         test("we can remove an element") {
             siths.srem("test-set", "test1", "test2") shouldBe 2L
             siths.scard("test-set") shouldBe 0L
+        }
+
+        test("sintercard") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val set1 = randomUUID()
+            val set2 = randomUUID()
+            siths.sadd(set1, "key1", "key2")
+            siths.sadd(set2, "key2", "key3")
+
+            // ACT
+            val intersection = siths.sintercard(set1, set2)
+
+            // ASSERT
+            intersection shouldBe 1L
         }
     }
 })
