@@ -23,16 +23,16 @@ value class RespParser(private val channel: ByteReadChannel) {
         return String(responseBuffer.array(), Charsets.UTF_8)
     }
 
-    suspend fun parseSimpleString(): RespSimpleString = RespSimpleString(value = channel.readUTF8Line()!!)
-    suspend fun parseError(): RespError {
+    private suspend fun parseSimpleString(): RespSimpleString = RespSimpleString(value = channel.readUTF8Line()!!)
+    private suspend fun parseError(): RespError {
         // TODO: `firstWord` in koy
         val errorMessage = channel.readUTF8Line()!!
         val errorType = firstWordRegex.find(errorMessage)!!.value
         return RespError(type = errorType, value = errorMessage.drop(errorType.length))
     }
-    suspend fun parseInteger(): RespInteger = RespInteger(channel.readUTF8Line()!!.toLong())
-    suspend fun parseBulkString(length: Int): RespBulkString = RespBulkString(readWithoutCrlf(length))
-    suspend fun parseArray(length: Int): RespArray {
+    private suspend fun parseInteger(): RespInteger = RespInteger(channel.readUTF8Line()!!.toLong())
+    private suspend fun parseBulkString(length: Int): RespBulkString = RespBulkString(readWithoutCrlf(length))
+    private suspend fun parseArray(length: Int): RespArray {
         val responses: MutableList<RespType<*>> = ArrayList(length)
         repeat(length) {
             responses += parse()
