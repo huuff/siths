@@ -57,4 +57,19 @@ class SithsSetTest : FunSpec({
         ("key3" in set) shouldBe true
     }
 
+    test("can clear") {
+        // ARRANGE
+        val set = SithsSet<String>(sithsPool = makeSithsPool(container))
+        set += "key1"
+
+        // SANITY CHECK
+        set.size shouldBe 1
+
+        // ACT
+        set.clear()
+
+        // ASSERT
+        set.size shouldBe 0
+    }
+
 })
