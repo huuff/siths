@@ -2,6 +2,7 @@ package xyz.haff.siths.client
 
 import kotlinx.coroutines.runBlocking
 import xyz.haff.siths.common.RedisUnexpectedRespResponse
+import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import java.util.*
 
@@ -16,11 +17,11 @@ class SithsSet<T: Any>(
 
     override fun add(element: T): Boolean = runBlocking { sithsClient.sadd(name, element) == 1L }
 
-    // OPT: Likely unoptimal array management
+    // OPT: Prevent copying the array
     override fun addAll(elements: Collection<T>): Boolean {
-        val uniqueElements = elements.toSet().stream().toArray()
+        val (head, tail) = (elements.toSet() as Set<Any>).toTypedArray().headAndTail()
         val addedCount = runBlocking {
-            sithsClient.sadd(name, uniqueElements[0], *uniqueElements.slice(1 until uniqueElements.size).stream().toArray())
+            sithsClient.sadd(name, head, *tail)
         }
         return addedCount.toInt() != 0
     }
@@ -37,13 +38,13 @@ class SithsSet<T: Any>(
 
     // TODO: I'm sure I can heavily dry removeAll, retainAll and containsAll, since they differ in one or two lines at most
     override fun removeAll(elements: Collection<T>): Boolean {
-        val otherSet = elements.stream().toArray()
+        val (otherSetHead, otherSetTail) = (elements.toSet() as Set<Any>).toTypedArray().headAndTail()
         val sizePriorToChange = this.size
         val pipelineResults = runBlocking {
             withRedis(sithsPool) {
                 pipelined {
                     val otherSetKey = randomUUID()
-                    sadd(otherSetKey, otherSet[0], otherSet.slice(1 until otherSet.size))
+                    sadd(otherSetKey, otherSetHead, *otherSetTail)
                     sdiffstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
                     del(otherSetKey)
                 }
@@ -58,13 +59,13 @@ class SithsSet<T: Any>(
     }
 
     override fun retainAll(elements: Collection<T>): Boolean {
-        val otherSet = elements.stream().toArray()
+        val (otherSetHead, otherSetTail) = (elements.toSet() as Set<Any>).toTypedArray().headAndTail()
         val sizePriorToChange = this.size
         val pipelineResults = runBlocking {
             withRedis(sithsPool) {
                 pipelined {
                     val otherSetKey = randomUUID()
-                    sadd(otherSetKey, otherSet[0], otherSet.slice(1 until otherSet.size))
+                    sadd(otherSetKey, otherSetHead, *otherSetTail)
                     sinterstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
                     del(otherSetKey)
                 }
