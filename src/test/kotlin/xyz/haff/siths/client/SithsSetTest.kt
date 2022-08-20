@@ -95,4 +95,20 @@ class SithsSetTest : FunSpec({
         ("key2" in set) shouldBe true
         ("key3" in set) shouldBe false
     }
+
+    test("retain all") {
+        // ARRANGE
+        val set = SithsSet<String>(sithsPool = makeSithsPool(container))
+        set.addAll(listOf("key1", "key2", "key3"))
+
+        // ACT
+        val wasModified = set.retainAll(listOf("key1", "key3"))
+
+        // ASSERT
+        wasModified shouldBe true
+        set.size shouldBe 2
+        ("key1" in set) shouldBe true
+        ("key2" in set) shouldBe false
+        ("key3" in set) shouldBe true
+    }
 })
