@@ -48,13 +48,14 @@ class SithsSetTest : FunSpec({
         val set = SithsSet<String>(sithsPool = makeSithsPool(container))
 
         // ACT
-        set.addAll(listOf("key1", "key2", "key3"))
+        val wasModified = set.addAll(listOf("key1", "key2", "key3"))
 
         // ASSERT
         set.size shouldBe 3
         ("key1" in set) shouldBe true
         ("key2" in set) shouldBe true
         ("key3" in set) shouldBe true
+        wasModified shouldBe true
     }
 
     test("can clear") {
@@ -70,6 +71,25 @@ class SithsSetTest : FunSpec({
 
         // ASSERT
         set.size shouldBe 0
+    }
+
+    test("correct return type for add") {
+        // ARRANGE
+        val set = SithsSet<String>(sithsPool = makeSithsPool(container))
+
+        // ACT & ASSERT
+        set.add("1") shouldBe true
+        set.add("1") shouldBe false
+    }
+
+    test("correct return type for remove") {
+        // ARRANGE
+        val set = SithsSet<String>(sithsPool = makeSithsPool(container))
+        set.add("1")
+
+        // ACT && ASSERT
+        set.remove("1") shouldBe true
+        set.remove("1") shouldBe false
     }
 
 })
