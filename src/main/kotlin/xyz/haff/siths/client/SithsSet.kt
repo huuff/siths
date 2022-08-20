@@ -16,10 +16,11 @@ class SithsSet<T: Any>(
 
     override fun add(element: T): Boolean = runBlocking { sithsClient.sadd(name, element) == 1L }
 
+    // OPT: Likely unoptimal array management
     override fun addAll(elements: Collection<T>): Boolean {
         val uniqueElements = elements.toSet().stream().toArray()
         val addedCount = runBlocking {
-            sithsClient.sadd(name, uniqueElements[0], uniqueElements.slice(1 until uniqueElements.size))
+            sithsClient.sadd(name, uniqueElements[0], *uniqueElements.slice(1 until uniqueElements.size).stream().toArray())
         }
         return addedCount.toInt() != 0
     }

@@ -63,7 +63,7 @@ class RedisCommandBuilder : Siths<
         "SADD",
         key,
         value.toString(),
-        *rest.map { it.toString() }.toTypedArray()
+        *rest,
     )
 
     override suspend fun smembers(key: String): RedisCommand = RedisCommand("SMEMBERS", key)

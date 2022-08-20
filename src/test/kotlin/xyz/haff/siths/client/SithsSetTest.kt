@@ -43,4 +43,18 @@ class SithsSetTest : FunSpec({
         set.size shouldBe 0
     }
 
+    test("can add all") {
+        // ARRANGE
+        val set = SithsSet<String>(sithsPool = makeSithsPool(container))
+
+        // ACT
+        set.addAll(listOf("key1", "key2", "key3"))
+
+        // ASSERT
+        set.size shouldBe 3
+        ("key1" in set) shouldBe true
+        ("key2" in set) shouldBe true
+        ("key3" in set) shouldBe true
+    }
+
 })
