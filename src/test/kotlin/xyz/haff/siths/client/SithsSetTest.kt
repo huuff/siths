@@ -79,4 +79,20 @@ class SithsSetTest : FunSpec({
         // ASSERT
         set.size shouldBe 0
     }
+
+    test("remove all") {
+        // ARRANGE
+        val set = SithsSet<String>(sithsPool = makeSithsPool(container))
+        set.addAll(listOf("key1", "key2", "key3"))
+
+        // ACT
+        val wasModified = set.removeAll(listOf("key1", "key3"))
+
+        // ASSERT
+        wasModified shouldBe true
+        set.size shouldBe 1
+        ("key1" in set) shouldBe false
+        ("key2" in set) shouldBe true
+        ("key3" in set) shouldBe false
+    }
 })
