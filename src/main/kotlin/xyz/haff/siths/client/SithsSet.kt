@@ -88,12 +88,13 @@ class SithsSet<T: Any>(
     override fun contains(element: T): Boolean = runBlocking { sithsClient.sismember(name, element) }
 
     override fun containsAll(elements: Collection<T>): Boolean {
-        val otherSet = elements.toSet().stream().toArray()
+        val otherSet = (elements.toSet() as Set<Any>).toTypedArray()
+        val (otherSetHead, otherSetTail) = otherSet.headAndTail()
         val pipelineResults = runBlocking {
             withRedis(sithsPool) {
                 pipelined {
                     val temporarySetKey = randomUUID()
-                    sadd(temporarySetKey, otherSet[0], otherSet.slice(1 until otherSet.size))
+                    sadd(temporarySetKey, otherSetHead, *otherSetTail)
                     sintercard(this@SithsSet.name, temporarySetKey, limit = otherSet.size)
                     del(temporarySetKey)
                 }

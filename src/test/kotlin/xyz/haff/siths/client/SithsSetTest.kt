@@ -111,4 +111,16 @@ class SithsSetTest : FunSpec({
         ("key2" in set) shouldBe false
         ("key3" in set) shouldBe true
     }
+
+    test("contains all") {
+        // ARRANGE
+        val set = SithsSet<String>(sithsPool = makeSithsPool(container))
+        set.addAll(listOf("key1", "key2", "key3"))
+
+        // ACT
+        val containsAll = set.containsAll(listOf("key1", "key3"))
+
+        // ASSERT
+        containsAll shouldBe true
+    }
 })
