@@ -3,9 +3,11 @@ package xyz.haff.siths.client
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.makeSithsPool
+import kotlin.math.exp
 
 class SithsSetTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine")) {
@@ -122,5 +124,23 @@ class SithsSetTest : FunSpec({
 
         // ASSERT
         containsAll shouldBe true
+    }
+
+    context("iterator") {
+        test("correctly iterates collection") {
+            // ARRANGE
+            val set = SithsSet.ofString(sithsPool = makeSithsPool(container))
+            val expectedElements = (1..100).map { "value$it" }
+            set.addAll(expectedElements)
+            val iteratedElements = mutableListOf<String>()
+
+            // ACT
+            for (elem in set) {
+                iteratedElements += elem
+            }
+
+            // ASSERT
+            iteratedElements shouldContainExactlyInAnyOrder expectedElements
+        }
     }
 })

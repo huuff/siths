@@ -39,9 +39,7 @@ class SithsSet<T : Any>(
         runBlocking { sithsClient.del(name) }
     }
 
-    override fun iterator(): MutableIterator<T> {
-        TODO("Not yet implemented")
-    }
+    override fun iterator(): MutableIterator<T> = Iterator(runBlocking { sithsClient.sscan(name).map(deserializer) })
 
     override fun remove(element: T): Boolean = runBlocking { sithsClient.srem(name, element) != 0L }
 
@@ -123,17 +121,21 @@ class SithsSet<T : Any>(
     ) : MutableIterator<T> {
         private var positionWithinLastCursor = 0
 
-        override fun hasNext(): Boolean = lastCursorResult.next != 0L
+        override fun hasNext(): Boolean = lastCursorResult.next != 0L || positionWithinLastCursor < lastCursorResult.contents.size
 
         override fun next(): T {
-            positionWithinLastCursor++
-
-            if (positionWithinLastCursor < lastCursorResult.contents.size) {
-                return lastCursorResult.contents[positionWithinLastCursor]
+            if (positionWithinLastCursor < lastCursorResult.contents.size - 1) {
+                return lastCursorResult.contents[positionWithinLastCursor].also {
+                    positionWithinLastCursor++
+                }
             } else {
-                lastCursorResult = runBlocking { sithsClient.sscan(name, lastCursorResult.next).map(deserializer) }
-                positionWithinLastCursor = 0
-                return lastCursorResult.contents[positionWithinLastCursor]
+                return lastCursorResult.contents[positionWithinLastCursor].also {
+                    positionWithinLastCursor++
+                    if (hasNext()) {
+                        lastCursorResult = runBlocking { sithsClient.sscan(name, lastCursorResult.next).map(deserializer) }
+                        positionWithinLastCursor = 0
+                    }
+                }
             }
         }
 
