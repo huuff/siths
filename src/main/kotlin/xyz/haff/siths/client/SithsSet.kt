@@ -20,8 +20,8 @@ class SithsSet<T : Any>(
     private val sithsClient = PooledSithsClient(sithsPool)
 
     companion object {
-        fun ofString(sithsPool: SithsPool, name: String = "set:${UUID.randomUUID()}"): SithsSet<String>
-            = SithsSet(sithsPool = sithsPool, name = name, { it }, { it })
+        fun ofString(sithsPool: SithsPool, name: String = "set:${UUID.randomUUID()}"): SithsSet<String> =
+            SithsSet(sithsPool = sithsPool, name = name, { it }, { it })
     }
 
     override fun add(element: T): Boolean = runBlocking { sithsClient.sadd(name, element) == 1L }
@@ -121,21 +121,15 @@ class SithsSet<T : Any>(
     ) : MutableIterator<T> {
         private var positionWithinLastCursor = 0
 
-        override fun hasNext(): Boolean = lastCursorResult.next != 0L || positionWithinLastCursor < lastCursorResult.contents.size
+        override fun hasNext(): Boolean =
+            lastCursorResult.next != 0L || positionWithinLastCursor < lastCursorResult.contents.size
 
-        override fun next(): T {
-            if (positionWithinLastCursor < lastCursorResult.contents.size - 1) {
-                return lastCursorResult.contents[positionWithinLastCursor].also {
-                    positionWithinLastCursor++
-                }
-            } else {
-                return lastCursorResult.contents[positionWithinLastCursor].also {
-                    positionWithinLastCursor++
-                    if (hasNext()) {
-                        lastCursorResult = runBlocking { sithsClient.sscan(name, lastCursorResult.next).map(deserializer) }
-                        positionWithinLastCursor = 0
-                    }
-                }
+        override fun next(): T = lastCursorResult.contents[positionWithinLastCursor].also {
+            positionWithinLastCursor++
+            // XXX: Overflowed the last cursor, but there are more elements
+            if (positionWithinLastCursor >= lastCursorResult.contents.size && hasNext()) {
+                lastCursorResult = runBlocking { sithsClient.sscan(name, lastCursorResult.next).map(deserializer) }
+                positionWithinLastCursor = 0
             }
         }
 
