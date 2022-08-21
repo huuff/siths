@@ -14,7 +14,7 @@ class SithsSetTest : FunSpec({
 
     test("can add elements") {
         // ARRANGE
-        val set = SithsSet<String>(sithsPool = makeSithsPool(container))
+        val set = SithsSet.ofString(sithsPool = makeSithsPool(container))
 
         // ACT
         val wasModified1 = set.add("key1")
@@ -32,7 +32,7 @@ class SithsSetTest : FunSpec({
 
     test("can remove elements") {
         // ARRANGE
-        val set = SithsSet<String>(sithsPool = makeSithsPool(container))
+        val set = SithsSet.ofString(sithsPool = makeSithsPool(container))
         set += "key1"
 
         // SANITY CHECK
@@ -52,7 +52,7 @@ class SithsSetTest : FunSpec({
 
     test("can add all") {
         // ARRANGE
-        val set = SithsSet<String>(sithsPool = makeSithsPool(container))
+        val set = SithsSet.ofString(sithsPool = makeSithsPool(container))
 
         // ACT
         val wasModified = set.addAll(listOf("key1", "key2", "key3"))
@@ -67,7 +67,7 @@ class SithsSetTest : FunSpec({
 
     test("can clear") {
         // ARRANGE
-        val set = SithsSet<String>(sithsPool = makeSithsPool(container))
+        val set = SithsSet.ofString(sithsPool = makeSithsPool(container))
         set += "key1"
 
         // SANITY CHECK
@@ -82,7 +82,7 @@ class SithsSetTest : FunSpec({
 
     test("remove all") {
         // ARRANGE
-        val set = SithsSet<String>(sithsPool = makeSithsPool(container))
+        val set = SithsSet.ofString(sithsPool = makeSithsPool(container))
         set.addAll(listOf("key1", "key2", "key3"))
 
         // ACT
@@ -98,7 +98,7 @@ class SithsSetTest : FunSpec({
 
     test("retain all") {
         // ARRANGE
-        val set = SithsSet<String>(sithsPool = makeSithsPool(container))
+        val set = SithsSet.ofString(sithsPool = makeSithsPool(container))
         set.addAll(listOf("key1", "key2", "key3"))
 
         // ACT
@@ -114,7 +114,7 @@ class SithsSetTest : FunSpec({
 
     test("contains all") {
         // ARRANGE
-        val set = SithsSet<String>(sithsPool = makeSithsPool(container))
+        val set = SithsSet.ofString(sithsPool = makeSithsPool(container))
         set.addAll(listOf("key1", "key2", "key3"))
 
         // ACT

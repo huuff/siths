@@ -11,11 +11,18 @@ import java.util.*
 // TODO: I delete all temporary sets I make... but that's not enough, I should also set an expiration to make sure they
 // eventually get removed in case the `del` is never executed due to some error. UPDATE: Not gonna work,
 // maybe I should use a transaction
-class SithsSet<T: Any>(
+class SithsSet<T : Any>(
     private val sithsPool: SithsPool,
-    private val name: String = "set:${UUID.randomUUID()}"
+    private val name: String = "set:${UUID.randomUUID()}",
+    private val serializer: (T) -> String,
+    private val deserializer: (String) -> T
 ) : MutableSet<T> {
     private val sithsClient = PooledSithsClient(sithsPool)
+
+    companion object {
+        fun ofString(sithsPool: SithsPool, name: String = "set:${UUID.randomUUID()}"): SithsSet<String>
+            = SithsSet(sithsPool = sithsPool, name = name, { it }, { it })
+    }
 
     override fun add(element: T): Boolean = runBlocking { sithsClient.sadd(name, element) == 1L }
 
@@ -111,19 +118,29 @@ class SithsSet<T: Any>(
 
     override fun isEmpty(): Boolean = size == 0
 
-    inner class Iterator<T: Any>(
-        var lastCursorResult: RedisCursor<Set<T>>,
-    ): MutableIterator<T> {
-        var positionWithinLastCursor = 0
+    inner class Iterator(
+        private var lastCursorResult: RedisCursor<T>,
+    ) : MutableIterator<T> {
+        private var positionWithinLastCursor = 0
 
         override fun hasNext(): Boolean = lastCursorResult.next != 0L
 
         override fun next(): T {
-            TODO("Not yet implement")
+            positionWithinLastCursor++
+
+            if (positionWithinLastCursor < lastCursorResult.contents.size) {
+                return lastCursorResult.contents[positionWithinLastCursor]
+            } else {
+                lastCursorResult = runBlocking { sithsClient.sscan(name, lastCursorResult.next).map(deserializer) }
+                positionWithinLastCursor = 0
+                return lastCursorResult.contents[positionWithinLastCursor]
+            }
         }
 
         override fun remove() {
-            TODO("Not yet implemented")
+            val currentElem = lastCursorResult.contents[positionWithinLastCursor]
+
+            runBlocking { sithsClient.srem(name, serializer(currentElem)) }
         }
     }
 }
