@@ -298,7 +298,6 @@ class SithsClientTest : FunSpec({
             val result3 = siths.sscan(set, result2.next, match = "value*", count = 6)
 
             // ASSERT
-            // TODO: Can I assert the sizes of the returned lists?
             (result1.contents + result2.contents + result3.contents).toSet() shouldBe valuesToAdd.toSet()
         }
     }
