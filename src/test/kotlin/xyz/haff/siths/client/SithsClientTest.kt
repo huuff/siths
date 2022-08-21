@@ -190,30 +190,49 @@ class SithsClientTest : FunSpec({
         }
     }
 
-    // TODO: These tests should be independent to allow executing them independently
     context("sets") {
-        val siths = PooledSithsClient(makeSithsPool(container))
-
         test("we can add to the set") {
-            siths.sadd("test-set", "test1", "test2") shouldBe 2
-        }
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val set = randomUUID();
 
-        test("the cardinality is correct") {
-            siths.scard("test-set") shouldBe 2
-        }
+            // ACT
+            val added = siths.sadd(set, "test1", "test2")
 
-        test("we can check for pertenence") {
-            siths.sismember("test-set", "test1") shouldBe true
-            siths.sismember("test-set", "test3") shouldBe false
+            // ASSERT
+            added shouldBe 2
+            siths.sismember(set, "test1") shouldBe true
+            siths.sismember(set, "test2") shouldBe true
         }
 
         test("we can get all members") {
-            siths.smembers("test-set") shouldBe setOf("test1", "test2")
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val set = randomUUID();
+            siths.sadd(set, "test1", "test2")
+
+            // ACT
+            val members = siths.smembers(set)
+
+            // ASSERT
+            members shouldBe setOf("test1", "test2")
         }
 
         test("we can remove an element") {
-            siths.srem("test-set", "test1", "test2") shouldBe 2L
-            siths.scard("test-set") shouldBe 0L
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val set = randomUUID();
+            siths.sadd(set, "test1", "test2")
+
+            // SANITY CHECK
+            siths.sismember(set, "test1") shouldBe true
+
+            // ACT
+            val removed = siths.srem(set, "test1")
+
+            // ASSERT
+            removed shouldBe 1L
+            siths.sismember(set, "test1") shouldBe false
         }
 
         test("sintercard") {
