@@ -4,7 +4,7 @@ import kotlin.time.Duration
 
 class RedisPipelineBuilder(
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder(),
-): Siths<Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit> {
+): Siths<Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit> {
     private val commandList = mutableListOf<RedisCommand>()
     val length get() = commandList.size
 
@@ -84,5 +84,9 @@ class RedisPipelineBuilder(
 
     override suspend fun sinterstore(destination: String, key: String, vararg rest: String) {
         commandList += commandBuilder.sinterstore(destination, key, *rest)
+    }
+
+    override suspend fun sscan(key: String, cursor: Long, match: String?, count: Int?) {
+        commandList += commandBuilder.sscan(key, cursor, match, count)
     }
 }

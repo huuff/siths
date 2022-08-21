@@ -11,7 +11,8 @@ class RedisCommandBuilder : Siths<
         RedisCommand,
         RedisCommand,
         RedisCommand,
-        RedisCommand
+        RedisCommand,
+        RedisCommand,
         > {
 
     override suspend fun get(key: String) = RedisCommand("GET", key)
@@ -90,4 +91,18 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun sinterstore(destination: String, key: String, vararg rest: String): RedisCommand
         = RedisCommand("SINTERSTORE", destination, key, *rest)
+
+    override suspend fun sscan(key: String, cursor: Long, match: String?, count: Int?): RedisCommand {
+        var command = RedisCommand("SSCAN", key, cursor)
+
+        if (match != null) {
+            command += RedisCommand("MATCH", match)
+        }
+
+        if (count != null) {
+            command += RedisCommand("COUNT", count)
+        }
+
+        return command
+    }
 }

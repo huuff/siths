@@ -10,6 +10,7 @@ interface Siths<
         ClientListResponseType,
         DurationResponseType,
         StringSetResponseType,
+        StringSetCursorResponseType,
         BooleanResponseType,
         > {
     suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode? = null, timeToLive: Duration? = null): UnitResponseType
@@ -31,6 +32,7 @@ interface Siths<
     suspend fun sintercard(key: String, vararg rest: String, limit: Int? = null): LongResponseType
     suspend fun sdiffstore(destination: String, key: String, vararg rest: String): LongResponseType
     suspend fun sinterstore(destination: String, key: String, vararg rest: String): LongResponseType
+    suspend fun sscan(key: String, cursor: Long = 0, match: String? = null, count: Int? = null): StringSetCursorResponseType
 
     suspend fun clientList(): ClientListResponseType
     suspend fun ping(): BooleanResponseType

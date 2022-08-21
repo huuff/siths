@@ -131,6 +131,25 @@ class StandaloneSithsClient(
             else -> handleUnexpectedRespResponse(response)
         }
 
+    @Suppress("UNCHECKED_CAST") // Not actually unchecked, but Kotlin is not smart enough to notice
+    override suspend fun sscan(key: String, cursor: Long, match: String?, count: Int?): RedisCursor<Set<String>> {
+        val response = connection.runCommand(commandBuilder.sscan(key, cursor, match, count))
+
+        return when {
+            (response is RespArray)
+                    && (response.value[0] is RespBulkString)
+                    && (response.value[1] is RespArray)
+                    && (response.value[1] as RespArray).value.all { it is RespBulkString }
+            -> {
+                RedisCursor(
+                    next = (response.value[0] as RespBulkString).value.toLong(),
+                    contents = ((response.value[1] as RespArray).value as List<RespBulkString>).map { it.value }.toSet()
+                )
+            }
+            else -> handleUnexpectedRespResponse(response)
+        }
+    }
+
     override suspend fun clientList(): List<RedisClient> =
         when (val response = connection.runCommand(commandBuilder.clientList())) {
             is RespBulkString -> parseClientList(response.value)

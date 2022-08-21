@@ -283,6 +283,22 @@ class SithsClientTest : FunSpec({
             elementNumber shouldBe 2L
             siths.smembers(destination) shouldBe setOf("key1", "key3")
         }
+
+        test("sscan") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val set = randomUUID()
+            val valuesToAdd = (1..15).map { "value$it" }
+            siths.sadd(set, "unincluded-value", *valuesToAdd.toTypedArray())
+
+            // ACT
+            val result1 = siths.sscan(set, 0, match = "value*", count = 5)
+            val result2 = siths.sscan(set, result1.next, match = "value*", count = 5)
+            val result3 = siths.sscan(set, result2.next, match = "value*", count = 5)
+
+            // ASSERT
+            (result1.contents + result2.contents + result3.contents) shouldBe valuesToAdd.toSet()
+        }
     }
 
     test("ping") {
