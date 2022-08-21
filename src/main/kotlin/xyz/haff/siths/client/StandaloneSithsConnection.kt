@@ -5,7 +5,7 @@ import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 import xyz.haff.siths.common.RedisAuthException
-import xyz.haff.siths.common.RedisUnexpectedRespResponse
+import xyz.haff.siths.common.RedisUnexpectedRespResponseException
 import java.util.*
 import kotlin.text.Charsets
 import kotlin.text.toByteArray
@@ -51,7 +51,7 @@ class StandaloneSithsConnection private constructor(
                 val response = it.runCommand(RedisCommand("CLIENT", "SETNAME", name))
                 if (!response.isOk()) {
                     if (response is RespError) { response.throwAsException() }
-                    else { throw RedisUnexpectedRespResponse(response) } // Maybe a better error?
+                    else { throw RedisUnexpectedRespResponseException(response) } // Maybe a better error?
                 }
             }
         }

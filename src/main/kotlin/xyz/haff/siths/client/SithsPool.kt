@@ -1,7 +1,7 @@
 package xyz.haff.siths.client
 
 import kotlinx.coroutines.delay
-import xyz.haff.siths.common.RedisPoolOutOfConnections
+import xyz.haff.siths.common.RedisPoolOutOfConnectionsException
 import kotlin.time.Duration
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
@@ -41,7 +41,7 @@ class SithsPool(
             }
         }
 
-        throw RedisPoolOutOfConnections()
+        throw RedisPoolOutOfConnectionsException()
     }
 
     fun releaseConnection(connection: SithsConnection) {

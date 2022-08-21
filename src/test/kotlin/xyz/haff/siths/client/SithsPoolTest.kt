@@ -1,14 +1,13 @@
 package xyz.haff.siths.client
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import xyz.haff.siths.common.RedisBrokenConnectionException
-import xyz.haff.siths.common.RedisPoolOutOfConnections
+import xyz.haff.siths.common.RedisPoolOutOfConnectionsException
 import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.suspended
 import java.util.*
@@ -39,7 +38,7 @@ class SithsPoolTest : FunSpec({
         repeat(3) { pool.getConnection() }
 
         // ASSERT
-        shouldThrow<RedisPoolOutOfConnections> { pool.getConnection() }
+        shouldThrow<RedisPoolOutOfConnectionsException> { pool.getConnection() }
         pool.totalConnections shouldBe 3
     }
 

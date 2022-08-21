@@ -1,5 +1,6 @@
 package xyz.haff.siths.common
 
+import xyz.haff.siths.client.RespError
 import xyz.haff.siths.client.RespType
 import kotlin.time.Duration
 
@@ -12,10 +13,15 @@ class RedisLockTimeoutException(
     acquireTimeout: Duration
 ) : RuntimeException("Timed out waiting for $lockName after $acquireTimeout")
 
-class RedisUnexpectedRespResponse(response: RespType<*>): RuntimeException("Unexpected RESP response: $response")
+class RedisUnexpectedRespResponseException(response: RespType<*>): RuntimeException("Unexpected RESP response: $response")
 
 class RedisBrokenConnectionException(cause: Throwable) : RuntimeException(cause)
 
-class RedisPoolOutOfConnections(): RuntimeException("All Redis connections of this pool are currently used")
+class RedisPoolOutOfConnectionsException(): RuntimeException("All Redis connections of this pool are currently used")
 
 class RedisAuthException(response: RespType<*>): RuntimeException("Unable to authenticate. Redis response: $response")
+
+fun handleUnexpectedRespResponse(response: RespType<*>): Nothing = when (response) {
+    is RespError -> response.throwAsException()
+    else -> throw RedisUnexpectedRespResponseException(response)
+}

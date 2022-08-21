@@ -1,9 +1,7 @@
 package xyz.haff.siths.client
 
 import kotlinx.coroutines.delay
-import xyz.haff.siths.common.RedisLockTimeoutException
-import xyz.haff.siths.common.RedisScriptNotLoadedException
-import xyz.haff.siths.common.RedisUnexpectedRespResponse
+import xyz.haff.siths.common.*
 import xyz.haff.siths.common.buildLockKey
 import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.scripts.RedisScripts
@@ -54,7 +52,7 @@ class SithsDSL(val pool: SithsPool) {
         if (firstResponse is RespArray) {
             return firstResponse
         } else {
-            throw RedisUnexpectedRespResponse(firstResponse)
+            handleUnexpectedRespResponse(firstResponse)
         }
     }
 
