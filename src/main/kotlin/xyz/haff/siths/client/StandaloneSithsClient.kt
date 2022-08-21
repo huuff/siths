@@ -136,4 +136,13 @@ class StandaloneSithsClient(
             is RespBulkString -> parseClientList(response.value)
             else -> handleUnexpectedRespResponse(response)
         }
+
+    override suspend fun ping(): Boolean {
+        val response = connection.runCommand(commandBuilder.ping())
+
+        return when {
+            (response is RespSimpleString) && (response.value == "PONG") -> true
+            else -> handleUnexpectedRespResponse(response)
+        }
+    }
 }

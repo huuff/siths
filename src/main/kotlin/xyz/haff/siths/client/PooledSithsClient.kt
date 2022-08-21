@@ -81,4 +81,8 @@ class PooledSithsClient(
     override suspend fun clientList(): List<RedisClient> {
         return pool.getConnection().use { conn -> StandaloneSithsClient(conn).clientList() }
     }
+
+    override suspend fun ping(): Boolean {
+        return pool.getConnection().use { conn -> StandaloneSithsClient(conn).ping() }
+    }
 }

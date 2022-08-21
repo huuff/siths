@@ -284,4 +284,15 @@ class SithsClientTest : FunSpec({
             siths.smembers(destination) shouldBe setOf("key1", "key3")
         }
     }
+
+    test("ping") {
+        // ARRANGE
+        val siths = makeSithsClient(container)
+
+        // ACT
+        val response = siths.ping()
+
+        // ASSERT
+        response shouldBe true
+    }
 })

@@ -2,13 +2,6 @@ package xyz.haff.siths.client
 
 import kotlin.time.Duration
 
-/**
- * A thin wrapper over a plain redis connection. Things it does:
- *  * Provide a discoverable entrypoint for available functions
- *  * Escape the commands that are sent to Redis
- *  * Convert the responses to the appropriate Kotlin types
- */
-// TODO: Add ping! It'll be useful!
 interface Siths<
         UnitResponseType,
         StringResponseType,
@@ -40,4 +33,5 @@ interface Siths<
     suspend fun sinterstore(destination: String, key: String, vararg rest: String): LongResponseType
 
     suspend fun clientList(): ClientListResponseType
+    suspend fun ping(): BooleanResponseType
 }

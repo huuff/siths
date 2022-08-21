@@ -9,7 +9,7 @@ import java.util.*
 
 // TODO: I should test this all!
 // TODO: I delete all temporary sets I make... but that's not enough, I should also set an expiration to make sure they
-// eventually get removed in case the `del` is never executed due to some error. UPDATE: 
+// eventually get removed in case the `del` is never executed due to some error. UPDATE:
 class SithsSet<T: Any>(
     private val sithsPool: SithsPool,
     private val name: String = "set:${UUID.randomUUID()}"

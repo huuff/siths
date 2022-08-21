@@ -59,6 +59,8 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun exists(key: String, vararg rest: String) = RedisCommand("EXISTS", key, *rest)
 
+    override suspend fun ping(): RedisCommand = RedisCommand("PING")
+
     override suspend fun sadd(key: String, value: Any, vararg rest: Any) = RedisCommand(
         "SADD",
         key,

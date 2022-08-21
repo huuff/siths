@@ -42,6 +42,10 @@ class RedisPipelineBuilder(
         commandList += commandBuilder.clientList()
     }
 
+    override suspend fun ping() {
+        commandList += commandBuilder.ping()
+    }
+
     override suspend fun eval(script: String, keys: List<String>, args: List<String>) {
         commandList += commandBuilder.eval(script, keys, args)
     }
