@@ -5,6 +5,7 @@ import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.comparables.shouldBeGreaterThanOrEqualTo
 import io.kotest.matchers.comparables.shouldBeLessThanOrEqualTo
 import io.kotest.matchers.shouldBe
@@ -292,12 +293,13 @@ class SithsClientTest : FunSpec({
             siths.sadd(set, "unincluded-value", *valuesToAdd.toTypedArray())
 
             // ACT
-            val result1 = siths.sscan(set, 0, match = "value*", count = 5)
-            val result2 = siths.sscan(set, result1.next, match = "value*", count = 5)
-            val result3 = siths.sscan(set, result2.next, match = "value*", count = 5)
+            val result1 = siths.sscan(set, 0, match = "value*", count = 6)
+            val result2 = siths.sscan(set, result1.next, match = "value*", count = 6)
+            val result3 = siths.sscan(set, result2.next, match = "value*", count = 6)
 
             // ASSERT
-            (result1.contents + result2.contents + result3.contents) shouldBe valuesToAdd.toSet()
+            // TODO: Can I assert the sizes of the returned lists?
+            (result1.contents + result2.contents + result3.contents).toSet() shouldBe valuesToAdd.toSet()
         }
     }
 

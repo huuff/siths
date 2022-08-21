@@ -110,4 +110,20 @@ class SithsSet<T: Any>(
     }
 
     override fun isEmpty(): Boolean = size == 0
+
+    inner class Iterator<T: Any>(
+        var lastCursorResult: RedisCursor<Set<T>>,
+    ): MutableIterator<T> {
+        var positionWithinLastCursor = 0
+
+        override fun hasNext(): Boolean = lastCursorResult.next != 0L
+
+        override fun next(): T {
+            TODO("Not yet implement")
+        }
+
+        override fun remove() {
+            TODO("Not yet implemented")
+        }
+    }
 }

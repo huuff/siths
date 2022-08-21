@@ -78,7 +78,7 @@ class PooledSithsClient(
         return pool.getConnection().use { conn -> StandaloneSithsClient(conn).sinterstore(destination, key, *rest) }
     }
 
-    override suspend fun sscan(key: String, cursor: Long, match: String?, count: Int?): RedisCursor<Set<String>> {
+    override suspend fun sscan(key: String, cursor: Long, match: String?, count: Int?): RedisCursor<String> {
         return pool.getConnection().use { conn -> StandaloneSithsClient(conn).sscan(key, cursor, match, count) }
     }
 

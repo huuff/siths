@@ -16,7 +16,7 @@ interface SithsClient : Siths<
         List<RedisClient>,
         Duration,
         Set<String>,
-        RedisCursor<Set<String>>,
+        RedisCursor<String>,
         Boolean
         > {
 
