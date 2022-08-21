@@ -9,7 +9,8 @@ import java.util.*
 
 // TODO: I should test this all!
 // TODO: I delete all temporary sets I make... but that's not enough, I should also set an expiration to make sure they
-// eventually get removed in case the `del` is never executed due to some error. UPDATE:
+// eventually get removed in case the `del` is never executed due to some error. UPDATE: Not gonna work,
+// maybe I should use a transaction
 class SithsSet<T: Any>(
     private val sithsPool: SithsPool,
     private val name: String = "set:${UUID.randomUUID()}"
@@ -80,7 +81,9 @@ class SithsSet<T: Any>(
 
     // TODO: Can I just cache this or manage it locally to avoid making a new roundtrip? retainAll and removeAll use them
     // outside of the pipeline, so at minimum I can move them into the pipeline (and thus, use scard only) but maybe I just
-    // can manage the set size locally and make it very optimal to use.
+    // can manage the set size locally and make it very optimal to use. UPDATE: Obviously not possible, since this is
+    // intended to be used as a distributed data structure, what if another client modifies it? I should just put it
+    // in a pipeline
     override val size: Int
         get() = runBlocking { sithsClient.scard(name).toInt() }
 
