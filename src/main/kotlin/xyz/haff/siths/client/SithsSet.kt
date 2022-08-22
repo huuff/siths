@@ -40,11 +40,11 @@ class SithsSet<T : Any>(
     // TODO: I'm sure I can heavily dry removeAll, retainAll and containsAll, since they differ in one or two lines at most
     override fun removeAll(elements: Collection<T>): Boolean {
         val (otherSetHead, otherSetTail) = (elements.toSet() as Set<Any>).toTypedArray().headAndTail()
-        val sizePriorToChange = this.size
         val pipelineResults = runBlocking {
             withRedis(sithsPool) {
                 transactional {
                     val otherSetKey = randomUUID()
+                    scard(this@SithsSet.name)
                     sadd(otherSetKey, otherSetHead, *otherSetTail)
                     sdiffstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
                     del(otherSetKey)
@@ -52,19 +52,20 @@ class SithsSet<T : Any>(
             }
         }
 
-        return when (val sdiffstoreResponse = pipelineResults[1]) {
-            is RespInteger -> sdiffstoreResponse.value.toInt() != sizePriorToChange
+        val sizePriorToChange = (pipelineResults[1] as RespInteger).value
+        return when (val sdiffstoreResponse = pipelineResults[2]) {
+            is RespInteger -> sdiffstoreResponse.value != sizePriorToChange
             else -> handleUnexpectedRespResponse(sdiffstoreResponse)
         }
     }
 
     override fun retainAll(elements: Collection<T>): Boolean {
         val (otherSetHead, otherSetTail) = (elements.toSet() as Set<Any>).toTypedArray().headAndTail()
-        val sizePriorToChange = this.size
         val pipelineResults = runBlocking {
             withRedis(sithsPool) {
                 transactional {
                     val otherSetKey = randomUUID()
+                    scard(this@SithsSet.name)
                     sadd(otherSetKey, otherSetHead, *otherSetTail)
                     sinterstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
                     del(otherSetKey)
@@ -72,17 +73,13 @@ class SithsSet<T : Any>(
             }
         }
 
-        return when (val sinterstoreResponse = pipelineResults[1]) {
-            is RespInteger -> sinterstoreResponse.value.toInt() != sizePriorToChange
+        val sizePriorToChange = (pipelineResults[0] as RespInteger).value
+        return when (val sinterstoreResponse = pipelineResults[2]) {
+            is RespInteger -> sinterstoreResponse.value != sizePriorToChange
             else -> handleUnexpectedRespResponse(sinterstoreResponse)
         }
     }
 
-    // TODO: Can I just cache this or manage it locally to avoid making a new roundtrip? retainAll and removeAll use them
-    // outside of the pipeline, so at minimum I can move them into the pipeline (and thus, use scard only) but maybe I just
-    // can manage the set size locally and make it very optimal to use. UPDATE: Obviously not possible, since this is
-    // intended to be used as a distributed data structure, what if another client modifies it? I should just put it
-    // in a pipeline
     override val size: Int
         get() = runBlocking { sithsClient.scard(name).toInt() }
 
