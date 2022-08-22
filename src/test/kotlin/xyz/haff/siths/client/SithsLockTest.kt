@@ -59,7 +59,7 @@ class SithsLockTest : FunSpec({
     test("acquire times out if it cant acquire the lock") {
         // ARRANGE
         val fakePool = mockk<SithsPool>(relaxed = true) {
-            coEvery { get().runCommand(any()) } returns RespNullResponse
+            coEvery { get().resource.runCommand(any()) } returns RespNullResponse
         }
 
         // ACT & ASSERT

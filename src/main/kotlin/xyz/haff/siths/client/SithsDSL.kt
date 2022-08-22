@@ -34,7 +34,7 @@ class SithsDSL(val pool: SithsPool) {
         val pipelineBuilder = RedisPipelineBuilder()
         pipelineBuilder.f()
         return pool.get().use {
-            it.runPipeline(pipelineBuilder.build())
+            it.resource.runPipeline(pipelineBuilder.build())
         }
     }
 
@@ -45,7 +45,7 @@ class SithsDSL(val pool: SithsPool) {
 
         val pipeline = RedisCommand("MULTI") + (pipelineBuilder.build() + RedisCommand("EXEC"))
         val response = pool.get().use {
-            it.runPipeline(pipeline)
+            it.resource.runPipeline(pipeline)
         }.drop(actualPipelineCommands + 1) // Drop the OK response to the MULTI and all QUEUED responses, since they won't matter to the client
 
         val firstResponse = response[0] // Since it's an EXEC ... MULTI we know the response must be a RespArray

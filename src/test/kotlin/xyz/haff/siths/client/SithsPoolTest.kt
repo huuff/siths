@@ -38,8 +38,8 @@ class SithsPoolTest : FunSpec({
         repeat(3) { pool.get() }
 
         // ASSERT
-        shouldThrow<RedisPoolOutOfConnectionsException> { pool.get() }
-        pool.openConnections shouldBe 3
+        shouldThrow<ExhaustedPoolException> { pool.get() }
+        pool.currentResources shouldBe 3
     }
 
     context("self-healing pool") {
@@ -50,7 +50,7 @@ class SithsPoolTest : FunSpec({
 
         test("connection initially works (sanity check)") {
             killedConnection.use { it.runCommand(RedisCommand("PING")).value shouldBe "PONG" }
-            pool.openConnections shouldBe 1
+            pool.currentResources shouldBe 1
         }
 
         test("calling the killed connection throws an exception") {
@@ -68,7 +68,7 @@ class SithsPoolTest : FunSpec({
         }
 
         test("the connection is removed from the pool") {
-            pool.openConnections shouldBe 0
+            pool.currentResources shouldBe 0
         }
 
         test("the pool creates a new one on request") {
@@ -76,7 +76,7 @@ class SithsPoolTest : FunSpec({
 
             newConnection.identifier shouldNotBe killedConnection.identifier
             newConnection.use { it.runCommand(RedisCommand("PING")).value shouldBe "PONG" }
-            pool.openConnections shouldBe 1
+            pool.currentResources shouldBe 1
         }
     }
 

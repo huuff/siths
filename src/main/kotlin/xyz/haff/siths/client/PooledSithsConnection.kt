@@ -12,34 +12,16 @@ import java.util.*
  * This Siths connection is pooled. Actually, just a decorator around a StandaloneSithsConnection, that instead of
  * closing the underlying socket, only releases it to the pool.
  */
-class PooledSithsConnection private constructor(
+class PooledSithsConnection(
     override val resource: StandaloneSithsConnection,
-    override val pool: SithsPool,
-    override val identifier: String,
+    override val pool: Pool<SithsConnection, PooledSithsConnection>,
+    override val identifier: String = resource.identifier,
     override var status: PoolStatus = PoolStatus.FREE,
 ) : PooledResource<SithsConnection>, SithsConnection {
 
-    companion object {
-        suspend fun open(
-            pool: SithsPool,
-            host: String = "localhost",
-            port: Int = 6379,
-            user: String? = null,
-            password: String? = null,
-            name: String = UUID.randomUUID().toString(),
-            status: PoolStatus = PoolStatus.FREE,
-        )
-            = PooledSithsConnection(
-                resource = StandaloneSithsConnection.open(host = host, port = port, name = name, user = user, password = password),
-                pool = pool,
-                identifier = name,
-                status = status,
-            )
-    }
-
     override suspend fun runCommand(command: RedisCommand): RespType<*> = try {
         resource.runCommand(command)
-    } catch (e: Exception) {
+    } catch (e: Exception) { // TODO: Why not IOException?
         handleChannelException(e)
     }
 
