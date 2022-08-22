@@ -12,7 +12,7 @@ class SithsSet<T : Any>(
     private val serializer: (T) -> String,
     private val deserializer: (String) -> T
 ) : MutableSet<T> {
-    private val sithsClient = PooledSithsClient(sithsPool)
+    private val sithsClient = ManagedSithsClient(sithsPool)
 
     companion object {
         fun ofStrings(sithsPool: SithsPool, name: String = "set:${UUID.randomUUID()}"): SithsSet<String> =

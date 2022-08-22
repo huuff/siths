@@ -8,7 +8,7 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import redis.clients.jedis.JedisPooled
-import xyz.haff.siths.client.PooledSithsClient
+import xyz.haff.siths.client.ManagedSithsClient
 import xyz.haff.siths.makeSithsPool
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -41,7 +41,7 @@ class JedisVsSithsTest : FunSpec({
         }
 
         test("siths performance") {
-            val siths = PooledSithsClient(makeSithsPool(container))
+            val siths = ManagedSithsClient(makeSithsPool(container))
             val writes = AtomicInteger()
             val endTime = System.currentTimeMillis() + 60_000 // 10s
 
@@ -64,7 +64,7 @@ class JedisVsSithsTest : FunSpec({
 
     context("single thread") {
         test("siths performance") {
-            val siths = PooledSithsClient(makeSithsPool(container))
+            val siths = ManagedSithsClient(makeSithsPool(container))
             val writes = AtomicInteger()
             val endTime = System.currentTimeMillis() + 60_000 // 10s
 

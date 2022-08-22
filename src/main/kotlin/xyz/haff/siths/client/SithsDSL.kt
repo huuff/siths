@@ -11,7 +11,7 @@ import java.util.*
 
 // TODO: Implement Siths? Delegate it? To avoid using a context receiver
 class SithsDSL(val pool: SithsPool) {
-    val redis = PooledSithsClient(pool)
+    val redis = ManagedSithsClient(pool)
 
     /**
      * Tries to run script, and, if not loaded, loads it, then runs it again
