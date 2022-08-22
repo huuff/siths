@@ -4,10 +4,9 @@ import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import xyz.haff.siths.makeSithsClient
 import xyz.haff.siths.makeSithsPool
-import kotlin.math.exp
 
 class SithsSetTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine")) {
@@ -141,6 +140,23 @@ class SithsSetTest : FunSpec({
 
             // ASSERT
             iteratedElements shouldContainExactlyInAnyOrder expectedElements
+        }
+
+        test("can remove") {
+            // ARRANGE
+            val set = SithsSet.ofStrings(sithsPool = makeSithsPool(container))
+            val client = makeSithsClient(container)
+            val expectedElements = (1..20).map { "value$it" }
+            set.addAll(expectedElements)
+
+            // ACT
+            val iterator = set.iterator()
+            while (iterator.hasNext()) {
+                if (iterator.next() == "value11") { iterator.remove() }
+            }
+
+            // ASSERT
+            client.smembers(set.name) shouldBe (expectedElements.toSet() - "value11")
         }
     }
 })

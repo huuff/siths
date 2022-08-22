@@ -11,7 +11,7 @@ import java.util.*
 // maybe I should use a transaction
 class SithsSet<T : Any>(
     private val sithsPool: SithsPool,
-    private val name: String = "set:${UUID.randomUUID()}",
+    val name: String = "set:${UUID.randomUUID()}",
     private val serializer: (T) -> String,
     private val deserializer: (String) -> T
 ) : MutableSet<T> {
@@ -24,7 +24,6 @@ class SithsSet<T : Any>(
 
     override fun add(element: T): Boolean = runBlocking { sithsClient.sadd(name, element) == 1L }
 
-    // OPT: Prevent copying the array
     override fun addAll(elements: Collection<T>): Boolean {
         val (head, tail) = (elements.toSet() as Set<Any>).toTypedArray().headAndTail()
         val addedCount = runBlocking {
@@ -118,11 +117,13 @@ class SithsSet<T : Any>(
         private var lastCursorResult: RedisCursor<T>,
     ) : MutableIterator<T> {
         private var positionWithinLastCursor = 0
+        private var lastResult: T? = null // XXX: Only to implement `remove`... it's hacky but all of my other options were too
 
         override fun hasNext(): Boolean =
             lastCursorResult.next != 0L || positionWithinLastCursor < lastCursorResult.contents.size
 
         override fun next(): T = lastCursorResult.contents[positionWithinLastCursor].also {
+            lastResult = it
             positionWithinLastCursor++
             // XXX: Overflowed the last cursor, but there are more elements
             if (positionWithinLastCursor >= lastCursorResult.contents.size && hasNext()) {
@@ -132,9 +133,11 @@ class SithsSet<T : Any>(
         }
 
         override fun remove() {
-            val currentElem = lastCursorResult.contents[positionWithinLastCursor]
-
-            runBlocking { sithsClient.srem(name, serializer(currentElem)) }
+            if (lastResult != null) {
+                // XXX: Non-null assertion is correct, since if `lastResult` has changed, it must have changed to a non-null value
+                // (see `next()`)
+                runBlocking { sithsClient.srem(name, serializer(lastResult!!)) }
+            }
         }
     }
 }
