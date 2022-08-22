@@ -18,7 +18,7 @@ class SithsSet<T : Any>(
     private val sithsClient = PooledSithsClient(sithsPool)
 
     companion object {
-        fun ofString(sithsPool: SithsPool, name: String = "set:${UUID.randomUUID()}"): SithsSet<String> =
+        fun ofStrings(sithsPool: SithsPool, name: String = "set:${UUID.randomUUID()}"): SithsSet<String> =
             SithsSet(sithsPool = sithsPool, name = name, { it }, { it })
     }
 
