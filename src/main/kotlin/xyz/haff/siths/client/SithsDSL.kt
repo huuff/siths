@@ -17,7 +17,7 @@ class SithsDSL(val pool: SithsPool) {
      * Tries to run script, and, if not loaded, loads it, then runs it again
      */
     suspend fun runScript(script: RedisScript, keys: List<String> = listOf(), args: List<String> = listOf()): RespType<*> {
-        return pool.getConnection().use { conn ->
+        return pool.get().use { conn ->
             with (StandaloneSithsClient(conn)) {
                 try {
                     evalSha(script.sha, keys, args)
@@ -33,7 +33,7 @@ class SithsDSL(val pool: SithsPool) {
     suspend inline fun pipelined(f: RedisPipelineBuilder.() -> Unit): List<RespType<*>> {
         val pipelineBuilder = RedisPipelineBuilder()
         pipelineBuilder.f()
-        return pool.getConnection().use {
+        return pool.get().use {
             it.runPipeline(pipelineBuilder.build())
         }
     }
@@ -44,7 +44,7 @@ class SithsDSL(val pool: SithsPool) {
         val actualPipelineCommands = pipelineBuilder.length
 
         val pipeline = RedisCommand("MULTI") + (pipelineBuilder.build() + RedisCommand("EXEC"))
-        val response = pool.getConnection().use {
+        val response = pool.get().use {
             it.runPipeline(pipeline)
         }.drop(actualPipelineCommands + 1) // Drop the OK response to the MULTI and all QUEUED responses, since they won't matter to the client
 

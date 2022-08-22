@@ -5,7 +5,6 @@ import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
-import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.comparables.shouldBeGreaterThanOrEqualTo
 import io.kotest.matchers.comparables.shouldBeLessThanOrEqualTo
 import io.kotest.matchers.shouldBe
@@ -60,7 +59,7 @@ class SithsClientTest : FunSpec({
             val clients = siths.clientList()
 
             // ASSERT
-            clients.find { it.name == connection.name } shouldNotBe null
+            clients.find { it.name == connection.identifier } shouldNotBe null
         }
     }
 

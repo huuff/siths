@@ -14,25 +14,23 @@ class SithsPool(
     private val password: String? = null,
     private val maxConnections: Int = 10,
     private val acquireTimeout: Duration = 10.seconds
-) {
-    private val freeConnections = Collections.synchronizedList(mutableListOf<SithsConnection>())
-    private val usedConnections = Collections.synchronizedList(mutableListOf<SithsConnection>())
+): Pool<SithsConnection> {
+    private val connections = mutableMapOf<String, PooledSithsConnection>()
 
-    internal val totalConnections get() = freeConnections.size + usedConnections.size
+    internal val openConnections get() = connections.size
 
-    suspend fun getConnection(): SithsConnection {
+    override suspend fun get(): PooledSithsConnection {
         val deadline = System.currentTimeMillis() + acquireTimeout.inWholeMilliseconds
 
         while (System.currentTimeMillis() < deadline) {
-            if (freeConnections.isNotEmpty()) {
-                val connection = freeConnections[0]
-                freeConnections -= connection
-                usedConnections += connection
+            if (connections.values.any { it.status == PoolStatus.FREE }) {
+                val connection = connections.values.find { it.status == PoolStatus.FREE }!!
+                connection.status = PoolStatus.BUSY
                 return connection
             } else {
-                if (totalConnections < maxConnections) {
-                    val connection = PooledSithsConnection.open(pool = this, host = host, port = port, user = user, password = password)
-                    usedConnections += connection
+                if (openConnections < maxConnections) {
+                    val connection = PooledSithsConnection.open(pool = this, host = host, port = port, user = user, password = password, status = PoolStatus.BUSY)
+                    connections[connection.identifier] = connection
                     return connection
                 } else {
                     delay(10)
@@ -44,18 +42,14 @@ class SithsPool(
         throw RedisPoolOutOfConnectionsException()
     }
 
-    fun releaseConnection(connection: SithsConnection) {
-        if (connection in usedConnections) {
-            usedConnections -= connection
-            freeConnections += connection
-        }
+    override fun release(resourceIdentifier: String) {
+        connections[resourceIdentifier]?.status = PoolStatus.FREE
     }
 
     /**
      * Remove connection from the pool, because p.e. it is broken. This allows the pool to heal by creating a new one.
      */
-    fun removeConnection(connection: SithsConnection) {
-        usedConnections -= connection
-        freeConnections -= connection
+    override fun remove(resourceIdentifier: String) {
+        connections -= resourceIdentifier
     }
 }

@@ -27,7 +27,7 @@ class SithsLockTest : FunSpec({
         val values = Collections.synchronizedList(mutableListOf<String>())
 
         suspended(10) {
-            makeSithsPool(container).getConnection().use { redis ->
+            makeSithsPool(container).get().use { redis ->
                 val siths = StandaloneSithsClient(redis)
                 siths.incrBy("key", 1)
                 Thread.sleep(100)
@@ -59,7 +59,7 @@ class SithsLockTest : FunSpec({
     test("acquire times out if it cant acquire the lock") {
         // ARRANGE
         val fakePool = mockk<SithsPool>(relaxed = true) {
-            coEvery { getConnection().runCommand(any()) } returns RespNullResponse
+            coEvery { get().runCommand(any()) } returns RespNullResponse
         }
 
         // ACT & ASSERT

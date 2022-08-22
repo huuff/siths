@@ -19,7 +19,7 @@ import kotlin.text.toByteArray
 class StandaloneSithsConnection private constructor(
     private val selectorManager: SelectorManager,
     private val socket: Socket,
-    override val name: String,
+    override val identifier: String,
 ): SithsConnection {
     private val sendChannel = socket.openWriteChannel(autoFlush = false)
     private val receiveChannel = socket.openReadChannel()
@@ -37,7 +37,7 @@ class StandaloneSithsConnection private constructor(
             return StandaloneSithsConnection(
                 selectorManager = selectorManager,
                 socket = aSocket(selectorManager).tcp().connect(host, port),
-                name = name,
+                identifier = name,
             ).also {
                 if (password != null) {
                     val response = it.runCommand(RedisCommand("AUTH", user, password))

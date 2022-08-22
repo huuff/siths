@@ -23,8 +23,8 @@ class SithsPoolTest : FunSpec({
 
         suspended(100) { i ->
             val randomValue = UUID.randomUUID().toString()
-            pool.getConnection().use { conn -> conn.runCommand(RedisCommand("SET", "key:$i", randomValue)) }
-            val retrievedValue = pool.getConnection().use { conn -> conn.runCommand(RedisCommand("GET", "key:$i")) }
+            pool.get().use { conn -> conn.runCommand(RedisCommand("SET", "key:$i", randomValue)) }
+            val retrievedValue = pool.get().use { conn -> conn.runCommand(RedisCommand("GET", "key:$i")) }
 
             retrievedValue.value shouldBe randomValue
         }
@@ -35,22 +35,22 @@ class SithsPoolTest : FunSpec({
         val pool = makeSithsPool(container, maxConnections = 3, acquireTimeout = 10.milliseconds)
 
         // ACT
-        repeat(3) { pool.getConnection() }
+        repeat(3) { pool.get() }
 
         // ASSERT
-        shouldThrow<RedisPoolOutOfConnectionsException> { pool.getConnection() }
-        pool.totalConnections shouldBe 3
+        shouldThrow<RedisPoolOutOfConnectionsException> { pool.get() }
+        pool.openConnections shouldBe 3
     }
 
     context("self-healing pool") {
         val host = container.host
         val port = container.firstMappedPort
         val pool = SithsPool(host = host, port = port, maxConnections = 1)
-        val killedConnection = pool.getConnection()
+        val killedConnection = pool.get()
 
         test("connection initially works (sanity check)") {
             killedConnection.use { it.runCommand(RedisCommand("PING")).value shouldBe "PONG" }
-            pool.totalConnections shouldBe 1
+            pool.openConnections shouldBe 1
         }
 
         test("calling the killed connection throws an exception") {
@@ -58,7 +58,7 @@ class SithsPoolTest : FunSpec({
             val killerConnection = StandaloneSithsConnection.open(host = host, port = port)
             val clientListResponse = killerConnection.runCommand(RedisCommand("CLIENT", "LIST"))
             val connectedClients = parseClientList(clientListResponse.value as String)
-            val idToKill = connectedClients.find { it.name == killedConnection.name }!!.id
+            val idToKill = connectedClients.find { it.name == killedConnection.identifier }!!.id
 
             killerConnection.runCommand(RedisCommand("CLIENT", "KILL", "ID", idToKill))
 
@@ -68,15 +68,15 @@ class SithsPoolTest : FunSpec({
         }
 
         test("the connection is removed from the pool") {
-            pool.totalConnections shouldBe 0
+            pool.openConnections shouldBe 0
         }
 
         test("the pool creates a new one on request") {
-            val newConnection = pool.getConnection()
+            val newConnection = pool.get()
 
-            newConnection.name shouldNotBe killedConnection.name
+            newConnection.identifier shouldNotBe killedConnection.identifier
             newConnection.use { it.runCommand(RedisCommand("PING")).value shouldBe "PONG" }
-            pool.totalConnections shouldBe 1
+            pool.openConnections shouldBe 1
         }
     }
 

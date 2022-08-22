@@ -13,10 +13,11 @@ import java.util.*
  * closing the underlying socket, only releases it to the pool.
  */
 class PooledSithsConnection private constructor(
-    private val connection: StandaloneSithsConnection,
-    private val pool: SithsPool,
-    override val name: String,
-) : SithsConnection {
+    override val resource: StandaloneSithsConnection,
+    override val pool: SithsPool,
+    override val identifier: String,
+    override var status: PoolStatus = PoolStatus.FREE,
+) : PooledResource<SithsConnection>, SithsConnection {
 
     companion object {
         suspend fun open(
@@ -25,35 +26,38 @@ class PooledSithsConnection private constructor(
             port: Int = 6379,
             user: String? = null,
             password: String? = null,
-            name: String = UUID.randomUUID().toString())
+            name: String = UUID.randomUUID().toString(),
+            status: PoolStatus = PoolStatus.FREE,
+        )
             = PooledSithsConnection(
-                connection = StandaloneSithsConnection.open(host = host, port = port, name = name, user = user, password = password),
+                resource = StandaloneSithsConnection.open(host = host, port = port, name = name, user = user, password = password),
                 pool = pool,
-                name = name,
+                identifier = name,
+                status = status,
             )
     }
 
     override suspend fun runCommand(command: RedisCommand): RespType<*> = try {
-        connection.runCommand(command)
+        resource.runCommand(command)
     } catch (e: Exception) {
         handleChannelException(e)
     }
 
     override suspend fun runPipeline(pipeline: RedisPipeline): List<RespType<*>> = try {
-        connection.runPipeline(pipeline)
+        resource.runPipeline(pipeline)
     } catch (e: IOException) {
         handleChannelException(e)
     }
 
     override fun close() {
-        pool.releaseConnection(this)
+        pool.release(identifier)
     }
 
     private fun handleChannelException(e: Exception): Nothing = when(e) {
         is ClosedReceiveChannelException, is ClosedSendChannelException -> {
             // Connection is broken, so we notify the pool to discard it and maybe create a new one that works
-            connection.close()
-            pool.removeConnection(this)
+            resource.close()
+            pool.remove(identifier)
             throw RedisBrokenConnectionException(e)
         }
         else -> throw e
