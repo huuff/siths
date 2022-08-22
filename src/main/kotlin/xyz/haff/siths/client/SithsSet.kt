@@ -6,9 +6,6 @@ import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import java.util.*
 
-// TODO: I delete all temporary sets I make... but that's not enough, I should also set an expiration to make sure they
-// eventually get removed in case the `del` is never executed due to some error. UPDATE: Not gonna work,
-// maybe I should use a transaction
 class SithsSet<T : Any>(
     private val sithsPool: SithsPool,
     val name: String = "set:${UUID.randomUUID()}",
@@ -46,7 +43,7 @@ class SithsSet<T : Any>(
         val sizePriorToChange = this.size
         val pipelineResults = runBlocking {
             withRedis(sithsPool) {
-                pipelined {
+                transactional {
                     val otherSetKey = randomUUID()
                     sadd(otherSetKey, otherSetHead, *otherSetTail)
                     sdiffstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
@@ -66,7 +63,7 @@ class SithsSet<T : Any>(
         val sizePriorToChange = this.size
         val pipelineResults = runBlocking {
             withRedis(sithsPool) {
-                pipelined {
+                transactional {
                     val otherSetKey = randomUUID()
                     sadd(otherSetKey, otherSetHead, *otherSetTail)
                     sinterstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
@@ -96,7 +93,7 @@ class SithsSet<T : Any>(
         val (otherSetHead, otherSetTail) = otherSet.headAndTail()
         val pipelineResults = runBlocking {
             withRedis(sithsPool) {
-                pipelined {
+                transactional {
                     val temporarySetKey = randomUUID()
                     sadd(temporarySetKey, otherSetHead, *otherSetTail)
                     sintercard(this@SithsSet.name, temporarySetKey, limit = otherSet.size)

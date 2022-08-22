@@ -65,13 +65,11 @@ class SithsDSLTest : FunSpec({
         }
 
         // ASSERT
-        pipelineResult shouldBe RespArray(
-            value = listOf(
+        pipelineResult shouldBe listOf(
                 RespSimpleString("OK"),
                 RespBulkString("0"),
                 RespInteger(1),
                 RespBulkString("1")
             )
-        )
     }
 })

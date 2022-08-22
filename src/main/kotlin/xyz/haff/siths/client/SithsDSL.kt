@@ -38,7 +38,7 @@ class SithsDSL(val pool: SithsPool) {
         }
     }
 
-    suspend inline fun transactional(f: RedisPipelineBuilder.() -> Unit): RespArray {
+    suspend inline fun transactional(f: RedisPipelineBuilder.() -> Unit): List<RespType<*>> {
         val pipelineBuilder = RedisPipelineBuilder()
         pipelineBuilder.f()
         val actualPipelineCommands = pipelineBuilder.length
@@ -50,7 +50,7 @@ class SithsDSL(val pool: SithsPool) {
 
         val firstResponse = response[0] // Since it's an EXEC ... MULTI we know the response must be a RespArray
         if (firstResponse is RespArray) {
-            return firstResponse
+            return firstResponse.value
         } else {
             handleUnexpectedRespResponse(firstResponse)
         }
