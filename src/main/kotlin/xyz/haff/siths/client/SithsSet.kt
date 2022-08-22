@@ -37,7 +37,6 @@ class SithsSet<T : Any>(
 
     override fun remove(element: T): Boolean = runBlocking { sithsClient.srem(name, element) != 0L }
 
-    // TODO: I'm sure I can heavily dry removeAll, retainAll and containsAll, since they differ in one or two lines at most
     override fun removeAll(elements: Collection<T>): Boolean {
         val (otherSetHead, otherSetTail) = (elements.toSet() as Set<Any>).toTypedArray().headAndTail()
         val pipelineResults = runBlocking {
@@ -52,7 +51,7 @@ class SithsSet<T : Any>(
             }
         }
 
-        val sizePriorToChange = (pipelineResults[1] as RespInteger).value
+        val sizePriorToChange = (pipelineResults[0] as RespInteger).value
         return when (val sdiffstoreResponse = pipelineResults[2]) {
             is RespInteger -> sdiffstoreResponse.value != sizePriorToChange
             else -> handleUnexpectedRespResponse(sdiffstoreResponse)
