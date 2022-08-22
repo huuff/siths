@@ -1,13 +1,11 @@
 package xyz.haff.siths.client
 
 import kotlinx.coroutines.runBlocking
-import xyz.haff.siths.common.RedisUnexpectedRespResponseException
 import xyz.haff.siths.common.handleUnexpectedRespResponse
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import java.util.*
 
-// TODO: I should test this all!
 // TODO: I delete all temporary sets I make... but that's not enough, I should also set an expiration to make sure they
 // eventually get removed in case the `del` is never executed due to some error. UPDATE: Not gonna work,
 // maybe I should use a transaction
