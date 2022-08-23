@@ -13,3 +13,4 @@
 * Pipe dream: A mutable map that uses that one trick I read on Redis' documentation about storing a hashmap entirely on smaller hashmaps with skip encoding.
 * Test with some huge key or value
 * Test my transaction code with the locking examples of "Redis in Action"
+* Add missing set commands
