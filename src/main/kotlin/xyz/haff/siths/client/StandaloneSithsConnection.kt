@@ -62,7 +62,7 @@ class StandaloneSithsConnection private constructor(
     }
 
     override suspend fun runCommand(command: RedisCommand): RespType<*> {
-        sendChannel.writeFully(command.toResp().toByteArray(Charsets.UTF_8)) // TODO: Doesn't writeUtf8String work?
+        sendChannel.writeStringUtf8(command.toResp())
         sendChannel.flush()
 
         return readResponse()
@@ -74,8 +74,7 @@ class StandaloneSithsConnection private constructor(
 
         return (1..pipeline.commands.size).map { readResponse() }
     }
-
-    // TODO: Do something with this (mark the connection as closed?)
+    
     override fun close() {
         socket.close()
         selectorManager.close()
