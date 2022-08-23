@@ -89,4 +89,8 @@ class RedisPipelineBuilder(
     override suspend fun sscan(key: String, cursor: Long, match: String?, count: Int?) {
         commandList += commandBuilder.sscan(key, cursor, match, count)
     }
+
+    override suspend fun expire(key: String, duration: Duration, expirationCondition: ExpirationCondition?) {
+        commandList += commandBuilder.expire(key, duration, expirationCondition)
+    }
 }

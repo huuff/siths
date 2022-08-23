@@ -13,7 +13,11 @@ data class RedisCommand(
         }
     }
 
-    operator fun plus(other: RedisCommand) = RedisCommand(this.parts + other.parts)
+    operator fun plus(other: RedisCommand?) = if (other != null) {
+        RedisCommand(this.parts + other.parts)
+    } else {
+        this
+    }
 
     operator fun plus(pipeline: RedisPipeline) = RedisPipeline(listOf(this) + pipeline.commands)
 }

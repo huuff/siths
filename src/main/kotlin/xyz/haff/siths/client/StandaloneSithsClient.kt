@@ -164,4 +164,14 @@ class StandaloneSithsClient(
             else -> handleUnexpectedRespResponse(response)
         }
     }
+
+    override suspend fun expire(key: String, duration: Duration, expirationCondition: ExpirationCondition?): Boolean
+        = when (val response = connection.runCommand(commandBuilder.expire(key, duration, expirationCondition))) {
+            is RespInteger -> when (response.value) {
+                0L -> false
+                1L -> true
+                else -> handleUnexpectedRespResponse(response)
+            }
+            else -> handleUnexpectedRespResponse(response)
+        }
 }

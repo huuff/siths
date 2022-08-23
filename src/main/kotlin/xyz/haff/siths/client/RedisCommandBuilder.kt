@@ -104,4 +104,7 @@ class RedisCommandBuilder : Siths<
 
         return command
     }
+    
+    override suspend fun expire(key: String, duration: Duration, expirationCondition: ExpirationCondition?)
+        = RedisCommand("PEXPIRE", key, duration.inWholeMilliseconds, expirationCondition)
 }

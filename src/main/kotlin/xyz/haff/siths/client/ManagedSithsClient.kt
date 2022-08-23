@@ -99,4 +99,8 @@ class ManagedSithsClient(
     override suspend fun ping(): Boolean {
         return pool.get().use { it.ping() }
     }
+
+    override suspend fun expire(key: String, duration: Duration, expirationCondition: ExpirationCondition?): Boolean {
+        return pool.get().use { it.expire(key, duration, expirationCondition) }
+    }
 }

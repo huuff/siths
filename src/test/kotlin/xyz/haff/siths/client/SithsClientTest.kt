@@ -312,4 +312,35 @@ class SithsClientTest : FunSpec({
         // ASSERT
         response shouldBe true
     }
+
+    context("expire") {
+        test("correctly sets expiration") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val key = randomUUID()
+            siths.set(key, "value")
+
+            // ACT
+            val commandWorked = siths.expire(key, 10.seconds)
+
+            // ASSERT
+            commandWorked shouldBe true
+            val expiration = siths.ttl(key)!!
+            expiration shouldBeLessThanOrEqualTo 10.seconds
+            expiration shouldBeGreaterThanOrEqualTo 8.seconds
+        }
+
+        test("expiration condition") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val key = randomUUID()
+            siths.set(key, "value", timeToLive = 10.seconds)
+
+            // ACT
+            val commandWorked = siths.expire(key, 10.seconds, expirationCondition = ExpirationCondition.NX)
+
+            // ASSERT
+            commandWorked shouldBe false
+        }
+    }
 })

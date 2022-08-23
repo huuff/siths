@@ -22,6 +22,7 @@ interface Siths<
     suspend fun eval(script: String, keys: List<String> = listOf(), args: List<String> = listOf()): RespResponseType
     suspend fun incrBy(key: String, value: Long): LongResponseType
     suspend fun exists(key: String, vararg rest: String): BooleanResponseType
+    suspend fun expire(key: String, duration: Duration, expirationCondition: ExpirationCondition? = null): BooleanResponseType
 
     // SETS
     suspend fun sadd(key: String, value: Any, vararg rest: Any): LongResponseType
