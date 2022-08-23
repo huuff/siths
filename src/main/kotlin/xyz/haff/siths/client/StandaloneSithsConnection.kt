@@ -74,7 +74,7 @@ class StandaloneSithsConnection private constructor(
 
         return (1..pipeline.commands.size).map { readResponse() }
     }
-    
+
     override fun close() {
         socket.close()
         selectorManager.close()

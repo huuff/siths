@@ -21,13 +21,13 @@ class PooledSithsConnection(
 
     override suspend fun runCommand(command: RedisCommand): RespType<*> = try {
         resource.runCommand(command)
-    } catch (e: Exception) { // TODO: Why not IOException?
+    } catch (e: Exception) {
         handleChannelException(e)
     }
 
     override suspend fun runPipeline(pipeline: RedisPipeline): List<RespType<*>> = try {
         resource.runPipeline(pipeline)
-    } catch (e: IOException) {
+    } catch (e: Exception) {
         handleChannelException(e)
     }
 
