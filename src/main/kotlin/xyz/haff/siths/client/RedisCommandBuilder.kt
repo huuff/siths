@@ -2,7 +2,6 @@ package xyz.haff.siths.client
 
 import kotlin.time.Duration
 
-// TODO: Maybe test the most complex ones
 class RedisCommandBuilder : Siths<
         RedisCommand,
         RedisCommand,
