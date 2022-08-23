@@ -1,22 +1,20 @@
 package xyz.haff.siths.client
 
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class ManagedSithsClient(
-    host: String = "localhost",
-    port: Int = 6379,
+    private val pool: SithsClientPool,
 ) : SithsClient {
-    private val pool = DefaultPool<SithsClient, PooledSithsClient>(
-        createNewResource = { pool ->
-            PooledSithsClient(
-                resource = StandaloneSithsClient(
-                    connection = StandaloneSithsConnection.open(host, port)
-                ),
-                pool = pool,
-                status = PoolStatus.FREE,
-            )
-        }
-    )
+    constructor(
+        redisConnection: RedisConnection,
+        maxConnections: Int = 10,
+        acquireTimeout: Duration = 10.seconds
+    ): this(SithsClientPool(SithsConnectionPool(redisConnection, maxConnections, acquireTimeout)))
+
+    constructor(
+        connectionPool: SithsConnectionPool
+    ): this(SithsClientPool(connectionPool))
 
     override suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode?, timeToLive: Duration?) {
         pool.get().use { it.set(key, value, exclusiveMode, timeToLive) }

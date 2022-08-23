@@ -7,40 +7,40 @@ import xyz.haff.siths.common.randomUUID
 import java.util.*
 
 class SithsSet<T : Any>(
-    private val sithsPool: SithsPool,
+    private val connectionPool: SithsConnectionPool,
     val name: String = "set:${UUID.randomUUID()}",
     private val serializer: (T) -> String,
     private val deserializer: (String) -> T
 ) : MutableSet<T> {
-    private val sithsClient = ManagedSithsClient(sithsPool)
+    private val client = ManagedSithsClient(pool = SithsClientPool(connectionPool))
 
     companion object {
-        fun ofStrings(sithsPool: SithsPool, name: String = "set:${UUID.randomUUID()}"): SithsSet<String> =
-            SithsSet(sithsPool = sithsPool, name = name, { it }, { it })
+        fun ofStrings(sithsConnectionPool: SithsConnectionPool, name: String = "set:${UUID.randomUUID()}"): SithsSet<String> =
+            SithsSet(connectionPool = sithsConnectionPool, name = name, { it }, { it })
     }
 
-    override fun add(element: T): Boolean = runBlocking { sithsClient.sadd(name, element) == 1L }
+    override fun add(element: T): Boolean = runBlocking { client.sadd(name, element) == 1L }
 
     override fun addAll(elements: Collection<T>): Boolean {
         val (head, tail) = (elements.toSet() as Set<Any>).toTypedArray().headAndTail()
         val addedCount = runBlocking {
-            sithsClient.sadd(name, head, *tail)
+            client.sadd(name, head, *tail)
         }
         return addedCount.toInt() != 0
     }
 
     override fun clear() {
-        runBlocking { sithsClient.del(name) }
+        runBlocking { client.del(name) }
     }
 
-    override fun iterator(): MutableIterator<T> = Iterator(runBlocking { sithsClient.sscan(name).map(deserializer) })
+    override fun iterator(): MutableIterator<T> = Iterator(runBlocking { client.sscan(name).map(deserializer) })
 
-    override fun remove(element: T): Boolean = runBlocking { sithsClient.srem(name, element) != 0L }
+    override fun remove(element: T): Boolean = runBlocking { client.srem(name, element) != 0L }
 
     override fun removeAll(elements: Collection<T>): Boolean {
         val (otherSetHead, otherSetTail) = (elements.toSet() as Set<Any>).toTypedArray().headAndTail()
         val pipelineResults = runBlocking {
-            withRedis(sithsPool) {
+            withRedis(connectionPool) {
                 transactional {
                     val otherSetKey = randomUUID()
                     scard(this@SithsSet.name)
@@ -61,7 +61,7 @@ class SithsSet<T : Any>(
     override fun retainAll(elements: Collection<T>): Boolean {
         val (otherSetHead, otherSetTail) = (elements.toSet() as Set<Any>).toTypedArray().headAndTail()
         val pipelineResults = runBlocking {
-            withRedis(sithsPool) {
+            withRedis(connectionPool) {
                 transactional {
                     val otherSetKey = randomUUID()
                     scard(this@SithsSet.name)
@@ -80,15 +80,15 @@ class SithsSet<T : Any>(
     }
 
     override val size: Int
-        get() = runBlocking { sithsClient.scard(name).toInt() }
+        get() = runBlocking { client.scard(name).toInt() }
 
-    override fun contains(element: T): Boolean = runBlocking { sithsClient.sismember(name, element) }
+    override fun contains(element: T): Boolean = runBlocking { client.sismember(name, element) }
 
     override fun containsAll(elements: Collection<T>): Boolean {
         val otherSet = (elements.toSet() as Set<Any>).toTypedArray()
         val (otherSetHead, otherSetTail) = otherSet.headAndTail()
         val pipelineResults = runBlocking {
-            withRedis(sithsPool) {
+            withRedis(connectionPool) {
                 transactional {
                     val temporarySetKey = randomUUID()
                     sadd(temporarySetKey, otherSetHead, *otherSetTail)
@@ -120,7 +120,7 @@ class SithsSet<T : Any>(
             positionWithinLastCursor++
             // XXX: Overflowed the last cursor, but there are more elements
             if (positionWithinLastCursor >= lastCursorResult.contents.size && hasNext()) {
-                lastCursorResult = runBlocking { sithsClient.sscan(name, lastCursorResult.next).map(deserializer) }
+                lastCursorResult = runBlocking { client.sscan(name, lastCursorResult.next).map(deserializer) }
                 positionWithinLastCursor = 0
             }
         }
@@ -129,7 +129,7 @@ class SithsSet<T : Any>(
             if (lastResult != null) {
                 // XXX: Non-null assertion is correct, since if `lastResult` has changed, it must have changed to a non-null value
                 // (see `next()`)
-                runBlocking { sithsClient.srem(name, serializer(lastResult!!)) }
+                runBlocking { client.srem(name, serializer(lastResult!!)) }
             }
         }
     }

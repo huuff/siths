@@ -5,21 +5,28 @@ import kotlinx.coroutines.launch
 import org.testcontainers.containers.GenericContainer
 import redis.clients.jedis.JedisPool
 import xyz.haff.siths.client.ManagedSithsClient
-import xyz.haff.siths.client.SithsPool
+import xyz.haff.siths.client.RedisConnection
+import xyz.haff.siths.client.SithsConnectionPool
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-fun makeSithsClient(contaier: GenericContainer<*>) = ManagedSithsClient(makeSithsPool(contaier))
+fun makeSithsClient(container: GenericContainer<*>) = ManagedSithsClient(makeSithsPool(container))
+
+fun makeRedisConnection(container: GenericContainer<*>, password: String? = null) = RedisConnection(
+    host = container.host,
+    port = container.firstMappedPort,
+    password = password,
+)
 
 fun makeJedisPool(container: GenericContainer<*>) = JedisPool(container.host, container.firstMappedPort)
 fun makeSithsPool(container: GenericContainer<*>, maxConnections: Int = 10, acquireTimeout: Duration = 10.seconds)
-    = SithsPool(container.host, container.firstMappedPort, maxConnections = maxConnections, acquireTimeout = acquireTimeout)
+    = SithsConnectionPool(redisConnection = makeRedisConnection(container), maxConnections = maxConnections, acquireTimeout = acquireTimeout)
 
 /**
  * For when I want to test with containers deployed on my machine instead of testcontainers, so I can use MONITOR and
  * inspect it closely
  */
-fun makeLocalSithsPool() = SithsPool("localhost", 6379)
+fun makeLocalSithsPool() = SithsConnectionPool(RedisConnection(host = "localhost", port = 6379))
 
 
 inline fun threaded(threadNumber: Int, crossinline f: (threadIndex: Int) -> Unit) = (0 until threadNumber).map { threadIndex ->

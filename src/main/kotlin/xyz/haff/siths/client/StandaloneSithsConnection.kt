@@ -26,25 +26,22 @@ class StandaloneSithsConnection private constructor(
 
     companion object {
         suspend fun open(
-            host: String = "localhost",
-            port: Int = 6379,
-            user: String? = null,
-            password: String? = null,
+            redisConnection: RedisConnection,
             name: String = UUID.randomUUID().toString(),
         ): StandaloneSithsConnection {
             val selectorManager = SelectorManager(Dispatchers.IO)
 
             return StandaloneSithsConnection(
                 selectorManager = selectorManager,
-                socket = aSocket(selectorManager).tcp().connect(host, port),
+                socket = aSocket(selectorManager).tcp().connect(redisConnection.host, redisConnection.port),
                 identifier = name,
             ).also {
-                if (password != null) {
-                    val response = it.runCommand(RedisCommand("AUTH", user, password))
+                if (redisConnection.password != null) {
+                    val response = it.runCommand(RedisCommand("AUTH", redisConnection.user, redisConnection.password))
                     if (!response.isOk()) {
                         throw RedisAuthException(response)
                     }
-                } else if (user != null) {
+                } else if (redisConnection.user != null) {
                     throw IllegalArgumentException("Can't create a connection with an username but without a password")
                 }
 

@@ -14,6 +14,7 @@ import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.client.ExclusiveMode.*
 import xyz.haff.siths.common.RedisScriptNotLoadedException
 import xyz.haff.siths.common.randomUUID
+import xyz.haff.siths.makeRedisConnection
 import xyz.haff.siths.makeSithsClient
 import kotlin.time.Duration.Companion.seconds
 
@@ -51,7 +52,7 @@ class SithsClientTest : FunSpec({
     }
 
     test("clientList contains current connection") {
-        StandaloneSithsConnection.open(host = container.host, port = container.firstMappedPort).use { connection ->
+        StandaloneSithsConnection.open(makeRedisConnection(container)).use { connection ->
             // ARRANGE
             val siths = StandaloneSithsClient(connection)
 

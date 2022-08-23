@@ -8,6 +8,7 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.common.RedisAuthException
 import xyz.haff.siths.common.RedisException
+import xyz.haff.siths.makeRedisConnection
 
 class AuthenticationTest : FunSpec({
     val password = "password"
@@ -18,7 +19,7 @@ class AuthenticationTest : FunSpec({
 
     test("can't start an unauthenticated connection") {
         val error = shouldThrow<RedisException> {
-            StandaloneSithsConnection.open(host = container.host, port = container.firstMappedPort)
+            StandaloneSithsConnection.open(makeRedisConnection(container))
         }
 
         error.type shouldBe "NOAUTH"
@@ -26,7 +27,7 @@ class AuthenticationTest : FunSpec({
 
     test("an authenticated connection works fine") {
         // ARRANGE
-        val connection = StandaloneSithsConnection.open(host = container.host, port = container.firstMappedPort, password = password)
+        val connection = StandaloneSithsConnection.open(makeRedisConnection(container, password))
 
         // ACT & ASSERT
         connection.runCommand(RedisCommand("PING")).value shouldBe "PONG"

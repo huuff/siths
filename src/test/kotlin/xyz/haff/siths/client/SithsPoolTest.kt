@@ -7,7 +7,7 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import xyz.haff.siths.common.RedisBrokenConnectionException
-import xyz.haff.siths.common.RedisPoolOutOfConnectionsException
+import xyz.haff.siths.makeRedisConnection
 import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.suspended
 import java.util.*
@@ -43,9 +43,7 @@ class SithsPoolTest : FunSpec({
     }
 
     context("self-healing pool") {
-        val host = container.host
-        val port = container.firstMappedPort
-        val pool = SithsPool(host = host, port = port, maxConnections = 1)
+        val pool = SithsConnectionPool(makeRedisConnection(container), maxConnections = 1)
         val killedConnection = pool.get()
 
         test("connection initially works (sanity check)") {
@@ -55,7 +53,7 @@ class SithsPoolTest : FunSpec({
 
         test("calling the killed connection throws an exception") {
             // We kill the connection
-            val killerConnection = StandaloneSithsConnection.open(host = host, port = port)
+            val killerConnection = StandaloneSithsConnection.open(makeRedisConnection(container))
             val clientListResponse = killerConnection.runCommand(RedisCommand("CLIENT", "LIST"))
             val connectedClients = parseClientList(clientListResponse.value as String)
             val idToKill = connectedClients.find { it.name == killedConnection.identifier }!!.id

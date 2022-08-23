@@ -10,8 +10,8 @@ import kotlin.time.Duration.Companion.seconds
 import java.util.*
 
 // TODO: Implement Siths? Delegate it? To avoid using a context receiver
-class SithsDSL(val pool: SithsPool) {
-    val redis = ManagedSithsClient(pool)
+class SithsDSL(val pool: SithsConnectionPool) {
+    val redis = ManagedSithsClient(pool = SithsClientPool(pool))
 
     /**
      * Tries to run script, and, if not loaded, loads it, then runs it again
@@ -90,7 +90,7 @@ class SithsDSL(val pool: SithsPool) {
     }
 }
 
-inline fun <T> withRedis(pool: SithsPool, f: SithsDSL.() -> T): T {
+inline fun <T> withRedis(pool: SithsConnectionPool, f: SithsDSL.() -> T): T {
     val dsl = SithsDSL(pool)
     return dsl.f()
 }

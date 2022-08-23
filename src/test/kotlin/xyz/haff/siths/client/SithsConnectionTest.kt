@@ -9,6 +9,7 @@ import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
+import xyz.haff.siths.makeRedisConnection
 import java.nio.ByteBuffer
 
 class SithsConnectionTest : FunSpec({
@@ -18,7 +19,7 @@ class SithsConnectionTest : FunSpec({
 
     test("can set and get a value") {
         // ARRANGE
-        val connection = StandaloneSithsConnection.open(container.host, container.firstMappedPort)
+        val connection = StandaloneSithsConnection.open(makeRedisConnection(container))
 
         // ACT
         connection.runCommand(RedisCommand("SET", "key", "value"))
@@ -30,7 +31,7 @@ class SithsConnectionTest : FunSpec({
 
     test("can pipeline commands") {
         // ARRANGE
-        val connection = StandaloneSithsConnection.open(container.host, container.firstMappedPort)
+        val connection = StandaloneSithsConnection.open(makeRedisConnection(container))
         val pipeline = RedisPipeline(
             RedisCommand("PING"),
             RedisCommand("SET", "pipeline-key", "pipeline-value"),
@@ -52,7 +53,7 @@ class SithsConnectionTest : FunSpec({
 
     test("connection is named") {
         // ARRANGE
-        val connection = StandaloneSithsConnection.open(container.host, container.firstMappedPort, name = "test-connection-name")
+        val connection = StandaloneSithsConnection.open(makeRedisConnection(container), name = "test-connection-name")
 
         // ACT
         val receivedName = connection.runCommand(RedisCommand("CLIENT", "GETNAME"))
