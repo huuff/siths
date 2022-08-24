@@ -7,6 +7,7 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.*
+import kotlinx.coroutines.delay
 import xyz.haff.siths.common.RedisLockTimeoutException
 import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.suspended
@@ -22,7 +23,6 @@ class SithsLockTest : FunSpec({
         clearAllMocks()
     }
 
-    // TODO: This test is flaky, can I mark it so somehow so it gets retried?
     test("execution gets interleaved without locking") {
         val values = Collections.synchronizedList(mutableListOf<String>())
 
@@ -30,7 +30,7 @@ class SithsLockTest : FunSpec({
             makeSithsPool(container).get().use { redis ->
                 val siths = StandaloneSithsClient(redis)
                 siths.incrBy("key", 1)
-                Thread.sleep(100)
+                delay(100)
                 siths.incrBy("key", -1)
                 values += siths.get("key")
             }
@@ -46,7 +46,7 @@ class SithsLockTest : FunSpec({
             withRedis(makeSithsPool(container)) {
                 withLock("lock") {
                     redis.incrBy("key", 1)
-                    Thread.sleep(100)
+                    delay(100)
                     redis.incrBy("key", -1)
                     values += redis.get("key")
                 }
