@@ -27,8 +27,10 @@ fun RespType<*>.toStringOrNull(): String? = when (this) {
     else -> handleAsUnexpected()
 }
 
-// TODO: This takes a possibly null response... I should throw some exception that describes which key is missing
-fun RespType<*>.toStringNonNull(): String = this.toStringOrNull()!!
+fun RespType<*>.toStringNonNull(): String = when (this) {
+    is RespBulkString -> value
+    else -> handleAsUnexpected()
+}
 
 fun RespType<*>.toLong(): Long = when (this) {
     is RespInteger -> value
