@@ -1,6 +1,5 @@
 package xyz.haff.siths.client
 
-import xyz.haff.siths.common.handleUnexpectedRespResponse
 import kotlin.time.Duration
 
 private data class CommandAndResponse<T>(val command: RedisCommand, val response: QueuedResponse<T>)
@@ -36,7 +35,7 @@ class RedisPipelineBuilder(
             if (multiResponse is RespArray) {
                 multiResponse.value // It must be a RespArray, since that's the specification for an EXEC
             } else {
-                handleUnexpectedRespResponse(multiResponse)
+                multiResponse.handleAsUnexpected()
             }
         } else {
             connection.runPipeline(pipeline)

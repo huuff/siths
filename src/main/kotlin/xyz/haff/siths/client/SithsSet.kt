@@ -1,7 +1,6 @@
 package xyz.haff.siths.client
 
 import kotlinx.coroutines.runBlocking
-import xyz.haff.siths.common.handleUnexpectedRespResponse
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import java.util.*
@@ -54,7 +53,7 @@ class SithsSet<T : Any>(
         val sizePriorToChange = (pipelineResults[0] as RespInteger).value
         return when (val sdiffstoreResponse = pipelineResults[2]) {
             is RespInteger -> sdiffstoreResponse.value != sizePriorToChange
-            else -> handleUnexpectedRespResponse(sdiffstoreResponse)
+            else -> sdiffstoreResponse.handleAsUnexpected()
         }
     }
 
@@ -75,7 +74,7 @@ class SithsSet<T : Any>(
         val sizePriorToChange = (pipelineResults[0] as RespInteger).value
         return when (val sinterstoreResponse = pipelineResults[2]) {
             is RespInteger -> sinterstoreResponse.value != sizePriorToChange
-            else -> handleUnexpectedRespResponse(sinterstoreResponse)
+            else -> sinterstoreResponse.handleAsUnexpected()
         }
     }
 
@@ -100,7 +99,7 @@ class SithsSet<T : Any>(
 
         return when (val sintercardResponse = pipelineResults[1]) {
             is RespInteger -> sintercardResponse.value.toInt() == otherSet.size
-            else -> handleUnexpectedRespResponse(sintercardResponse)
+            else -> sintercardResponse.handleAsUnexpected()
         }
     }
 

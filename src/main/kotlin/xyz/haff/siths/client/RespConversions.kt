@@ -1,10 +1,16 @@
 package xyz.haff.siths.client
 
-import xyz.haff.siths.common.handleUnexpectedRespResponse
+import xyz.haff.siths.common.RedisUnexpectedRespResponseException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-// TODO: What if handleUnexpectedRespResponse were one of these?
+/**
+ * Throw an exception from this response. It might be an error, or something weird. In any case, throw an exception.
+ */
+fun RespType<*>.handleAsUnexpected(): Nothing = when (this) {
+    is RespError -> this.throwAsException()
+    else -> throw RedisUnexpectedRespResponseException(this)
+}
 
 fun RespType<*>.toUnit() {
     if (this is RespError) { throwAsException() }
@@ -18,7 +24,7 @@ fun RespType<*>.throwOnError(): RespType<*> = when (this) {
 fun RespType<*>.toStringOrNull(): String? = when (this) {
     is RespBulkString -> value
     is RespNullResponse -> null
-    else -> handleUnexpectedRespResponse(this)
+    else -> handleAsUnexpected()
 }
 
 // TODO: This takes a possibly null response... I should throw some exception that describes which key is missing
@@ -26,7 +32,7 @@ fun RespType<*>.toStringNonNull(): String = this.toStringOrNull()!!
 
 fun RespType<*>.toLong(): Long = when (this) {
     is RespInteger -> value
-    else -> handleUnexpectedRespResponse(this)
+    else -> handleAsUnexpected()
 }
 
 fun RespType<*>.toDurationOrNull(): Duration? = when (this) {
@@ -35,29 +41,29 @@ fun RespType<*>.toDurationOrNull(): Duration? = when (this) {
     } else {
         value.milliseconds
     }
-    else -> handleUnexpectedRespResponse(this)
+    else -> handleAsUnexpected()
 }
 
 // XXX: Redis returns the number of DIFFERENT keys that exist. Since our client's semantics is `true` if all exist
 // and `false` otherwise, we count the number of different keys and compare it to the response
 fun RespType<*>.existenceToBoolean(expectedKeys: Long): Boolean = when (this) {
     is RespInteger -> value == expectedKeys
-    else -> handleUnexpectedRespResponse(this)
+    else -> handleAsUnexpected()
 }
 
 fun RespType<*>.integerToBoolean(): Boolean = when (this) {
     is RespInteger -> value == 1L
-    else -> handleUnexpectedRespResponse(this)
+    else -> handleAsUnexpected()
 }
 
 fun RespType<*>.toClientList(): List<RedisClient> = when (this) {
     is RespBulkString -> parseClientList(value)
-    else -> handleUnexpectedRespResponse(this)
+    else -> handleAsUnexpected()
 }
 
 fun RespType<*>.pongToBoolean(): Boolean = when {
     (this is RespSimpleString) && (value == "PONG") -> true
-    else -> handleUnexpectedRespResponse(this)
+    else -> handleAsUnexpected()
 }
 
 fun RespType<*>.toStringSet(): Set<String> = when (this) {
@@ -65,10 +71,10 @@ fun RespType<*>.toStringSet(): Set<String> = when (this) {
         if (it is RespBulkString) {
             it.value
         } else {
-            handleUnexpectedRespResponse(this)
+            handleAsUnexpected()
         }
     }.toSet()
-    else -> handleUnexpectedRespResponse(this)
+    else -> handleAsUnexpected()
 }
 
 @Suppress("UNCHECKED_CAST") // Not actually unchecked, but Kotlin is not smart enough to notice
@@ -83,5 +89,5 @@ fun RespType<*>.toStringCursor(): RedisCursor<String> = when {
             contents = ((this.value[1] as RespArray).value as List<RespBulkString>).map { it.value }
         )
     }
-    else -> handleUnexpectedRespResponse(this)
+    else -> handleAsUnexpected()
 }

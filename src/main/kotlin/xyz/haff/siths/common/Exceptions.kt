@@ -23,7 +23,3 @@ class RedisAuthException(response: RespType<*>): RuntimeException("Unable to aut
 
 class UnexecutedRedisPipelineException: RuntimeException("Trying to get the contents of an unexecuted pipeline!")
 
-fun handleUnexpectedRespResponse(response: RespType<*>): Nothing = when (response) {
-    is RespError -> response.throwAsException()
-    else -> throw RedisUnexpectedRespResponseException(response)
-}

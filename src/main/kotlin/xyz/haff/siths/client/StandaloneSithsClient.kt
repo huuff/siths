@@ -1,8 +1,6 @@
 package xyz.haff.siths.client
 
-import xyz.haff.siths.common.handleUnexpectedRespResponse
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
 class StandaloneSithsClient(
     private val connection: SithsConnection,
