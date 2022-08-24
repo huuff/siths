@@ -31,28 +31,17 @@ class SithsDSL(val pool: SithsConnectionPool) {
 
     // TODO: hmm this api seems unfriendly... the return type is too low-level
     suspend inline fun pipelined(f: RedisPipelineBuilder.() -> Unit): List<RespType<*>> {
-        val pipelineBuilder = RedisPipelineBuilder()
-        pipelineBuilder.f()
-        return pool.get().use {
-            it.resource.runPipeline(pipelineBuilder.build())
+        return pool.get().use { connection ->
+            val pipelineBuilder = RedisPipelineBuilder(connection)
+            pipelineBuilder.f()
+            pipelineBuilder.exec()
         }
     }
-
     suspend inline fun transactional(f: RedisPipelineBuilder.() -> Unit): List<RespType<*>> {
-        val pipelineBuilder = RedisPipelineBuilder()
-        pipelineBuilder.f()
-        val actualPipelineCommands = pipelineBuilder.length
-
-        val pipeline = RedisCommand("MULTI") + (pipelineBuilder.build() + RedisCommand("EXEC"))
-        val response = pool.get().use {
-            it.resource.runPipeline(pipeline)
-        }.drop(actualPipelineCommands + 1) // Drop the OK response to the MULTI and all QUEUED responses, since they won't matter to the client
-
-        val firstResponse = response[0] // Since it's an EXEC ... MULTI we know the response must be a RespArray
-        if (firstResponse is RespArray) {
-            return firstResponse.value
-        } else {
-            handleUnexpectedRespResponse(firstResponse)
+        return pool.get().use { connection ->
+            val pipelineBuilder = RedisPipelineBuilder(connection)
+            pipelineBuilder.f()
+            pipelineBuilder.exec(inTransaction = true)
         }
     }
 
