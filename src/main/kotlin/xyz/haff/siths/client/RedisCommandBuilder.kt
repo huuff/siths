@@ -107,4 +107,25 @@ class RedisCommandBuilder : Siths<
     
     override suspend fun expire(key: String, duration: Duration, expirationCondition: ExpirationCondition?)
         = RedisCommand("PEXPIRE", key, duration.inWholeMilliseconds, expirationCondition)
+
+    override suspend fun sdiff(key: String, vararg rest: String): RedisCommand
+        = RedisCommand("SDIFF", key, *rest)
+
+    override suspend fun sinter(key: String, vararg rest: String): RedisCommand
+        = RedisCommand("SINTER", key, *rest)
+
+    override suspend fun smove(source: String, destination: String, member: Any): RedisCommand
+        = RedisCommand("SMOVE", source, destination, member)
+
+    override suspend fun spop(key: String, count: Int?): RedisCommand
+        = RedisCommand("SPOP", key, count)
+
+    override suspend fun srandmember(key: String, count: Int?): RedisCommand
+        = RedisCommand("SRANDMEMBER", key, count)
+
+    override suspend fun sunion(key: String, vararg rest: String): RedisCommand
+        = RedisCommand("SUNION", key, *rest)
+
+    override suspend fun sunionstore(destination: String, key: String, vararg rest: String): RedisCommand
+        = RedisCommand("SUNIONSTORE", destination, key, *rest)
 }

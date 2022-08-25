@@ -84,6 +84,34 @@ class ManagedSithsClient(
         return pool.get().use { it.sdiffstore(destination, key, *rest) }
     }
 
+    override suspend fun sdiff(key: String, vararg rest: String): Set<String> {
+        return pool.get().use { it.sdiff(key, *rest) }
+    }
+
+    override suspend fun sinter(key: String, vararg rest: String): Set<String> {
+        return pool.get().use { it.sinter(key, *rest) }
+    }
+
+    override suspend fun smove(source: String, destination: String, member: Any): Boolean {
+        return pool.get().use { it.smove(source, destination, member) }
+    }
+
+    override suspend fun spop(key: String, count: Int?): Set<String> {
+        return pool.get().use { it.spop(key, count) }
+    }
+
+    override suspend fun srandmember(key: String, count: Int?): Set<String> {
+        return pool.get().use { it.srandmember(key, count) }
+    }
+
+    override suspend fun sunion(key: String, vararg rest: String): Set<String> {
+        return pool.get().use { it.sunion(key, *rest) }
+    }
+
+    override suspend fun sunionstore(destination: String, key: String, vararg rest: String): Long {
+        return pool.get().use { it.sunionstore(destination, key, *rest) }
+    }
+
     override suspend fun sinterstore(destination: String, key: String, vararg rest: String): Long {
         return pool.get().use { it.sinterstore(destination, key, *rest) }
     }

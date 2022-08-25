@@ -93,3 +93,13 @@ fun RespType<*>.toStringCursor(): RedisCursor<String> = when {
     }
     else -> handleAsUnexpected()
 }
+
+@Suppress("UNCHECKED_CAST")
+fun RespType<*>.bulkOrArrayToStringSet(): Set<String> = when (this) {
+    is RespBulkString -> setOf(value)
+    is RespArray -> when{
+        value.all { it is RespBulkString } -> (value as List<RespBulkString>).map { it.value }.toSet()
+        else -> handleAsUnexpected()
+    }
+    else -> handleAsUnexpected()
+}

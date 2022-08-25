@@ -5,6 +5,7 @@ import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
+import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.comparables.shouldBeGreaterThanOrEqualTo
 import io.kotest.matchers.comparables.shouldBeLessThanOrEqualTo
 import io.kotest.matchers.shouldBe
@@ -13,6 +14,7 @@ import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.client.ExclusiveMode.*
 import xyz.haff.siths.common.RedisScriptNotLoadedException
+import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeRedisConnection
 import xyz.haff.siths.makeSithsClient
@@ -299,6 +301,120 @@ class SithsClientTest : FunSpec({
 
             // ASSERT
             (result1.contents + result2.contents + result3.contents).toSet() shouldBe valuesToAdd.toSet()
+        }
+
+        test("sdiff") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val set1 = randomUUID()
+            siths.sadd(set1, "key1", "key2", "key3")
+            val set2 = randomUUID()
+            siths.sadd(set2, "key3")
+
+            // ACT
+            val difference = siths.sdiff(set1, set2)
+
+            // ASSERT
+            difference shouldBe setOf("key1", "key2")
+        }
+
+        test("sinter") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val set1 = randomUUID()
+            siths.sadd(set1, "key1", "key2", "key3")
+            val set2 = randomUUID()
+            siths.sadd(set2, "key3")
+
+            // ACT
+            val intersection = siths.sinter(set1, set2)
+
+            // ASSERT
+            intersection shouldBe setOf("key3")
+        }
+
+        test("smove") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val set1 = randomUUID()
+            siths.sadd(set1, "key1", "key2", "key3")
+            val set2 = randomUUID()
+            siths.sadd(set2, "key3")
+
+            // ACT
+            val wasMoved = siths.smove(set1, set2, "key1")
+
+            // ASSERT
+            wasMoved shouldBe true
+            siths.smembers(set1) shouldBe setOf("key2", "key3")
+            siths.smembers(set2) shouldBe setOf("key1", "key3")
+        }
+
+        test("spop") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val set = randomUUID()
+            val members = setOf("key1", "key2", "key3")
+            val (head, tail) = members.toTypedArray().headAndTail()
+            siths.sadd(set, head, *tail)
+
+            // ACT
+            val poppedSet = siths.spop(set)
+
+            // ASSERT
+            poppedSet.size shouldBe 1
+
+            val poppedElement = poppedSet.toList()[0]
+            poppedElement shouldBeIn members
+            siths.scard(set) shouldBe 2
+            siths.sismember(set, poppedElement) shouldBe false
+        }
+
+        test("srandmember") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val set = randomUUID()
+            siths.sadd(set, "key1", "key2", "key3")
+
+            // ACT
+            val randomMembers = siths.srandmember(set, count = 2)
+
+            // ASSERT
+            randomMembers.forEach {
+                it shouldBeIn siths.smembers(set)
+            }
+        }
+
+        test("sunion") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val set1 = randomUUID()
+            siths.sadd(set1, "key1", "key2")
+            val set2 = randomUUID()
+            siths.sadd(set2, "key3")
+
+            // ACT
+            val union = siths.sunion(set1, set2)
+
+            // ASSERT
+            union shouldBe setOf("key1", "key2", "key3")
+        }
+
+        test("sunionstore") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val set1 = randomUUID()
+            siths.sadd(set1, "key1", "key2")
+            val set2 = randomUUID()
+            siths.sadd(set2, "key3")
+            val destination = randomUUID()
+
+            // ACT
+            val unionCard = siths.sunionstore(destination, set1, set2)
+
+            // ASSERT
+            unionCard shouldBe 3
+            siths.smembers(destination) shouldBe setOf("key1", "key2", "key3")
         }
     }
 

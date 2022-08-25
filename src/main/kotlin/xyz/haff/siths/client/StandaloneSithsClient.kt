@@ -52,6 +52,27 @@ class StandaloneSithsClient(
     override suspend fun sdiffstore(destination: String, key: String, vararg rest: String): Long
         = connection.runCommand(commandBuilder.sdiffstore(destination, key, *rest)).toLong()
 
+    override suspend fun sdiff(key: String, vararg rest: String): Set<String>
+        = connection.runCommand(commandBuilder.sdiff(key, *rest)).toStringSet()
+
+    override suspend fun sinter(key: String, vararg rest: String): Set<String>
+        = connection.runCommand(commandBuilder.sinter(key, *rest)).toStringSet()
+
+    override suspend fun smove(source: String, destination: String, member: Any): Boolean
+        = connection.runCommand(commandBuilder.smove(source, destination, member)).integerToBoolean()
+
+    override suspend fun spop(key: String, count: Int?): Set<String>
+        = connection.runCommand(commandBuilder.spop(key, count)).bulkOrArrayToStringSet()
+
+    override suspend fun srandmember(key: String, count: Int?): Set<String>
+        = connection.runCommand(commandBuilder.srandmember(key, count)).bulkOrArrayToStringSet()
+
+    override suspend fun sunion(key: String, vararg rest: String): Set<String>
+        = connection.runCommand(commandBuilder.sunion(key, *rest)).toStringSet()
+
+    override suspend fun sunionstore(destination: String, key: String, vararg rest: String): Long
+        = connection.runCommand(commandBuilder.sunionstore(destination, key, *rest)).toLong()
+
     override suspend fun sinterstore(destination: String, key: String, vararg rest: String): Long
         = connection.runCommand(commandBuilder.sinterstore(destination, key, *rest)).toLong()
 

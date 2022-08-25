@@ -27,11 +27,19 @@ interface Siths<
     // SETS
     suspend fun sadd(key: String, value: Any, vararg rest: Any): LongResponseType
     suspend fun smembers(key: String): StringSetResponseType
-    suspend fun sismember(key: String, member: Any): BooleanResponseType
+    suspend fun sismember(key: String, member: Any): BooleanResponseType // TODO: Merge with `m` variant?
     suspend fun scard(key: String): LongResponseType
     suspend fun srem(key: String, member: Any, vararg rest: Any): LongResponseType
     suspend fun sintercard(key: String, vararg rest: String, limit: Int? = null): LongResponseType
     suspend fun sdiffstore(destination: String, key: String, vararg rest: String): LongResponseType
+    suspend fun sdiff(key: String, vararg rest: String): StringSetResponseType
+    suspend fun sinter(key: String, vararg rest: String): StringSetResponseType
+    suspend fun smove(source: String, destination: String, member: Any): BooleanResponseType
+    suspend fun spop(key: String, count: Int? = null): StringSetResponseType
+    suspend fun srandmember(key: String, count: Int? = null): StringSetResponseType
+    suspend fun sunion(key: String, vararg rest: String): StringSetResponseType
+    suspend fun sunionstore(destination: String, key: String, vararg rest: String): LongResponseType
+
     suspend fun sinterstore(destination: String, key: String, vararg rest: String): LongResponseType
     suspend fun sscan(key: String, cursor: Long = 0, match: String? = null, count: Int? = null): StringCursorResponseType
 

@@ -48,6 +48,7 @@ class RedisPipelineBuilder(
         return actualResponses
     }
 
+    // TODO: It's absurd that I repeat the same 3 lines a thousand times, I must extract it to a function
     override suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode?, timeToLive: Duration?): QueuedResponse<Unit> {
         val operation = CommandAndResponse(commandBuilder.set(key, value, exclusiveMode, timeToLive), QueuedResponse(RespType<*>::toUnit))
         operations += operation
@@ -179,6 +180,48 @@ class RedisPipelineBuilder(
 
     override suspend fun ping(): QueuedResponse<Boolean> {
         val operation = CommandAndResponse(commandBuilder.ping(), QueuedResponse(RespType<*>::pongToBoolean))
+        operations += operation
+        return operation.response
+    }
+
+    override suspend fun sdiff(key: String, vararg rest: String): QueuedResponse<Set<String>> {
+        val operation = CommandAndResponse(commandBuilder.sdiff(key, *rest), QueuedResponse(RespType<*>::toStringSet))
+        operations += operation
+        return operation.response
+    }
+
+    override suspend fun sinter(key: String, vararg rest: String): QueuedResponse<Set<String>> {
+        val operation = CommandAndResponse(commandBuilder.sinter(key, *rest), QueuedResponse(RespType<*>::toStringSet))
+        operations += operation
+        return operation.response
+    }
+
+    override suspend fun smove(source: String, destination: String, member: Any): QueuedResponse<Boolean> {
+        val operation = CommandAndResponse(commandBuilder.smove(source, destination, member), QueuedResponse(RespType<*>::integerToBoolean))
+        operations += operation
+        return operation.response
+    }
+
+    override suspend fun spop(key: String, count: Int?): QueuedResponse<Set<String>> {
+        val operation = CommandAndResponse(commandBuilder.spop(key, count), QueuedResponse(RespType<*>::bulkOrArrayToStringSet))
+        operations += operation
+        return operation.response
+    }
+
+    override suspend fun srandmember(key: String, count: Int?): QueuedResponse<Set<String>> {
+        val operation = CommandAndResponse(commandBuilder.srandmember(key, count), QueuedResponse(RespType<*>::bulkOrArrayToStringSet))
+        operations += operation
+        return operation.response
+    }
+
+    override suspend fun sunion(key: String, vararg rest: String): QueuedResponse<Set<String>> {
+        val operation = CommandAndResponse(commandBuilder.sunion(key, *rest), QueuedResponse(RespType<*>::toStringSet))
+        operations += operation
+        return operation.response
+    }
+
+    override suspend fun sunionstore(destination: String, key: String, vararg rest: String): QueuedResponse<Long> {
+        val operation = CommandAndResponse(commandBuilder.sunionstore(destination, key, *rest), QueuedResponse(RespType<*>::toLong))
         operations += operation
         return operation.response
     }
