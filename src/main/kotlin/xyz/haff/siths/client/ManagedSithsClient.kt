@@ -68,6 +68,10 @@ class ManagedSithsClient(
         return pool.get().use { it.sismember(key, member) }
     }
 
+    override suspend fun smismember(key: String, member: Any, vararg rest: Any): Map<String, Boolean> {
+        return pool.get().use { it.smismember(key, member, *rest) }
+    }
+
     override suspend fun scard(key: String): Long {
         return pool.get().use { it.scard(key) }
     }

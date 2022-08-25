@@ -416,6 +416,25 @@ class SithsClientTest : FunSpec({
             unionCard shouldBe 3
             siths.smembers(destination) shouldBe setOf("key1", "key2", "key3")
         }
+
+        test("smismember") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val set = randomUUID()
+            siths.sadd(set, "key1", "key3", "key5")
+
+            // ACT
+            val membershipMap = siths.smismember(set, "key1", "key2", "key3", "key4", "key5")
+
+            // ASSERT
+            membershipMap shouldBe mapOf(
+                "key1" to true,
+                "key2" to false,
+                "key3" to true,
+                "key4" to false,
+                "key5" to true,
+            )
+        }
     }
 
     test("ping") {

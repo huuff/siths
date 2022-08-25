@@ -12,6 +12,7 @@ class RedisCommandBuilder : Siths<
         RedisCommand,
         RedisCommand,
         RedisCommand,
+        RedisCommand,
         > {
 
     override suspend fun get(key: String) = RedisCommand("GET", key)
@@ -128,4 +129,7 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun sunionstore(destination: String, key: String, vararg rest: String): RedisCommand
         = RedisCommand("SUNIONSTORE", destination, key, *rest)
+
+    override suspend fun smismember(key: String, member: Any, vararg rest: Any)
+        = RedisCommand("SMISMEMBER", key, member, *rest)
 }

@@ -17,7 +17,8 @@ interface SithsClient : Siths<
         Duration,
         Set<String>,
         RedisCursor<String>,
-        Boolean
+        Boolean,
+        Map<String, Boolean>
         > {
 
     suspend fun getOrNull(key: String): String?

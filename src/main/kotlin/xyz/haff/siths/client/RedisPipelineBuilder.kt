@@ -17,7 +17,8 @@ class RedisPipelineBuilder(
         QueuedResponse<Duration?>,
         QueuedResponse<Set<String>>,
         QueuedResponse<RedisCursor<String>>,
-        QueuedResponse<Boolean>
+        QueuedResponse<Boolean>,
+        QueuedResponse<Map<String, Boolean>>
         > {
     private val operations = mutableListOf<CommandAndResponse<*>>()
     val length get() = operations.size
@@ -222,6 +223,16 @@ class RedisPipelineBuilder(
 
     override suspend fun sunionstore(destination: String, key: String, vararg rest: String): QueuedResponse<Long> {
         val operation = CommandAndResponse(commandBuilder.sunionstore(destination, key, *rest), QueuedResponse(RespType<*>::toLong))
+        operations += operation
+        return operation.response
+    }
+
+    override suspend fun smismember(
+        key: String,
+        member: Any,
+        vararg rest: Any
+    ): QueuedResponse<Map<String, Boolean>> {
+        val operation = CommandAndResponse(commandBuilder.smismember(key, member, *rest), QueuedResponse(converter = { it.toStringToBooleanMap(member, *rest)}))
         operations += operation
         return operation.response
     }

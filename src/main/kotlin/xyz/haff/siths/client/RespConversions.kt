@@ -103,3 +103,14 @@ fun RespType<*>.bulkOrArrayToStringSet(): Set<String> = when (this) {
     }
     else -> handleAsUnexpected()
 }
+
+@Suppress("UNCHECKED_CAST")
+fun RespType<*>.toStringToBooleanMap(vararg input: Any): Map<String, Boolean> = when(this) {
+    is RespArray -> {
+        if (input.size != value.size) { handleAsUnexpected() }
+        if (value.any { it !is RespInteger }) { handleAsUnexpected() }
+        val booleanResponses = (value as List<RespInteger>).map { it.integerToBoolean() }
+        (input.map(Any::toString) zip booleanResponses).associate { it }
+    }
+    else -> handleAsUnexpected()
+}

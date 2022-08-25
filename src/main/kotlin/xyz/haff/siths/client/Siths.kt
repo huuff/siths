@@ -12,6 +12,7 @@ interface Siths<
         StringSetResponseType,
         StringCursorResponseType,
         BooleanResponseType,
+        StringToBooleanMapResponseType,
         > {
     suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode? = null, timeToLive: Duration? = null): UnitResponseType
     suspend fun get(key: String): StringResponseType
@@ -27,7 +28,8 @@ interface Siths<
     // SETS
     suspend fun sadd(key: String, value: Any, vararg rest: Any): LongResponseType
     suspend fun smembers(key: String): StringSetResponseType
-    suspend fun sismember(key: String, member: Any): BooleanResponseType // TODO: Merge with `m` variant?
+    suspend fun sismember(key: String, member: Any): BooleanResponseType
+    suspend fun smismember(key: String, member: Any, vararg rest: Any): StringToBooleanMapResponseType
     suspend fun scard(key: String): LongResponseType
     suspend fun srem(key: String, member: Any, vararg rest: Any): LongResponseType
     suspend fun sintercard(key: String, vararg rest: String, limit: Int? = null): LongResponseType
