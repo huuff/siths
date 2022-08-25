@@ -3,6 +3,7 @@ package xyz.haff.siths.client
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+// TODO: Refactor everything to be expressions instead of single-return methods
 class ManagedSithsClient(
     private val pool: SithsClientPool,
 ) : SithsClient {
@@ -124,9 +125,8 @@ class ManagedSithsClient(
         return pool.get().use { it.sscan(key, cursor, match, count) }
     }
 
-    override suspend fun llen(key: String): Long {
-        TODO("Not yet implemented")
-    }
+    override suspend fun llen(key: String): Long
+        = pool.get().use { it.llen(key) }
 
     override suspend fun lindex(key: String, index: Int): String? {
         TODO("Not yet implemented")
@@ -144,9 +144,8 @@ class ManagedSithsClient(
         TODO("Not yet implemented")
     }
 
-    override suspend fun lpush(key: String, element: Any, vararg rest: Any): Long {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lpush(key: String, element: Any, vararg rest: Any): Long
+        = pool.get().use { it.lpush(key, element, *rest) }
 
     override suspend fun rpush(key: String, element: Any, vararg rest: Any): Long {
         TODO("Not yet implemented")
@@ -156,9 +155,8 @@ class ManagedSithsClient(
         TODO("Not yet implemented")
     }
 
-    override suspend fun lrange(key: String, start: Int, end: Int): List<String> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lrange(key: String, start: Int, stop: Int): List<String>
+        = pool.get().use { it.lrange(key, start, stop) }
 
     override suspend fun clientList(): List<RedisClient> {
         return pool.get().use { it.clientList() }

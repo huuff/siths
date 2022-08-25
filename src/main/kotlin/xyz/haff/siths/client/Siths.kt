@@ -54,7 +54,7 @@ interface Siths<
     suspend fun lpush(key: String, element: Any, vararg rest: Any): LongResponseType
     suspend fun rpush(key: String, element: Any, vararg rest: Any): LongResponseType
     suspend fun lrem(key: String, element: Any, count: Int = 0): LongResponseType
-    suspend fun lrange(key: String, start: Int, end: Int): StringListResponseType
+    suspend fun lrange(key: String, start: Int, stop: Int): StringListResponseType
 
     suspend fun clientList(): ClientListResponseType
     suspend fun ping(): BooleanResponseType

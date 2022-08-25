@@ -4,6 +4,7 @@ import kotlin.time.Duration
 
 private data class CommandAndResponse<T>(val command: RedisCommand, val response: QueuedResponse<T>)
 
+// TODO: I should refactor all these methods to be expressions with = instead of a single return
 // TODO: Is PipelineBuilder the correct name? It's not simply a builder since it also executes it
 class RedisPipelineBuilder(
     private val connection: SithsConnection,
@@ -184,9 +185,8 @@ class RedisPipelineBuilder(
         return addOperation(CommandAndResponse(commandBuilder.smismember(key, member, *rest), QueuedResponse(converter = { it.toStringToBooleanMap(member, *rest)})))
     }
 
-    override suspend fun llen(key: String): QueuedResponse<Long> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun llen(key: String): QueuedResponse<Long>
+        = addOperation(CommandAndResponse(commandBuilder.llen(key), QueuedResponse(RespType<*>::toLong)))
 
     override suspend fun lindex(key: String, index: Int): QueuedResponse<String>? {
         TODO("Not yet implemented")
@@ -209,9 +209,8 @@ class RedisPipelineBuilder(
         TODO("Not yet implemented")
     }
 
-    override suspend fun lpush(key: String, element: Any, vararg rest: Any): QueuedResponse<Long> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lpush(key: String, element: Any, vararg rest: Any): QueuedResponse<Long>
+        = addOperation(CommandAndResponse(commandBuilder.lpush(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
 
     override suspend fun rpush(key: String, element: Any, vararg rest: Any): QueuedResponse<Long> {
         TODO("Not yet implemented")
@@ -221,7 +220,6 @@ class RedisPipelineBuilder(
         TODO("Not yet implemented")
     }
 
-    override suspend fun lrange(key: String, start: Int, end: Int): QueuedResponse<List<String>> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lrange(key: String, start: Int, stop: Int): QueuedResponse<List<String>>
+        = addOperation(CommandAndResponse(commandBuilder.lrange(key, start, stop), QueuedResponse(RespType<*>::toStringList)))
 }

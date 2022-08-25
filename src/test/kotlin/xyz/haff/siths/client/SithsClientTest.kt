@@ -437,6 +437,33 @@ class SithsClientTest : FunSpec({
         }
     }
 
+    context("lists") {
+        test("lpush") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val list = randomUUID()
+
+            // ACT
+            siths.lpush(list, "key1", "key2", "key3")
+
+            // ASSERT
+            siths.lrange(list, 0, -1) shouldBe listOf("key3", "key2", "key1")
+        }
+
+        test("llen") {
+            // ARRANGE
+            val siths = makeSithsClient(container)
+            val list = randomUUID()
+            siths.lpush(list, "key1", "key2", "key3")
+
+            // ACT
+            val length = siths.llen(list)
+
+            // ASSERT
+            length shouldBe 3
+        }
+    }
+
     test("ping") {
         // ARRANGE
         val siths = makeSithsClient(container)

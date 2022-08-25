@@ -4,6 +4,12 @@ import xyz.haff.siths.common.RedisUnexpectedRespResponseException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+@Suppress("UNCHECKED_CAST") // Not actually unchecked, but Kotlin is not smart enough to notice
+inline fun <reified T> RespArray.contentsOfType(): List<T> {
+    if (value.any { it !is T} ) { handleAsUnexpected() }
+    return value as List<T>
+}
+
 /**
  * Throw an exception from this response. It might be an error, or something weird. In any case, throw an exception.
  */
@@ -84,7 +90,7 @@ fun RespType<*>.toStringCursor(): RedisCursor<String> = when {
     (this is RespArray)
             && (this.value[0] is RespBulkString)
             && (this.value[1] is RespArray)
-            && (this.value[1] as RespArray).value.all { it is RespBulkString }
+            && (this.value[1] as RespArray).value.all { it is RespBulkString } // Can I use contentsOfType?
     -> {
         RedisCursor(
             next = (this.value[0] as RespBulkString).value.toLong(),
@@ -94,23 +100,22 @@ fun RespType<*>.toStringCursor(): RedisCursor<String> = when {
     else -> handleAsUnexpected()
 }
 
-@Suppress("UNCHECKED_CAST")
 fun RespType<*>.bulkOrArrayToStringSet(): Set<String> = when (this) {
     is RespBulkString -> setOf(value)
-    is RespArray -> when{
-        value.all { it is RespBulkString } -> (value as List<RespBulkString>).map { it.value }.toSet()
-        else -> handleAsUnexpected()
+    is RespArray -> contentsOfType<RespBulkString>().map { it.value }.toSet()
+    else -> handleAsUnexpected()
+}
+
+fun RespType<*>.toStringToBooleanMap(vararg input: Any): Map<String, Boolean> = when(this) {
+    is RespArray -> {
+        if (input.size != value.size) { handleAsUnexpected() }
+        val booleanResponses = contentsOfType<RespInteger>().map { it.integerToBoolean() }
+        (input.map(Any::toString) zip booleanResponses).associate { it }
     }
     else -> handleAsUnexpected()
 }
 
-@Suppress("UNCHECKED_CAST")
-fun RespType<*>.toStringToBooleanMap(vararg input: Any): Map<String, Boolean> = when(this) {
-    is RespArray -> {
-        if (input.size != value.size) { handleAsUnexpected() }
-        if (value.any { it !is RespInteger }) { handleAsUnexpected() }
-        val booleanResponses = (value as List<RespInteger>).map { it.integerToBoolean() }
-        (input.map(Any::toString) zip booleanResponses).associate { it }
-    }
+fun RespType<*>.toStringList(): List<String> = when (this) {
+    is RespArray -> contentsOfType<RespBulkString>().map { it.value }
     else -> handleAsUnexpected()
 }
