@@ -138,7 +138,7 @@ class RedisCommandBuilder : Siths<
         TODO("Not yet implemented")
     }
 
-    override suspend fun lindex(key: String, index: Int): RedisCommand? {
+    override suspend fun lindex(key: String, index: Int): RedisCommand {
         TODO("Not yet implemented")
     }
 
