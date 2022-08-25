@@ -18,7 +18,8 @@ class RedisPipelineBuilder(
         QueuedResponse<Set<String>>,
         QueuedResponse<RedisCursor<String>>,
         QueuedResponse<Boolean>,
-        QueuedResponse<Map<String, Boolean>>
+        QueuedResponse<Map<String, Boolean>>,
+        QueuedResponse<List<String>>
         > {
     private val operations = mutableListOf<CommandAndResponse<*>>()
     val length get() = operations.size
@@ -181,5 +182,46 @@ class RedisPipelineBuilder(
         vararg rest: Any
     ): QueuedResponse<Map<String, Boolean>> {
         return addOperation(CommandAndResponse(commandBuilder.smismember(key, member, *rest), QueuedResponse(converter = { it.toStringToBooleanMap(member, *rest)})))
+    }
+
+    override suspend fun llen(key: String): QueuedResponse<Long> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lindex(key: String, index: Int): QueuedResponse<String>? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun linsert(
+        key: String,
+        relativePosition: RelativePosition,
+        pivot: Any,
+        element: Any
+    ): QueuedResponse<Long>? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lpop(key: String, count: Int?): QueuedResponse<List<String>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun rpop(key: String, count: Int?): QueuedResponse<List<String>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lpush(key: String, element: Any, vararg rest: Any): QueuedResponse<Long> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun rpush(key: String, element: Any, vararg rest: Any): QueuedResponse<Long> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lrem(key: String, element: Any, count: Int): QueuedResponse<Long> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lrange(key: String, start: Int, end: Int): QueuedResponse<List<String>> {
+        TODO("Not yet implemented")
     }
 }

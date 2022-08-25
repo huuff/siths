@@ -5,6 +5,9 @@
 * Set `codecov.io`
 
 ## Siths
+* Implement `PERSIST`
+* Implement `EXPIREAT`
+* Implement `ZSET` operations! I had forgotten
 * Before implementing the `MutableList`, implement ALL list commands
 * See if I can some of the official documentation patterns, such as those [here](https://redis.io/commands/lmove/)
 * Distributed data structures that implement their respective Kotlin interfaces such as `MutableList`, `MutableMap`,  etc.
@@ -13,3 +16,4 @@
 * Test with some huge key or value
 * Test my transaction code with the locking examples of "Redis in Action"
 * Implement the Redis in Action semaphore
+* Maybe I should separate the methods that take an optional count and return one or many elements into alternatives? such as `lpopOne` and `lpopMany`. I find it bothersome forcing the user to handle a singleton list

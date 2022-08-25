@@ -82,6 +82,42 @@ class StandaloneSithsClient(
     override suspend fun sscan(key: String, cursor: Long, match: String?, count: Int?): RedisCursor<String>
         = connection.runCommand(commandBuilder.sscan(key, cursor, match, count)).toStringCursor()
 
+    override suspend fun llen(key: String): Long {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lindex(key: String, index: Int): String? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: Any, element: Any): Long? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lpop(key: String, count: Int?): List<String> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun rpop(key: String, count: Int?): List<String> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lpush(key: String, element: Any, vararg rest: Any): Long {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun rpush(key: String, element: Any, vararg rest: Any): Long {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lrem(key: String, element: Any, count: Int): Long {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lrange(key: String, start: Int, end: Int): List<String> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun smismember(key: String, member: Any, vararg rest: Any): Map<String, Boolean>
         = connection.runCommand(commandBuilder.smismember(key, member, *rest)).toStringToBooleanMap(member, *rest)
 

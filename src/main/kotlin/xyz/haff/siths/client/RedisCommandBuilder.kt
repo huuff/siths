@@ -13,6 +13,7 @@ class RedisCommandBuilder : Siths<
         RedisCommand,
         RedisCommand,
         RedisCommand,
+        RedisCommand,
         > {
 
     override suspend fun get(key: String) = RedisCommand("GET", key)
@@ -132,4 +133,45 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun smismember(key: String, member: Any, vararg rest: Any)
         = RedisCommand("SMISMEMBER", key, member, *rest)
+
+    override suspend fun llen(key: String): RedisCommand {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lindex(key: String, index: Int): RedisCommand? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun linsert(
+        key: String,
+        relativePosition: RelativePosition,
+        pivot: Any,
+        element: Any
+    ): RedisCommand? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lpop(key: String, count: Int?): RedisCommand {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun rpop(key: String, count: Int?): RedisCommand {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lpush(key: String, element: Any, vararg rest: Any): RedisCommand {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun rpush(key: String, element: Any, vararg rest: Any): RedisCommand {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lrem(key: String, element: Any, count: Int): RedisCommand {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lrange(key: String, start: Int, end: Int): RedisCommand {
+        TODO("Not yet implemented")
+    }
 }

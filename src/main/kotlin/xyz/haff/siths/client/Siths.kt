@@ -13,6 +13,7 @@ interface Siths<
         StringCursorResponseType,
         BooleanResponseType,
         StringToBooleanMapResponseType,
+        StringListResponseType,
         > {
     suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode? = null, timeToLive: Duration? = null): UnitResponseType
     suspend fun get(key: String): StringResponseType
@@ -41,9 +42,19 @@ interface Siths<
     suspend fun srandmember(key: String, count: Int? = null): StringSetResponseType
     suspend fun sunion(key: String, vararg rest: String): StringSetResponseType
     suspend fun sunionstore(destination: String, key: String, vararg rest: String): LongResponseType
-
     suspend fun sinterstore(destination: String, key: String, vararg rest: String): LongResponseType
     suspend fun sscan(key: String, cursor: Long = 0, match: String? = null, count: Int? = null): StringCursorResponseType
+
+    // LISTS
+    suspend fun llen(key: String): LongResponseType
+    suspend fun lindex(key: String, index: Int): StringResponseType?
+    suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: Any, element: Any): LongResponseType?
+    suspend fun lpop(key: String, count: Int? = null): StringListResponseType
+    suspend fun rpop(key: String, count: Int? = null): StringListResponseType
+    suspend fun lpush(key: String, element: Any, vararg rest: Any): LongResponseType
+    suspend fun rpush(key: String, element: Any, vararg rest: Any): LongResponseType
+    suspend fun lrem(key: String, element: Any, count: Int = 0): LongResponseType
+    suspend fun lrange(key: String, start: Int, end: Int): StringListResponseType
 
     suspend fun clientList(): ClientListResponseType
     suspend fun ping(): BooleanResponseType
