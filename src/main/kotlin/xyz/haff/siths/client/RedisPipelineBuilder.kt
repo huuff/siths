@@ -23,6 +23,11 @@ class RedisPipelineBuilder(
     private val operations = mutableListOf<CommandAndResponse<*>>()
     val length get() = operations.size
 
+    private fun <T> addOperation(operation: CommandAndResponse<T>): QueuedResponse<T> {
+        operations += operation
+        return operation.response
+    }
+
     suspend fun exec(inTransaction: Boolean = false): List<RespType<*>> {
         val pipeline = if (inTransaction) {
             RedisPipeline(commands = listOf(RedisCommand("MULTI"), *operations.map { it.command }.toTypedArray(), RedisCommand("EXEC")))
@@ -49,59 +54,40 @@ class RedisPipelineBuilder(
         return actualResponses
     }
 
-    // TODO: It's absurd that I repeat the same 3 lines a thousand times, I must extract it to a function
     override suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode?, timeToLive: Duration?): QueuedResponse<Unit> {
-        val operation = CommandAndResponse(commandBuilder.set(key, value, exclusiveMode, timeToLive), QueuedResponse(RespType<*>::toUnit))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.set(key, value, exclusiveMode, timeToLive), QueuedResponse(RespType<*>::toUnit)))
     }
 
     override suspend fun get(key: String): QueuedResponse<String> {
-        val operation = CommandAndResponse(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringNonNull))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringNonNull)))
     }
 
     override suspend fun del(key: String, vararg rest: String): QueuedResponse<Long> {
-        val operation = CommandAndResponse(commandBuilder.del(key, *rest), QueuedResponse(RespType<*>::toLong))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.del(key, *rest), QueuedResponse(RespType<*>::toLong)))
     }
 
     override suspend fun ttl(key: String): QueuedResponse<Duration?> {
-        val operation = CommandAndResponse(commandBuilder.ttl(key), QueuedResponse(RespType<*>::toDurationOrNull))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.ttl(key), QueuedResponse(RespType<*>::toDurationOrNull)))
     }
 
     override suspend fun scriptLoad(script: String): QueuedResponse<String> {
-        val operation = CommandAndResponse(commandBuilder.scriptLoad(script), QueuedResponse(RespType<*>::toStringNonNull))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.scriptLoad(script), QueuedResponse(RespType<*>::toStringNonNull)))
     }
 
     override suspend fun evalSha(sha: String, keys: List<String>, args: List<String>): QueuedResponse<RespType<*>> {
-        val operation = CommandAndResponse(commandBuilder.evalSha(sha, keys, args), QueuedResponse(RespType<*>::throwOnError))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.evalSha(sha, keys, args), QueuedResponse(RespType<*>::throwOnError)))
     }
 
     override suspend fun eval(script: String, keys: List<String>, args: List<String>): QueuedResponse<RespType<*>> {
-        val operation = CommandAndResponse(commandBuilder.eval(script, keys, args), QueuedResponse(RespType<*>::throwOnError))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.eval(script, keys, args), QueuedResponse(RespType<*>::throwOnError)))
     }
 
     override suspend fun incrBy(key: String, value: Long): QueuedResponse<Long> {
-        val operation = CommandAndResponse(commandBuilder.incrBy(key, value), QueuedResponse(RespType<*>::toLong))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.incrBy(key, value), QueuedResponse(RespType<*>::toLong)))
     }
 
     override suspend fun exists(key: String, vararg rest: String): QueuedResponse<Boolean> {
-        val operation = CommandAndResponse(commandBuilder.exists(key, *rest), QueuedResponse(converter = { it.existenceToBoolean(setOf(key, *rest).size.toLong()) }))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.exists(key, *rest), QueuedResponse(converter = { it.existenceToBoolean(setOf(key, *rest).size.toLong()) })))
     }
 
     override suspend fun expire(
@@ -109,57 +95,39 @@ class RedisPipelineBuilder(
         duration: Duration,
         expirationCondition: ExpirationCondition?
     ): QueuedResponse<Boolean> {
-        val operation = CommandAndResponse(commandBuilder.expire(key, duration, expirationCondition), QueuedResponse(RespType<*>::integerToBoolean))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.expire(key, duration, expirationCondition), QueuedResponse(RespType<*>::integerToBoolean)))
     }
 
     override suspend fun sadd(key: String, value: Any, vararg rest: Any): QueuedResponse<Long> {
-        val operation = CommandAndResponse(commandBuilder.sadd(key, value, *rest), QueuedResponse(RespType<*>::toLong))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.sadd(key, value, *rest), QueuedResponse(RespType<*>::toLong)))
     }
 
     override suspend fun smembers(key: String): QueuedResponse<Set<String>> {
-        val operation = CommandAndResponse(commandBuilder.smembers(key), QueuedResponse(RespType<*>::toStringSet))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.smembers(key), QueuedResponse(RespType<*>::toStringSet)))
     }
 
     override suspend fun sismember(key: String, member: Any): QueuedResponse<Boolean> {
-        val operation = CommandAndResponse(commandBuilder.sismember(key, member), QueuedResponse(RespType<*>::integerToBoolean))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.sismember(key, member), QueuedResponse(RespType<*>::integerToBoolean)))
     }
 
     override suspend fun scard(key: String): QueuedResponse<Long> {
-        val operation = CommandAndResponse(commandBuilder.scard(key), QueuedResponse(RespType<*>::toLong))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.scard(key), QueuedResponse(RespType<*>::toLong)))
     }
 
     override suspend fun srem(key: String, member: Any, vararg rest: Any): QueuedResponse<Long> {
-        val operation = CommandAndResponse(commandBuilder.srem(key, member, *rest), QueuedResponse(RespType<*>::toLong))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.srem(key, member, *rest), QueuedResponse(RespType<*>::toLong)))
     }
 
     override suspend fun sintercard(key: String, vararg rest: String, limit: Int?): QueuedResponse<Long> {
-        val operation = CommandAndResponse(commandBuilder.sintercard(key, rest = rest, limit = limit), QueuedResponse(RespType<*>::toLong))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.sintercard(key, rest = rest, limit = limit), QueuedResponse(RespType<*>::toLong)))
     }
 
     override suspend fun sdiffstore(destination: String, key: String, vararg rest: String): QueuedResponse<Long> {
-        val operation = CommandAndResponse(commandBuilder.sdiffstore(destination, key, *rest), QueuedResponse(RespType<*>::toLong))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.sdiffstore(destination, key, *rest), QueuedResponse(RespType<*>::toLong)))
     }
 
     override suspend fun sinterstore(destination: String, key: String, vararg rest: String): QueuedResponse<Long> {
-        val operation = CommandAndResponse(commandBuilder.sinterstore(destination, key, *rest), QueuedResponse(RespType<*>::toLong))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.sinterstore(destination, key, *rest), QueuedResponse(RespType<*>::toLong)))
     }
 
     override suspend fun sscan(
@@ -168,63 +136,43 @@ class RedisPipelineBuilder(
         match: String?,
         count: Int?
     ): QueuedResponse<RedisCursor<String>> {
-        val operation = CommandAndResponse(commandBuilder.sscan(key, cursor, match, count), QueuedResponse(RespType<*>::toStringCursor))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.sscan(key, cursor, match, count), QueuedResponse(RespType<*>::toStringCursor)))
     }
 
     override suspend fun clientList(): QueuedResponse<List<RedisClient>> {
-        val operation = CommandAndResponse(commandBuilder.clientList(), QueuedResponse(RespType<*>::toClientList))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.clientList(), QueuedResponse(RespType<*>::toClientList)))
     }
 
     override suspend fun ping(): QueuedResponse<Boolean> {
-        val operation = CommandAndResponse(commandBuilder.ping(), QueuedResponse(RespType<*>::pongToBoolean))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.ping(), QueuedResponse(RespType<*>::pongToBoolean)))
     }
 
     override suspend fun sdiff(key: String, vararg rest: String): QueuedResponse<Set<String>> {
-        val operation = CommandAndResponse(commandBuilder.sdiff(key, *rest), QueuedResponse(RespType<*>::toStringSet))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.sdiff(key, *rest), QueuedResponse(RespType<*>::toStringSet)))
     }
 
     override suspend fun sinter(key: String, vararg rest: String): QueuedResponse<Set<String>> {
-        val operation = CommandAndResponse(commandBuilder.sinter(key, *rest), QueuedResponse(RespType<*>::toStringSet))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.sinter(key, *rest), QueuedResponse(RespType<*>::toStringSet)))
     }
 
     override suspend fun smove(source: String, destination: String, member: Any): QueuedResponse<Boolean> {
-        val operation = CommandAndResponse(commandBuilder.smove(source, destination, member), QueuedResponse(RespType<*>::integerToBoolean))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.smove(source, destination, member), QueuedResponse(RespType<*>::integerToBoolean)))
     }
 
     override suspend fun spop(key: String, count: Int?): QueuedResponse<Set<String>> {
-        val operation = CommandAndResponse(commandBuilder.spop(key, count), QueuedResponse(RespType<*>::bulkOrArrayToStringSet))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.spop(key, count), QueuedResponse(RespType<*>::bulkOrArrayToStringSet)))
     }
 
     override suspend fun srandmember(key: String, count: Int?): QueuedResponse<Set<String>> {
-        val operation = CommandAndResponse(commandBuilder.srandmember(key, count), QueuedResponse(RespType<*>::bulkOrArrayToStringSet))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.srandmember(key, count), QueuedResponse(RespType<*>::bulkOrArrayToStringSet)))
     }
 
     override suspend fun sunion(key: String, vararg rest: String): QueuedResponse<Set<String>> {
-        val operation = CommandAndResponse(commandBuilder.sunion(key, *rest), QueuedResponse(RespType<*>::toStringSet))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.sunion(key, *rest), QueuedResponse(RespType<*>::toStringSet)))
     }
 
     override suspend fun sunionstore(destination: String, key: String, vararg rest: String): QueuedResponse<Long> {
-        val operation = CommandAndResponse(commandBuilder.sunionstore(destination, key, *rest), QueuedResponse(RespType<*>::toLong))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.sunionstore(destination, key, *rest), QueuedResponse(RespType<*>::toLong)))
     }
 
     override suspend fun smismember(
@@ -232,8 +180,6 @@ class RedisPipelineBuilder(
         member: Any,
         vararg rest: Any
     ): QueuedResponse<Map<String, Boolean>> {
-        val operation = CommandAndResponse(commandBuilder.smismember(key, member, *rest), QueuedResponse(converter = { it.toStringToBooleanMap(member, *rest)}))
-        operations += operation
-        return operation.response
+        return addOperation(CommandAndResponse(commandBuilder.smismember(key, member, *rest), QueuedResponse(converter = { it.toStringToBooleanMap(member, *rest)})))
     }
 }
