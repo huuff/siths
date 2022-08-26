@@ -8,7 +8,6 @@ fun randomUUID() = UUID.randomUUID().toString()
 // OPT: Prevent copying the array
 fun <T> Array<T>.headAndTail(): Pair<T, Array<T>> = Pair(this[0], this.copyOfRange(1, this.size))
 
-// TODO: Remove the top one
 // XXX: As checked as we can get with arrays
 @Suppress("UNCHECKED_CAST")
 fun <T> Iterable<T>.headAndTail(): Pair<T, Array<T>> {

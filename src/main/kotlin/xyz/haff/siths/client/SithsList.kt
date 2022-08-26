@@ -4,12 +4,12 @@ import kotlinx.coroutines.runBlocking
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 
-class SithsList<T: Any>(
+class SithsList<T : Any>(
     private val connectionPool: SithsConnectionPool,
     val name: String = "list:${randomUUID()}",
     private val serializer: (T) -> String,
     private val deserializer: (String) -> T
-): MutableList<T> {
+) : MutableList<T> {
     private val client = ManagedSithsClient(connectionPool)
 
     companion object {
@@ -75,7 +75,7 @@ class SithsList<T: Any>(
     }
 
     override fun addAll(elements: Collection<T>): Boolean {
-        val (head, tail) = elements.headAndTail()
+        val (head, tail) = elements.map(serializer).toTypedArray().headAndTail()
 
         return runBlocking {
             connectionPool.get().use { conn ->
@@ -101,7 +101,15 @@ class SithsList<T: Any>(
     }
 
     override fun remove(element: T): Boolean {
-        TODO("Not yet implemented")
+        return runBlocking {
+            connectionPool.get().use { conn ->
+                val pipeline = RedisPipelineBuilder(conn)
+                val sizePriorToUpdate = pipeline.llen(name)
+                val sizeAfterUpdate = pipeline.lrem(name, serializer(element), count = 1)
+                pipeline.exec(inTransaction = true)
+                sizePriorToUpdate != sizeAfterUpdate
+            }
+        }
     }
 
     override fun removeAll(elements: Collection<T>): Boolean {
@@ -124,6 +132,6 @@ class SithsList<T: Any>(
      * Note that this returns a new Kotlin list, not backed by redis!
      */
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
-        return runBlocking { client.lrange(name, fromIndex, toIndex-1) }.map(deserializer).toMutableList()
+        return runBlocking { client.lrange(name, fromIndex, toIndex - 1) }.map(deserializer).toMutableList()
     }
 }

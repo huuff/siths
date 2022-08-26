@@ -23,7 +23,7 @@ class SithsSet<T : Any>(
     override fun add(element: T): Boolean = runBlocking { client.sadd(name, element) == 1L }
 
     override fun addAll(elements: Collection<T>): Boolean {
-        val (head, tail) = (elements.toSet() as Set<Any>).toTypedArray().headAndTail()
+        val (head, tail) = elements.map(serializer).toTypedArray().headAndTail()
         val addedCount = runBlocking {
             client.sadd(name, head, *tail)
         }
@@ -39,7 +39,7 @@ class SithsSet<T : Any>(
     override fun remove(element: T): Boolean = runBlocking { client.srem(name, element) != 0L }
 
     override fun removeAll(elements: Collection<T>): Boolean {
-        val (otherSetHead, otherSetTail) = (elements.toSet() as Set<Any>).toTypedArray().headAndTail()
+        val (otherSetHead, otherSetTail) = elements.map(serializer).toTypedArray().headAndTail()
         val pipelineResults = runBlocking {
             withRedis(connectionPool) {
                 transactional {
@@ -60,7 +60,7 @@ class SithsSet<T : Any>(
     }
 
     override fun retainAll(elements: Collection<T>): Boolean {
-        val (otherSetHead, otherSetTail) = (elements.toSet() as Set<Any>).toTypedArray().headAndTail()
+        val (otherSetHead, otherSetTail) = elements.map(serializer).toTypedArray().headAndTail()
         val pipelineResults = runBlocking {
             withRedis(connectionPool) {
                 transactional {
@@ -86,7 +86,7 @@ class SithsSet<T : Any>(
     override fun contains(element: T): Boolean = runBlocking { client.sismember(name, element) }
 
     override fun containsAll(elements: Collection<T>): Boolean {
-        val otherSet = (elements.toSet() as Set<Any>).toTypedArray()
+        val otherSet = elements.map(serializer).toTypedArray()
         val (otherSetHead, otherSetTail) = otherSet.headAndTail()
         val pipelineResults = runBlocking {
             withRedis(connectionPool) {

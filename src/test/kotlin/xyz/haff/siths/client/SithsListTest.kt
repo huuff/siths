@@ -56,7 +56,21 @@ class SithsListTest : FunSpec({
         val wasModified = list.addAll(listOf("v1", "v2", "v3"))
 
         // ASSERT
+        wasModified shouldBe true
         list.subList(0, list.size) shouldBe listOf("v1", "v2", "v3")
+    }
+
+    test("remove") {
+        // ARRANGE
+        val list = SithsList.ofStrings(makeSithsPool(container))
+        list.addAll(listOf("v1", "v2", "v3"))
+
+        // ACT
+        val wasModified = list.remove("v2")
+
+        // ASSERT
+        wasModified shouldBe true
+        list.subList(0, list.size) shouldBe listOf("v1", "v3")
     }
 
 })
