@@ -26,4 +26,12 @@ class SithsListTest : FunSpec({
         list.subList(0, list.size) shouldBe listOf("v1", "v2")
     }
 
+    test("isEmpty") {
+        // ARRANGE
+        val list = SithsList.ofStrings(makeSithsPool(container))
+
+        // ACT & ASSERT
+        list.isEmpty() shouldBe true
+    }
+
 })

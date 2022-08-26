@@ -41,9 +41,7 @@ class SithsList<T: Any>(
         TODO("Not yet implemented")
     }
 
-    override fun isEmpty(): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun isEmpty(): Boolean = this.size == 0
 
     override fun iterator(): MutableIterator<T> {
         TODO("Not yet implemented")
