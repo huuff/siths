@@ -73,4 +73,32 @@ class SithsListTest : FunSpec({
         list.subList(0, list.size) shouldBe listOf("v1", "v3")
     }
 
+    context("removeAll") {
+        test("actually removing") {
+            // ARRANGE
+            val list = SithsList.ofStrings(makeSithsPool(container))
+            list.addAll(listOf("v1", "v2", "v3"))
+
+            // ACT
+            val wasModified = list.removeAll(listOf("v1", "v2"))
+
+            // ASSERT
+            wasModified shouldBe true
+            list.subList(0, list.size) shouldBe listOf("v3")
+        }
+
+        test("without removing") {
+            // ARRANGE
+            val list = SithsList.ofStrings(makeSithsPool(container))
+            list.addAll(listOf("v1", "v2", "v3"))
+
+            // ACT
+            val wasModified = list.removeAll(listOf("v4", "v5", "v8"))
+
+            // ASSERT
+            wasModified shouldBe false
+            list.subList(0, list.size) shouldBe listOf("v1", "v2", "v3")
+        }
+    }
+
 })
