@@ -105,9 +105,8 @@ class StandaloneSithsClient(
     override suspend fun rpush(key: String, element: Any, vararg rest: Any): Long
         = connection.runCommand(commandBuilder.rpush(key, element, *rest)).toLong()
 
-    override suspend fun lrem(key: String, element: Any, count: Int): Long {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lrem(key: String, element: Any, count: Int): Long
+        = connection.runCommand(commandBuilder.lrem(key, element, count)).toLong()
 
     override suspend fun lrange(key: String, start: Int, stop: Int): List<String>
         = connection.runCommand(commandBuilder.lrange(key, start, stop)).toStringList()

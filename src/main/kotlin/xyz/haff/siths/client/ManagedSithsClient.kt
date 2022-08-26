@@ -148,9 +148,8 @@ class ManagedSithsClient(
     override suspend fun rpush(key: String, element: Any, vararg rest: Any): Long
         = pool.get().use { it.rpush(key, element, *rest)}
 
-    override suspend fun lrem(key: String, element: Any, count: Int): Long {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lrem(key: String, element: Any, count: Int): Long
+        = pool.get().use { it.lrem(key, element, count) }
 
     override suspend fun lrange(key: String, start: Int, stop: Int): List<String>
         = pool.get().use { it.lrange(key, start, stop) }
