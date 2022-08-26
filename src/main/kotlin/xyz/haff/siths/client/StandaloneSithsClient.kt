@@ -85,9 +85,8 @@ class StandaloneSithsClient(
     override suspend fun llen(key: String): Long
         = connection.runCommand(commandBuilder.llen(key)).toLong()
 
-    override suspend fun lindex(key: String, index: Int): String? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lindex(key: String, index: Int): String?
+        = connection.runCommand(commandBuilder.lindex(key, index)).toStringOrNull()
 
     override suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: Any, element: Any): Long? {
         TODO("Not yet implemented")

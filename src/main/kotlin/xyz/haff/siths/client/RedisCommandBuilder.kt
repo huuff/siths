@@ -14,6 +14,7 @@ class RedisCommandBuilder : Siths<
         RedisCommand,
         RedisCommand,
         RedisCommand,
+        RedisCommand,
         > {
 
     override suspend fun get(key: String) = RedisCommand("GET", key)
@@ -137,9 +138,8 @@ class RedisCommandBuilder : Siths<
     override suspend fun llen(key: String): RedisCommand
         = RedisCommand("LLEN", key)
 
-    override suspend fun lindex(key: String, index: Int): RedisCommand {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lindex(key: String, index: Int): RedisCommand
+        = RedisCommand("LINDEX", key, index)
 
     override suspend fun linsert(
         key: String,

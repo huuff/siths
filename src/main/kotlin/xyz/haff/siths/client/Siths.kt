@@ -5,6 +5,7 @@ import kotlin.time.Duration
 interface Siths<
         UnitResponseType,
         StringResponseType,
+        NullableStringResponseType,
         RespResponseType,
         LongResponseType,
         ClientListResponseType,
@@ -47,7 +48,7 @@ interface Siths<
 
     // LISTS
     suspend fun llen(key: String): LongResponseType
-    suspend fun lindex(key: String, index: Int): StringResponseType?
+    suspend fun lindex(key: String, index: Int): NullableStringResponseType
     suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: Any, element: Any): LongResponseType?
     suspend fun lpop(key: String, count: Int? = null): StringListResponseType
     suspend fun rpop(key: String, count: Int? = null): StringListResponseType

@@ -12,6 +12,7 @@ class RedisPipelineBuilder(
 ): Siths<
         QueuedResponse<Unit>,
         QueuedResponse<String>,
+        QueuedResponse<String?>,
         QueuedResponse<RespType<*>>,
         QueuedResponse<Long>,
         QueuedResponse<List<RedisClient>>,
@@ -188,9 +189,8 @@ class RedisPipelineBuilder(
     override suspend fun llen(key: String): QueuedResponse<Long>
         = addOperation(CommandAndResponse(commandBuilder.llen(key), QueuedResponse(RespType<*>::toLong)))
 
-    override suspend fun lindex(key: String, index: Int): QueuedResponse<String>? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lindex(key: String, index: Int): QueuedResponse<String?>
+        = addOperation(CommandAndResponse(commandBuilder.lindex(key, index), QueuedResponse(RespType<*>::toStringOrNull)))
 
     override suspend fun linsert(
         key: String,

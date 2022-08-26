@@ -34,4 +34,18 @@ class SithsListTest : FunSpec({
         list.isEmpty() shouldBe true
     }
 
+    test("get") {
+        // ARRANGE
+        val list = SithsList.ofStrings(makeSithsPool(container))
+        list += "v1"
+        list += "v2"
+        list += "v3"
+
+        // ACT
+        val secondElement = list[1]
+
+        // ASSERT
+        secondElement shouldBe "v2"
+    }
+
 })

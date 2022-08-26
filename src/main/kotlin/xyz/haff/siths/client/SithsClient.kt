@@ -11,6 +11,7 @@ import kotlin.time.Duration
 interface SithsClient : Siths<
         Unit,
         String,
+        String?,
         RespType<*>,
         Long,
         List<RedisClient>,

@@ -33,8 +33,10 @@ class SithsList<T: Any>(
         TODO("Implement LPOS first")
     }
 
-    override fun get(index: Int): T {
-        TODO("Implement LINDEX first!")
+    override fun get(index: Int): T = runBlocking {
+        client.lindex(name, index)
+            ?.let(deserializer)
+            ?: throw IndexOutOfBoundsException(index)
     }
 
     override fun indexOf(element: T): Int {
