@@ -15,6 +15,7 @@ class RedisPipelineBuilder(
         QueuedResponse<String?>,
         QueuedResponse<RespType<*>>,
         QueuedResponse<Long>,
+        QueuedResponse<Long?>,
         QueuedResponse<List<RedisClient>>,
         QueuedResponse<Duration?>,
         QueuedResponse<Set<String>>,
@@ -197,9 +198,11 @@ class RedisPipelineBuilder(
         relativePosition: RelativePosition,
         pivot: Any,
         element: Any
-    ): QueuedResponse<Long>? {
-        TODO("Not yet implemented")
-    }
+    ): QueuedResponse<Long?> = addOperation(
+        CommandAndResponse(
+            commandBuilder.linsert(key, relativePosition, pivot, element),
+            QueuedResponse(RespType<*>::toPositiveLongOrNull))
+    )
 
     override suspend fun lpop(key: String, count: Int?): QueuedResponse<List<String>> {
         TODO("Not yet implemented")

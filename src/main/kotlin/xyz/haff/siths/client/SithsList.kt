@@ -3,7 +3,6 @@ package xyz.haff.siths.client
 import kotlinx.coroutines.runBlocking
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
-import java.util.*
 
 class SithsList<T: Any>(
     private val connectionPool: SithsConnectionPool,
@@ -67,6 +66,7 @@ class SithsList<T: Any>(
     }
 
     override fun add(index: Int, element: T) {
+        // TODO: A bit complex but I must do it, check https://stackoverflow.com/questions/21692456/insert-value-by-index-in-redis-list
         TODO("Not yet implemented")
     }
 

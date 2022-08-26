@@ -8,6 +8,7 @@ interface Siths<
         NullableStringResponseType,
         RespResponseType,
         LongResponseType,
+        NullableLongResponseType,
         ClientListResponseType,
         DurationResponseType,
         StringSetResponseType,
@@ -49,7 +50,7 @@ interface Siths<
     // LISTS
     suspend fun llen(key: String): LongResponseType
     suspend fun lindex(key: String, index: Int): NullableStringResponseType
-    suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: Any, element: Any): LongResponseType?
+    suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: Any, element: Any): NullableLongResponseType
     suspend fun lpop(key: String, count: Int? = null): StringListResponseType
     suspend fun rpop(key: String, count: Int? = null): StringListResponseType
     suspend fun lpush(key: String, element: Any, vararg rest: Any): LongResponseType

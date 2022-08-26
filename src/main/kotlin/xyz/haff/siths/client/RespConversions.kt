@@ -119,3 +119,11 @@ fun RespType<*>.toStringList(): List<String> = when (this) {
     is RespArray -> contentsOfType<RespBulkString>().map { it.value }
     else -> handleAsUnexpected()
 }
+
+fun RespType<*>.toPositiveLongOrNull(): Long? = when (this) {
+    is RespInteger -> when (value) {
+        -1L -> null
+        else -> value
+    }
+    else -> handleAsUnexpected()
+}

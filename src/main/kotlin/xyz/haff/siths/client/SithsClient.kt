@@ -14,6 +14,7 @@ interface SithsClient : Siths<
         String?,
         RespType<*>,
         Long,
+        Long?,
         List<RedisClient>,
         Duration,
         Set<String>,

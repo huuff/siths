@@ -131,9 +131,8 @@ class ManagedSithsClient(
     override suspend fun lindex(key: String, index: Int): String?
         = pool.get().use { it.lindex(key, index) }
 
-    override suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: Any, element: Any): Long? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: Any, element: Any): Long?
+        = pool.get().use { it.linsert(key, relativePosition, pivot, element) }
 
     override suspend fun lpop(key: String, count: Int?): List<String> {
         TODO("Not yet implemented")

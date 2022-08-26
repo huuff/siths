@@ -15,6 +15,7 @@ class RedisCommandBuilder : Siths<
         RedisCommand,
         RedisCommand,
         RedisCommand,
+        RedisCommand,
         > {
 
     override suspend fun get(key: String) = RedisCommand("GET", key)
@@ -146,9 +147,7 @@ class RedisCommandBuilder : Siths<
         relativePosition: RelativePosition,
         pivot: Any,
         element: Any
-    ): RedisCommand? {
-        TODO("Not yet implemented")
-    }
+    ): RedisCommand = RedisCommand("LINSERT", key, relativePosition, pivot, element)
 
     override suspend fun lpop(key: String, count: Int?): RedisCommand {
         TODO("Not yet implemented")
