@@ -34,11 +34,11 @@ class SithsList<T: Any>(
     }
 
     override fun get(index: Int): T {
-        TODO("Not yet implemented")
+        TODO("Implement LINDEX first!")
     }
 
     override fun indexOf(element: T): Int {
-        TODO("Implement LINDEX first!")
+        TODO("Not yet implemented")
     }
 
     override fun isEmpty(): Boolean {
