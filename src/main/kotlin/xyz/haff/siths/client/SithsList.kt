@@ -1,6 +1,7 @@
 package xyz.haff.siths.client
 
 import kotlinx.coroutines.runBlocking
+import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import java.util.*
 
@@ -74,7 +75,17 @@ class SithsList<T: Any>(
     }
 
     override fun addAll(elements: Collection<T>): Boolean {
-        TODO("Not yet implemented")
+        val (head, tail) = elements.headAndTail()
+
+        return runBlocking {
+            connectionPool.get().use { conn ->
+                val pipeline = RedisPipelineBuilder(conn)
+                val sizePriorToUpdate = pipeline.llen(name)
+                val sizeAfterUpdate = pipeline.rpush(name, head, *tail)
+                pipeline.exec(inTransaction = true)
+                sizePriorToUpdate != sizeAfterUpdate
+            }
+        }
     }
 
     override fun clear() {

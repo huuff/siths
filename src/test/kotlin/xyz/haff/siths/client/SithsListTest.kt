@@ -48,4 +48,15 @@ class SithsListTest : FunSpec({
         secondElement shouldBe "v2"
     }
 
+    test("addAll") {
+        // ARRANGE
+        val list = SithsList.ofStrings(makeSithsPool(container))
+
+        // ACT
+        val wasModified = list.addAll(listOf("v1", "v2", "v3"))
+
+        // ASSERT
+        list.subList(0, list.size) shouldBe listOf("v1", "v2", "v3")
+    }
+
 })
