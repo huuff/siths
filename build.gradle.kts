@@ -17,10 +17,11 @@ tasks.wrapper {
     gradleVersion = "7.4"
 }
 
-tasks.withType<Test> {
+tasks.test {
     useJUnitPlatform()
     jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
     finalizedBy(tasks.koverHtmlReport)
+    systemProperties["kotest.framework.parallelism"] = 4
 }
 
 java {
