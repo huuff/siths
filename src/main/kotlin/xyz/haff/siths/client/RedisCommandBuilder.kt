@@ -161,9 +161,8 @@ class RedisCommandBuilder : Siths<
     override suspend fun lpush(key: String, element: Any, vararg rest: Any): RedisCommand
         = RedisCommand("LPUSH", key, element, *rest)
 
-    override suspend fun rpush(key: String, element: Any, vararg rest: Any): RedisCommand {
-        TODO("Not yet implemented")
-    }
+    override suspend fun rpush(key: String, element: Any, vararg rest: Any): RedisCommand
+        = RedisCommand("RPUSH", key, element, *rest)
 
     override suspend fun lrem(key: String, element: Any, count: Int): RedisCommand {
         TODO("Not yet implemented")

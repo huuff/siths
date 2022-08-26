@@ -212,9 +212,8 @@ class RedisPipelineBuilder(
     override suspend fun lpush(key: String, element: Any, vararg rest: Any): QueuedResponse<Long>
         = addOperation(CommandAndResponse(commandBuilder.lpush(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
 
-    override suspend fun rpush(key: String, element: Any, vararg rest: Any): QueuedResponse<Long> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun rpush(key: String, element: Any, vararg rest: Any): QueuedResponse<Long>
+        = addOperation(CommandAndResponse(commandBuilder.rpush(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
 
     override suspend fun lrem(key: String, element: Any, count: Int): QueuedResponse<Long> {
         TODO("Not yet implemented")

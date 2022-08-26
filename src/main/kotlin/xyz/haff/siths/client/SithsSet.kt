@@ -5,6 +5,7 @@ import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import java.util.*
 
+// TODO: Implement with new pipeline typesafe features!
 class SithsSet<T : Any>(
     private val connectionPool: SithsConnectionPool,
     val name: String = "set:${UUID.randomUUID()}",
@@ -14,6 +15,7 @@ class SithsSet<T : Any>(
     private val client = ManagedSithsClient(pool = SithsClientPool(connectionPool))
 
     companion object {
+        @JvmStatic
         fun ofStrings(sithsConnectionPool: SithsConnectionPool, name: String = "set:${UUID.randomUUID()}"): SithsSet<String> =
             SithsSet(connectionPool = sithsConnectionPool, name = name, { it }, { it })
     }

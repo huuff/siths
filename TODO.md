@@ -8,6 +8,8 @@
 * Implement `PERSIST`
 * Implement `EXPIREAT`
 * Implement `ZSET` operations! I had forgotten
+* Implement a queue with lists!
+* Implement a distributed counter!
 * Before implementing the `MutableList`, implement ALL list commands
 * See if I can some of the official documentation patterns, such as those [here](https://redis.io/commands/lmove/)
 * Distributed data structures that implement their respective Kotlin interfaces such as `MutableList`, `MutableMap`,  etc.
