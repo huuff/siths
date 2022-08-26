@@ -101,15 +101,7 @@ class SithsList<T : Any>(
     }
 
     override fun remove(element: T): Boolean {
-        return runBlocking {
-            connectionPool.get().use { conn ->
-                val pipeline = RedisPipelineBuilder(conn)
-                val sizePriorToUpdate = pipeline.llen(name)
-                val sizeAfterUpdate = pipeline.lrem(name, serializer(element), count = 1)
-                pipeline.exec(inTransaction = true)
-                sizePriorToUpdate != sizeAfterUpdate
-            }
-        }
+        return runBlocking { client.lrem(name, serializer(element), count = 1 ) == 1L}
     }
 
     override fun removeAll(elements: Collection<T>): Boolean {
