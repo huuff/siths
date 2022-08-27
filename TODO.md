@@ -18,4 +18,3 @@
 * Test with some huge key or value
 * Test my transaction code with the locking examples of "Redis in Action"
 * Implement the Redis in Action semaphore
-* I have a lot of code (`SithsSet`, `SithsList`) that runs a transaction where we check the size of something before and after an operation to maintain Java collection semantics... can I simplify this?
