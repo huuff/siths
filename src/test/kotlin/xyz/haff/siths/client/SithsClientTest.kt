@@ -20,16 +20,13 @@ import xyz.haff.siths.makeRedisConnection
 import xyz.haff.siths.makeSithsClient
 import kotlin.time.Duration.Companion.seconds
 
-// TODO: What if.. I create a single `siths` for all tests?
 class SithsClientTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
         withExposedPorts(6379)
     }
+    val siths = makeSithsClient(container)
 
     test("can set and get a value") {
-        // ARRANGE
-        val siths = ManagedSithsClient(makeSithsPool(container))
-
         // ACT
         siths.set("key", "value")
         val value = siths.getOrNull("key")
@@ -40,7 +37,6 @@ class SithsClientTest : FunSpec({
 
     test("del deletes key") {
         // ARRANGE
-        val siths = ManagedSithsClient(makeSithsPool(container))
         siths.set("future-deleted-key1", "value")
         siths.set("future-deleted-key2", "value")
 
@@ -69,16 +65,12 @@ class SithsClientTest : FunSpec({
 
 
     test("correct handling when the value doesn't exist") {
-        // ARRANGE
-        val siths = ManagedSithsClient(makeSithsPool(container))
-
         // ACT && ASSERT
         siths.getOrNull("non-existent") shouldBe null
     }
 
     test("weird strings work as intended") {
         // ARRANGE
-        val siths = ManagedSithsClient(makeSithsPool(container))
         val key = """ as${'$'} d"f"2"""
         val value = """fd's2${'$'} """
 
@@ -91,9 +83,6 @@ class SithsClientTest : FunSpec({
     }
 
     test("incrBy works") {
-        // ARRANGE
-        val siths = ManagedSithsClient(makeSithsPool(container))
-
         // ACT
         siths.set("incremented-key", 0)
         val response = siths.incrBy("incremented-key", 1)
@@ -107,7 +96,6 @@ class SithsClientTest : FunSpec({
         context("SET ... (NX|XX)") {
             test("SET ... NX does not set if the key exists") {
                 // ARRANGE
-                val siths = ManagedSithsClient(makeSithsPool(container))
                 siths.set("nxkey", "test1")
 
                 // ACT
@@ -117,9 +105,6 @@ class SithsClientTest : FunSpec({
                 siths.get("nxkey") shouldBe "test1"
             }
             test("SET ... XX does not set if the key does not exist") {
-                // ARRANGE
-                val siths = ManagedSithsClient(makeSithsPool(container))
-
                 // ACT
                 siths.set("xxkey", "testvalue", exclusiveMode = XX)
 
@@ -129,9 +114,6 @@ class SithsClientTest : FunSpec({
         }
 
         test("timeToLive sets ttl") {
-            // ARRANGE
-            val siths = ManagedSithsClient(makeSithsPool(container))
-
             // ACT
             siths.set("ttledkey", "ttlvalue", timeToLive = 10.seconds)
             val ttl = siths.ttl("ttledkey")
@@ -148,9 +130,6 @@ class SithsClientTest : FunSpec({
 
     context("scripts") {
         test("correctly evals script") {
-            // ARRANGE
-            val siths = ManagedSithsClient(makeSithsPool(container))
-
             // ACT
             val response = siths.eval("return 'Hello World!'")
 
@@ -159,8 +138,6 @@ class SithsClientTest : FunSpec({
         }
 
         test("correctly loads script") {
-            // ARRANGE
-            val siths = ManagedSithsClient(makeSithsPool(container))
             val script = RedisScript(code = """return 'Hello World!' """)
 
             // ACT
@@ -171,8 +148,6 @@ class SithsClientTest : FunSpec({
         }
 
         test("correctly runs script") {
-            // ARRANGE
-            val siths = ManagedSithsClient(makeSithsPool(container))
             val script = RedisScript(code = """return 'Hello World!' """)
             val sha = siths.scriptLoad(script.code)
 
@@ -184,9 +159,6 @@ class SithsClientTest : FunSpec({
         }
 
         test("fails when script doesn't exist") {
-            // ARRANGE
-            val siths = ManagedSithsClient(makeSithsPool(container))
-
             // ACT & ASSERT
            shouldThrow<RedisScriptNotLoadedException> {
                siths.evalSha("b16b7ff836ae87a150204570d9d82178ece81c8e")
@@ -196,8 +168,6 @@ class SithsClientTest : FunSpec({
 
     context("sets") {
         test("we can add to the set") {
-            // ARRANGE
-            val siths = makeSithsClient(container)
             val set = randomUUID();
 
             // ACT
@@ -211,7 +181,6 @@ class SithsClientTest : FunSpec({
 
         test("we can get all members") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val set = randomUUID();
             siths.sadd(set, "test1", "test2")
 
@@ -224,7 +193,6 @@ class SithsClientTest : FunSpec({
 
         test("we can remove an element") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val set = randomUUID();
             siths.sadd(set, "test1", "test2")
 
@@ -241,7 +209,6 @@ class SithsClientTest : FunSpec({
 
         test("sintercard") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val set1 = randomUUID()
             val set2 = randomUUID()
             siths.sadd(set1, "key1", "key2")
@@ -256,7 +223,6 @@ class SithsClientTest : FunSpec({
 
         test("sdiffstore") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val operand1 = randomUUID()
             val operand2 = randomUUID()
             val destination = randomUUID()
@@ -273,7 +239,6 @@ class SithsClientTest : FunSpec({
 
         test("sinterstore") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val operand1 = randomUUID()
             val operand2 = randomUUID()
             val destination = randomUUID()
@@ -290,7 +255,6 @@ class SithsClientTest : FunSpec({
 
         test("sscan") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val set = randomUUID()
             val valuesToAdd = (1..15).map { "value$it" }
             siths.sadd(set, "unincluded-value", *valuesToAdd.toTypedArray())
@@ -306,7 +270,6 @@ class SithsClientTest : FunSpec({
 
         test("sdiff") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val set1 = randomUUID()
             siths.sadd(set1, "key1", "key2", "key3")
             val set2 = randomUUID()
@@ -321,7 +284,6 @@ class SithsClientTest : FunSpec({
 
         test("sinter") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val set1 = randomUUID()
             siths.sadd(set1, "key1", "key2", "key3")
             val set2 = randomUUID()
@@ -336,7 +298,6 @@ class SithsClientTest : FunSpec({
 
         test("smove") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val set1 = randomUUID()
             siths.sadd(set1, "key1", "key2", "key3")
             val set2 = randomUUID()
@@ -353,7 +314,6 @@ class SithsClientTest : FunSpec({
 
         test("spop") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val set = randomUUID()
             val members = setOf("key1", "key2", "key3")
             val (head, tail) = members.toTypedArray().headAndTail()
@@ -373,7 +333,6 @@ class SithsClientTest : FunSpec({
 
         test("srandmember") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val set = randomUUID()
             siths.sadd(set, "key1", "key2", "key3")
 
@@ -388,7 +347,6 @@ class SithsClientTest : FunSpec({
 
         test("sunion") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val set1 = randomUUID()
             siths.sadd(set1, "key1", "key2")
             val set2 = randomUUID()
@@ -403,7 +361,6 @@ class SithsClientTest : FunSpec({
 
         test("sunionstore") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val set1 = randomUUID()
             siths.sadd(set1, "key1", "key2")
             val set2 = randomUUID()
@@ -420,7 +377,6 @@ class SithsClientTest : FunSpec({
 
         test("smismember") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val set = randomUUID()
             siths.sadd(set, "key1", "key3", "key5")
 
@@ -441,7 +397,6 @@ class SithsClientTest : FunSpec({
     context("lists") {
         test("lpush") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val list = randomUUID()
 
             // ACT
@@ -453,7 +408,6 @@ class SithsClientTest : FunSpec({
 
         test("llen") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val list = randomUUID()
             siths.lpush(list, "key1", "key2", "key3")
 
@@ -467,7 +421,6 @@ class SithsClientTest : FunSpec({
         context("lpop and rpop") {
             test("single lpop") {
                 // ARRANGE
-                val siths = makeSithsClient(container)
                 val list = randomUUID()
                 siths.lpush(list, "key1", "key2", "key3")
 
@@ -480,7 +433,6 @@ class SithsClientTest : FunSpec({
 
             test("rpop many") {
                 // ARRANGE
-                val siths = makeSithsClient(container)
                 val list = randomUUID()
                 siths.lpush(list, "key1", "key2", "key3")
 
@@ -494,9 +446,6 @@ class SithsClientTest : FunSpec({
     }
 
     test("ping") {
-        // ARRANGE
-        val siths = makeSithsClient(container)
-
         // ACT
         val response = siths.ping()
 
@@ -507,7 +456,6 @@ class SithsClientTest : FunSpec({
     context("expire") {
         test("correctly sets expiration") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val key = randomUUID()
             siths.set(key, "value")
 
@@ -523,7 +471,6 @@ class SithsClientTest : FunSpec({
 
         test("expiration condition") {
             // ARRANGE
-            val siths = makeSithsClient(container)
             val key = randomUUID()
             siths.set(key, "value", timeToLive = 10.seconds)
 
