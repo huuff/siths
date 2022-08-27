@@ -24,7 +24,11 @@ class SithsClientTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
         withExposedPorts(6379)
     }
-    val siths = makeSithsClient(container)
+    lateinit var siths: SithsClient
+
+    beforeAny {
+        siths = makeSithsClient(container)
+    }
 
     test("can set and get a value") {
         // ACT
@@ -53,7 +57,7 @@ class SithsClientTest : FunSpec({
     test("clientList contains current connection") {
         StandaloneSithsConnection.open(makeRedisConnection(container)).use { connection ->
             // ARRANGE
-            val siths = StandaloneSithsClient(connection)
+            @Suppress("NAME_SHADOWING") val siths = StandaloneSithsClient(connection)
 
             // ACT
             val clients = siths.clientList()
