@@ -18,3 +18,4 @@
 * Test with some huge key or value
 * Test my transaction code with the locking examples of "Redis in Action"
 * Implement the Redis in Action semaphore
+* What if I simplify complex operations such as those of `SithsSet` or `SithsList` by making them lua scripts?
