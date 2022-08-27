@@ -6,6 +6,8 @@ private data class CommandAndResponse<T>(val command: RedisCommand, val response
 
 // TODO: Is PipelineBuilder the correct name? It's not simply a builder since it also executes it
 class RedisPipelineBuilder(
+    // TODO: Surely we shouldn't take the connection at the constructor, but only at execution! otherwise we'd be locking a
+    // connection without actually using it
     private val connection: SithsConnection,
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder(),
 ) : Siths<
