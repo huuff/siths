@@ -5,7 +5,6 @@ import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import java.util.*
 
-// TODO: Implement with new pipeline typesafe features!
 class SithsSet<T : Any>(
     private val connectionPool: SithsConnectionPool,
     val name: String = "set:${UUID.randomUUID()}",
@@ -41,22 +40,18 @@ class SithsSet<T : Any>(
 
     override fun removeAll(elements: Collection<T>): Boolean {
         val (otherSetHead, otherSetTail) = elements.map(serializer).toTypedArray().headAndTail()
-        val pipelineResults = runBlocking {
-            withRedis(connectionPool) {
-                transactional {
-                    val otherSetKey = randomUUID()
-                    scard(this@SithsSet.name)
-                    sadd(otherSetKey, otherSetHead, *otherSetTail)
-                    sdiffstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
-                    del(otherSetKey)
-                }
-            }
-        }
+        return runBlocking {
+            connectionPool.get().use { conn ->
+                val otherSetKey = randomUUID()
+                val pipeline = RedisPipelineBuilder(conn)
+                val sizeBeforeChange = pipeline.scard(this@SithsSet.name)
+                pipeline.sadd(otherSetKey, otherSetHead, *otherSetTail)
+                val sizeAfterChange = pipeline.sdiffstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
+                pipeline.del(otherSetKey)
+                pipeline.exec(inTransaction = true)
 
-        val sizePriorToChange = (pipelineResults[0] as RespInteger).value
-        return when (val sdiffstoreResponse = pipelineResults[2]) {
-            is RespInteger -> sdiffstoreResponse.value != sizePriorToChange
-            else -> sdiffstoreResponse.handleAsUnexpected()
+                return@use sizeBeforeChange.get() != sizeAfterChange.get()
+            }
         }
     }
 
@@ -72,7 +67,7 @@ class SithsSet<T : Any>(
                 pipeline.del(otherSetKey)
                 pipeline.exec(inTransaction = true)
 
-                return@use sizeBeforeChange != sizeAfterChange
+                return@use sizeBeforeChange.get() != sizeAfterChange.get()
             }
         }
     }
