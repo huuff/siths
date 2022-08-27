@@ -16,6 +16,7 @@ class RedisCommandBuilder : Siths<
         RedisCommand,
         RedisCommand,
         RedisCommand,
+        RedisCommand,
         > {
 
     override suspend fun get(key: String) = RedisCommand("GET", key)
@@ -182,4 +183,10 @@ class RedisCommandBuilder : Siths<
             + rank?.let { RedisCommand("RANK", it) }
             + maxlen?.let { RedisCommand("MAXLEN", it)}
     )
+
+    override suspend fun lpos(key: String, element: Any, rank: Int?, count: Int, maxlen: Int?): RedisCommand
+        = (RedisCommand("LPOS", key, element)
+                + rank?.let { RedisCommand("RANK", it) }
+                + RedisCommand("COUNT", count)
+                + maxlen?.let { RedisCommand("MAXLEN", it) })
 }

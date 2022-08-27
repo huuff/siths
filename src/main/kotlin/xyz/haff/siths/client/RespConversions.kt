@@ -141,3 +141,8 @@ fun RespType<*>.toLongOrNull(): Long? = when (this) {
     is RespNullResponse -> null
     else -> handleAsUnexpected()
 }
+
+fun RespType<*>.toLongList(): List<Long> = when (this) {
+    is RespArray -> contentsOfType<Long>()
+    else -> handleAsUnexpected()
+}

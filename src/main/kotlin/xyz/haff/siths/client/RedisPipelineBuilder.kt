@@ -2,6 +2,7 @@ package xyz.haff.siths.client
 
 import kotlin.time.Duration
 
+// TODO: Call it operation?
 private data class CommandAndResponse<T>(val command: RedisCommand, val response: QueuedResponse<T>)
 
 // TODO: Is PipelineBuilder the correct name? It's not simply a builder since it also executes it
@@ -17,6 +18,7 @@ class RedisPipelineBuilder(
         QueuedResponse<RespType<*>>,
         QueuedResponse<Long>,
         QueuedResponse<Long?>,
+        QueuedResponse<List<Long>>,
         QueuedResponse<List<RedisClient>>,
         QueuedResponse<Duration?>,
         QueuedResponse<Set<String>>,
@@ -350,5 +352,18 @@ class RedisPipelineBuilder(
                 response = QueuedResponse(RespType<*>::toLongOrNull)
             )
         )
+
+    override suspend fun lpos(
+        key: String,
+        element: Any,
+        rank: Int?,
+        count: Int,
+        maxlen: Int?
+    ): QueuedResponse<List<Long>> = addOperation(
+        CommandAndResponse(
+            command = commandBuilder.lpos(key, element, rank, count, maxlen),
+            response = QueuedResponse(RespType<*>::toLongList)
+        )
+    )
 
 }
