@@ -2,9 +2,7 @@ package xyz.haff.siths.client
 
 import io.ktor.utils.io.*
 import java.nio.ByteBuffer
-
-// TODO: Somewhere else
-private val firstWordRegex = Regex("""\w+""")
+import xyz.haff.koy.strings.words
 
 private val CRLF = "\r\n".toByteArray(Charsets.UTF_8)
 private val PLUS = "+".toByteArray(Charsets.UTF_8)[0]
@@ -25,9 +23,8 @@ value class RespParser(private val channel: ByteReadChannel) {
 
     private suspend fun parseSimpleString(): RespSimpleString = RespSimpleString(value = channel.readUTF8Line()!!)
     private suspend fun parseError(): RespError {
-        // TODO: `firstWord` in koy
         val errorMessage = channel.readUTF8Line()!!
-        val errorType = firstWordRegex.find(errorMessage)!!.value
+        val errorType = errorMessage.words[0]
         return RespError(type = errorType, value = errorMessage.drop(errorType.length))
     }
     private suspend fun parseInteger(): RespInteger = RespInteger(channel.readUTF8Line()!!.toLong())
