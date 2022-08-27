@@ -90,6 +90,9 @@ class StandaloneSithsClient(
     override suspend fun sscan(key: String, cursor: Long, match: String?, count: Int?): RedisCursor<String>
         = connection.runCommand(commandBuilder.sscan(key, cursor, match, count)).toStringCursor()
 
+    override suspend fun smismember(key: String, member: Any, vararg rest: Any): Map<String, Boolean>
+            = connection.runCommand(commandBuilder.smismember(key, member, *rest)).toStringToBooleanMap(member, *rest)
+
     // LIST OPERATIONS
 
     override suspend fun llen(key: String): Long
@@ -125,8 +128,8 @@ class StandaloneSithsClient(
     override suspend fun lrange(key: String, start: Int, stop: Int): List<String>
         = connection.runCommand(commandBuilder.lrange(key, start, stop)).toStringList()
 
-    override suspend fun smismember(key: String, member: Any, vararg rest: Any): Map<String, Boolean>
-        = connection.runCommand(commandBuilder.smismember(key, member, *rest)).toStringToBooleanMap(member, *rest)
+    override suspend fun lpos(key: String, element: Any, rank: Int?, maxlen: Int?): Long?
+        = connection.runCommand(commandBuilder.lpos(key, element, rank, maxlen)).toLongOrNull()
 
     override suspend fun clientList(): List<RedisClient>
         = connection.runCommand(commandBuilder.clientList()).toClientList()

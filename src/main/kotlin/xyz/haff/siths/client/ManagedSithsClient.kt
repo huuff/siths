@@ -138,6 +138,9 @@ class ManagedSithsClient(
     override suspend fun lrange(key: String, start: Int, stop: Int): List<String>
         = pool.get().use { it.lrange(key, start, stop) }
 
+    override suspend fun lpos(key: String, element: Any, rank: Int?, maxlen: Int?): Long?
+        = pool.get().use { it.lpos(key, element, rank, maxlen) }
+
     override suspend fun clientList(): List<RedisClient>
         = pool.get().use { it.clientList() }
 

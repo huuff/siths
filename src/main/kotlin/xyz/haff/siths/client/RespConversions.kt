@@ -135,3 +135,9 @@ fun RespType<*>.toPositiveLongOrNull(): Long? = when (this) {
     }
     else -> handleAsUnexpected()
 }
+
+fun RespType<*>.toLongOrNull(): Long? = when (this) {
+    is RespInteger -> value
+    is RespNullResponse -> null
+    else -> handleAsUnexpected()
+}

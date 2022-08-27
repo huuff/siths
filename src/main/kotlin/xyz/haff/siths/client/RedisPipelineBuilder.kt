@@ -70,50 +70,48 @@ class RedisPipelineBuilder(
         value: Any,
         exclusiveMode: ExclusiveMode?,
         timeToLive: Duration?
-    ): QueuedResponse<Unit>
-        = addOperation(
-            CommandAndResponse(
-                command = commandBuilder.set(key, value, exclusiveMode, timeToLive),
-                response = QueuedResponse(RespType<*>::toUnit)
-            )
+    ): QueuedResponse<Unit> = addOperation(
+        CommandAndResponse(
+            command = commandBuilder.set(key, value, exclusiveMode, timeToLive),
+            response = QueuedResponse(RespType<*>::toUnit)
         )
+    )
 
     override suspend fun get(key: String): QueuedResponse<String> {
         return addOperation(CommandAndResponse(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringNonNull)))
     }
 
-    override suspend fun del(key: String, vararg rest: String): QueuedResponse<Long>
-        = addOperation(CommandAndResponse(commandBuilder.del(key, *rest), QueuedResponse(RespType<*>::toLong)))
+    override suspend fun del(key: String, vararg rest: String): QueuedResponse<Long> =
+        addOperation(CommandAndResponse(commandBuilder.del(key, *rest), QueuedResponse(RespType<*>::toLong)))
 
-    override suspend fun ttl(key: String): QueuedResponse<Duration?>
-        = addOperation(CommandAndResponse(commandBuilder.ttl(key), QueuedResponse(RespType<*>::toDurationOrNull)))
+    override suspend fun ttl(key: String): QueuedResponse<Duration?> =
+        addOperation(CommandAndResponse(commandBuilder.ttl(key), QueuedResponse(RespType<*>::toDurationOrNull)))
 
-    override suspend fun scriptLoad(script: String): QueuedResponse<String>
-        = addOperation(
-            CommandAndResponse(
-                command = commandBuilder.scriptLoad(script),
-                response = QueuedResponse(RespType<*>::toStringNonNull)
-            )
+    override suspend fun scriptLoad(script: String): QueuedResponse<String> = addOperation(
+        CommandAndResponse(
+            command = commandBuilder.scriptLoad(script),
+            response = QueuedResponse(RespType<*>::toStringNonNull)
         )
+    )
 
-    override suspend fun evalSha(sha: String, keys: List<String>, args: List<String>): QueuedResponse<RespType<*>>
-        = addOperation(
+    override suspend fun evalSha(sha: String, keys: List<String>, args: List<String>): QueuedResponse<RespType<*>> =
+        addOperation(
             CommandAndResponse(
                 command = commandBuilder.evalSha(sha, keys, args),
                 response = QueuedResponse(RespType<*>::throwOnError)
             )
         )
 
-    override suspend fun eval(script: String, keys: List<String>, args: List<String>): QueuedResponse<RespType<*>>
-        = addOperation(
+    override suspend fun eval(script: String, keys: List<String>, args: List<String>): QueuedResponse<RespType<*>> =
+        addOperation(
             CommandAndResponse(
                 command = commandBuilder.eval(script, keys, args),
                 response = QueuedResponse(RespType<*>::throwOnError)
             )
         )
 
-    override suspend fun incrBy(key: String, value: Long): QueuedResponse<Long>
-        = addOperation(CommandAndResponse(commandBuilder.incrBy(key, value), QueuedResponse(RespType<*>::toLong)))
+    override suspend fun incrBy(key: String, value: Long): QueuedResponse<Long> =
+        addOperation(CommandAndResponse(commandBuilder.incrBy(key, value), QueuedResponse(RespType<*>::toLong)))
 
     override suspend fun exists(key: String, vararg rest: String): QueuedResponse<Boolean> {
         return addOperation(
@@ -340,8 +338,17 @@ class RedisPipelineBuilder(
 
     override suspend fun lrange(key: String, start: Int, stop: Int): QueuedResponse<List<String>> = addOperation(
         CommandAndResponse(
-            commandBuilder.lrange(key, start, stop),
-            QueuedResponse(RespType<*>::toStringList)
+            command = commandBuilder.lrange(key, start, stop),
+            response = QueuedResponse(RespType<*>::toStringList)
         )
     )
+
+    override suspend fun lpos(key: String, element: Any, rank: Int?, maxlen: Int?): QueuedResponse<Long?> =
+        addOperation(
+            CommandAndResponse(
+                command = commandBuilder.lpos(key, element, rank, maxlen),
+                response = QueuedResponse(RespType<*>::toLongOrNull)
+            )
+        )
+
 }
