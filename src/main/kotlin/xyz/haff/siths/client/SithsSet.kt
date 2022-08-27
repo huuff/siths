@@ -16,7 +16,10 @@ class SithsSet<T : Any>(
 
     companion object {
         @JvmStatic
-        fun ofStrings(sithsConnectionPool: SithsConnectionPool, name: String = "set:${UUID.randomUUID()}"): SithsSet<String> =
+        fun ofStrings(
+            sithsConnectionPool: SithsConnectionPool,
+            name: String = "set:${UUID.randomUUID()}"
+        ): SithsSet<String> =
             SithsSet(connectionPool = sithsConnectionPool, name = name, { it }, { it })
     }
 
@@ -88,20 +91,17 @@ class SithsSet<T : Any>(
     override fun containsAll(elements: Collection<T>): Boolean {
         val otherSet = elements.map(serializer).toTypedArray()
         val (otherSetHead, otherSetTail) = otherSet.headAndTail()
-        val pipelineResults = runBlocking {
-            withRedis(connectionPool) {
-                transactional {
-                    val temporarySetKey = randomUUID()
-                    sadd(temporarySetKey, otherSetHead, *otherSetTail)
-                    sintercard(this@SithsSet.name, temporarySetKey, limit = otherSet.size)
-                    del(temporarySetKey)
-                }
+        return runBlocking {
+            connectionPool.get().use { conn ->
+                val pipeline = RedisPipelineBuilder(conn)
+                val temporalSetKey = randomUUID()
+                pipeline.sadd(temporalSetKey, otherSetHead, *otherSetTail)
+                val intersectionCardinality =
+                    pipeline.sintercard(this@SithsSet.name, temporalSetKey, limit = otherSet.size)
+                pipeline.del(temporalSetKey)
+                pipeline.exec(inTransaction = true)
+                return@use intersectionCardinality.get().toInt() == otherSet.size
             }
-        }
-
-        return when (val sintercardResponse = pipelineResults[1]) {
-            is RespInteger -> sintercardResponse.value.toInt() == otherSet.size
-            else -> sintercardResponse.handleAsUnexpected()
         }
     }
 
@@ -111,7 +111,8 @@ class SithsSet<T : Any>(
         private var lastCursorResult: RedisCursor<T>,
     ) : MutableIterator<T> {
         private var positionWithinLastCursor = 0
-        private var lastResult: T? = null // XXX: Only to implement `remove`... it's hacky but all of my other options were too
+        private var lastResult: T? =
+            null // XXX: Only to implement `remove`... it's hacky but all of my other options were too
 
         override fun hasNext(): Boolean =
             lastCursorResult.next != 0L || positionWithinLastCursor < lastCursorResult.contents.size
