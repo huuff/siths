@@ -204,13 +204,32 @@ class RedisPipelineBuilder(
             QueuedResponse(RespType<*>::toPositiveLongOrNull))
     )
 
-    override suspend fun lpop(key: String, count: Int?): QueuedResponse<List<String>> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lpop(key: String, count: Int): QueuedResponse<List<String>>
+        = addOperation(
+        CommandAndResponse(
+            command = commandBuilder.lpop(key, count),
+            response = QueuedResponse(RespType<*>::bulkOrArrayToStringList)
+        )
+    )
 
-    override suspend fun rpop(key: String, count: Int?): QueuedResponse<List<String>> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lpop(key: String): QueuedResponse<String?>
+        = addOperation(CommandAndResponse(commandBuilder.lpop(key), QueuedResponse(RespType<*>::toStringOrNull)))
+
+    override suspend fun rpop(key: String, count: Int): QueuedResponse<List<String>>
+        = addOperation(
+            CommandAndResponse(
+                command = commandBuilder.rpop(key, count),
+                response = QueuedResponse(RespType<*>::bulkOrArrayToStringList)
+            )
+        )
+
+    override suspend fun rpop(key: String): QueuedResponse<String?>
+        = addOperation(
+            CommandAndResponse(
+                command = commandBuilder.rpop(key),
+                response = QueuedResponse(RespType<*>::toStringOrNull)
+            )
+        )
 
     override suspend fun lpush(key: String, element: Any, vararg rest: Any): QueuedResponse<Long>
         = addOperation(CommandAndResponse(commandBuilder.lpush(key, element, *rest), QueuedResponse(RespType<*>::toLong)))

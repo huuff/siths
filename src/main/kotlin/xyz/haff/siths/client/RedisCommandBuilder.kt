@@ -149,13 +149,15 @@ class RedisCommandBuilder : Siths<
         element: Any
     ): RedisCommand = RedisCommand("LINSERT", key, relativePosition, pivot, element)
 
-    override suspend fun lpop(key: String, count: Int?): RedisCommand {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lpop(key: String, count: Int): RedisCommand
+        = RedisCommand("LPOP", key, count)
 
-    override suspend fun rpop(key: String, count: Int?): RedisCommand {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lpop(key: String): RedisCommand = RedisCommand("LPOP", key)
+
+    override suspend fun rpop(key: String, count: Int): RedisCommand
+        = RedisCommand("RPOP", key, count)
+
+    override suspend fun rpop(key: String): RedisCommand = RedisCommand("RPOP", key)
 
     override suspend fun lpush(key: String, element: Any, vararg rest: Any): RedisCommand
         = RedisCommand("LPUSH", key, element, *rest)

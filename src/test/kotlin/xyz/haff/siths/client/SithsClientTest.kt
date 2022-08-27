@@ -20,6 +20,7 @@ import xyz.haff.siths.makeRedisConnection
 import xyz.haff.siths.makeSithsClient
 import kotlin.time.Duration.Companion.seconds
 
+// TODO: What if.. I create a single `siths` for all tests?
 class SithsClientTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
         withExposedPorts(6379)
@@ -461,6 +462,34 @@ class SithsClientTest : FunSpec({
 
             // ASSERT
             length shouldBe 3
+        }
+
+        context("lpop and rpop") {
+            test("single lpop") {
+                // ARRANGE
+                val siths = makeSithsClient(container)
+                val list = randomUUID()
+                siths.lpush(list, "key1", "key2", "key3")
+
+                // ACT
+                val popped = siths.lpop(list)
+
+                // ASSERT
+                popped shouldBe "key3"
+            }
+
+            test("rpop many") {
+                // ARRANGE
+                val siths = makeSithsClient(container)
+                val list = randomUUID()
+                siths.lpush(list, "key1", "key2", "key3")
+
+                // ACT
+                val popped = siths.rpop(list, 2)
+
+                // ASSERT
+                popped shouldBe listOf("key3", "key2")
+            }
         }
     }
 

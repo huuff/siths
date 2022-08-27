@@ -91,13 +91,17 @@ class StandaloneSithsClient(
     override suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: Any, element: Any): Long?
         = connection.runCommand(commandBuilder.linsert(key, relativePosition, pivot, element)).toPositiveLongOrNull()
 
-    override suspend fun lpop(key: String, count: Int?): List<String> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lpop(key: String): String?
+        = connection.runCommand(commandBuilder.lpop(key)).toStringOrNull()
 
-    override suspend fun rpop(key: String, count: Int?): List<String> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun lpop(key: String, count: Int): List<String>
+        = connection.runCommand(commandBuilder.lpop(key, count)).bulkOrArrayToStringList()
+
+    override suspend fun rpop(key: String, count: Int): List<String>
+        = connection.runCommand(commandBuilder.rpop(key, count)).bulkOrArrayToStringList()
+
+    override suspend fun rpop(key: String): String?
+        = connection.runCommand(commandBuilder.rpop(key)).toStringOrNull()
 
     override suspend fun lpush(key: String, element: Any, vararg rest: Any): Long
         = connection.runCommand(commandBuilder.lpush(key, element, *rest)).toLong()
