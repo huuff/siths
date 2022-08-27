@@ -10,7 +10,6 @@ import io.kotest.matchers.comparables.shouldBeGreaterThanOrEqualTo
 import io.kotest.matchers.comparables.shouldBeLessThanOrEqualTo
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.client.ExclusiveMode.*
 import xyz.haff.siths.common.RedisScriptNotLoadedException
@@ -324,12 +323,11 @@ class SithsClientTest : FunSpec({
             siths.sadd(set, head, *tail)
 
             // ACT
-            val poppedSet = siths.spop(set)
+            val poppedElement = siths.spop(set)
 
             // ASSERT
-            poppedSet.size shouldBe 1
-
-            val poppedElement = poppedSet.toList()[0]
+            poppedElement shouldNotBe null
+            poppedElement!!
             poppedElement shouldBeIn members
             siths.scard(set) shouldBe 2
             siths.sismember(set, poppedElement) shouldBe false

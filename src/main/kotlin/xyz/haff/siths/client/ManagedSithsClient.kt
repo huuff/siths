@@ -57,6 +57,8 @@ class ManagedSithsClient(
         return pool.get().use { it.exists(key, *rest) }
     }
 
+    // SET OPERATIONS
+
     override suspend fun sadd(key: String, value: Any, vararg rest: Any): Long {
         return pool.get().use { it.sadd(key, value, *rest) }
     }
@@ -101,6 +103,9 @@ class ManagedSithsClient(
         return pool.get().use { it.smove(source, destination, member) }
     }
 
+    override suspend fun spop(key: String): String?
+        = pool.get().use { it.spop(key) }
+
     override suspend fun spop(key: String, count: Int?): Set<String> {
         return pool.get().use { it.spop(key, count) }
     }
@@ -108,6 +113,9 @@ class ManagedSithsClient(
     override suspend fun srandmember(key: String, count: Int?): Set<String> {
         return pool.get().use { it.srandmember(key, count) }
     }
+
+    override suspend fun srandmember(key: String): String?
+        = pool.get().use { it.srandmember(key) }
 
     override suspend fun sunion(key: String, vararg rest: String): Set<String> {
         return pool.get().use { it.sunion(key, *rest) }

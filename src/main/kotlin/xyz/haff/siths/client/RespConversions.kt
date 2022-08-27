@@ -100,11 +100,10 @@ fun RespType<*>.toStringCursor(): RedisCursor<String> = when {
     else -> handleAsUnexpected()
 }
 
-// TODO: Separate dependents of this into a "single" and "many" methods, as for lpop and rpop
-// TODO: handle null
 fun RespType<*>.bulkOrArrayToStringSet(): Set<String> = when (this) {
     is RespBulkString -> setOf(value)
     is RespArray -> contentsOfType<RespBulkString>().map { it.value }.toSet()
+    is RespNullResponse -> setOf()
     else -> handleAsUnexpected()
 }
 

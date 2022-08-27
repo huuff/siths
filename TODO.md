@@ -18,5 +18,4 @@
 * Test with some huge key or value
 * Test my transaction code with the locking examples of "Redis in Action"
 * Implement the Redis in Action semaphore
-* Maybe I should separate the methods that take an optional count and return one or many elements into alternatives? such as `lpopOne` and `lpopMany`. I find it bothersome forcing the user to handle a singleton list
 * I have a lot of code (`SithsSet`, `SithsList`) that runs a transaction where we check the size of something before and after an operation to maintain Java collection semantics... can I simplify this?

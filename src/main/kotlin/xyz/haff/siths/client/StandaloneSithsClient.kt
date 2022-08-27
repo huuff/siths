@@ -35,6 +35,8 @@ class StandaloneSithsClient(
     override suspend fun incrBy(key: String, value: Long): Long
         = connection.runCommand(commandBuilder.incrBy(key, value)).toLong()
 
+    // SET OPERATIONS
+
     override suspend fun sadd(key: String, value: Any, vararg rest: Any): Long
         = connection.runCommand(commandBuilder.sadd(key, value, *rest)).toLong()
 
@@ -61,8 +63,14 @@ class StandaloneSithsClient(
     override suspend fun smove(source: String, destination: String, member: Any): Boolean
         = connection.runCommand(commandBuilder.smove(source, destination, member)).integerToBoolean()
 
+    override suspend fun spop(key: String): String?
+        = connection.runCommand(commandBuilder.spop(key)).toStringOrNull()
+
     override suspend fun spop(key: String, count: Int?): Set<String>
         = connection.runCommand(commandBuilder.spop(key, count)).bulkOrArrayToStringSet()
+
+    override suspend fun srandmember(key: String): String?
+        = connection.runCommand(commandBuilder.srandmember(key)).toStringOrNull()
 
     override suspend fun srandmember(key: String, count: Int?): Set<String>
         = connection.runCommand(commandBuilder.srandmember(key, count)).bulkOrArrayToStringSet()
@@ -81,6 +89,8 @@ class StandaloneSithsClient(
 
     override suspend fun sscan(key: String, cursor: Long, match: String?, count: Int?): RedisCursor<String>
         = connection.runCommand(commandBuilder.sscan(key, cursor, match, count)).toStringCursor()
+
+    // LIST OPERATIONS
 
     override suspend fun llen(key: String): Long
         = connection.runCommand(commandBuilder.llen(key)).toLong()

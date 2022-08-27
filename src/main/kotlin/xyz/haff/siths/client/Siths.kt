@@ -40,7 +40,9 @@ interface Siths<
     suspend fun sdiff(key: String, vararg rest: String): StringSetResponseType
     suspend fun sinter(key: String, vararg rest: String): StringSetResponseType
     suspend fun smove(source: String, destination: String, member: Any): BooleanResponseType
+    suspend fun spop(key: String): NullableStringResponseType
     suspend fun spop(key: String, count: Int? = null): StringSetResponseType
+    suspend fun srandmember(key: String): NullableStringResponseType
     suspend fun srandmember(key: String, count: Int? = null): StringSetResponseType
     suspend fun sunion(key: String, vararg rest: String): StringSetResponseType
     suspend fun sunionstore(destination: String, key: String, vararg rest: String): LongResponseType

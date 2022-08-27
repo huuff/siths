@@ -121,8 +121,14 @@ class RedisCommandBuilder : Siths<
     override suspend fun smove(source: String, destination: String, member: Any): RedisCommand
         = RedisCommand("SMOVE", source, destination, member)
 
+    override suspend fun spop(key: String): RedisCommand
+        = RedisCommand("SPOP", key)
+
     override suspend fun spop(key: String, count: Int?): RedisCommand
         = RedisCommand("SPOP", key, count)
+
+    override suspend fun srandmember(key: String)
+        = RedisCommand("SRANDMEMBER", key)
 
     override suspend fun srandmember(key: String, count: Int?): RedisCommand
         = RedisCommand("SRANDMEMBER", key, count)
