@@ -6,6 +6,7 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.makeSithsPool
 
+// TODO: create a single lateinit pool and reuse it
 class SithsListTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine")) {
         withExposedPorts(6379)
@@ -98,6 +99,16 @@ class SithsListTest : FunSpec({
             // ASSERT
             wasModified shouldBe false
             list.subList(0, list.size) shouldBe listOf("v1", "v2", "v3")
+        }
+
+        test("contains") {
+            // ARRANGE
+            val list = SithsList.ofStrings(makeSithsPool(container))
+            list.addAll(listOf("v1", "v2", "v3"))
+
+            // ACT & ASSERT
+            ("v1" in list) shouldBe true
+            ("v8" in list) shouldBe false
         }
     }
 

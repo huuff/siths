@@ -25,12 +25,11 @@ class SithsList<T : Any>(
     override val size: Int
         get() = runBlocking { client.llen(name) }.toInt()
 
-    override fun contains(element: T): Boolean {
-        TODO("Implement LPOS first")
-    }
+    override fun contains(element: T): Boolean
+        = runBlocking { client.lpos(name, element) != null }
 
     override fun containsAll(elements: Collection<T>): Boolean {
-        TODO("Implement LPOS first")
+        TODO("Use LPOS")
     }
 
     override fun get(index: Int): T = runBlocking {
