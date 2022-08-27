@@ -27,9 +27,7 @@ class SithsSet<T : Any>(
 
     override fun addAll(elements: Collection<T>): Boolean {
         val (head, tail) = elements.map(serializer).toTypedArray().headAndTail()
-        val addedCount = runBlocking {
-            client.sadd(name, head, *tail)
-        }
+        val addedCount = runBlocking { client.sadd(name, head, *tail) }
         return addedCount.toInt() != 0
     }
 
@@ -64,22 +62,18 @@ class SithsSet<T : Any>(
 
     override fun retainAll(elements: Collection<T>): Boolean {
         val (otherSetHead, otherSetTail) = elements.map(serializer).toTypedArray().headAndTail()
-        val pipelineResults = runBlocking {
-            withRedis(connectionPool) {
-                transactional {
-                    val otherSetKey = randomUUID()
-                    scard(this@SithsSet.name)
-                    sadd(otherSetKey, otherSetHead, *otherSetTail)
-                    sinterstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
-                    del(otherSetKey)
-                }
-            }
-        }
+        return runBlocking {
+            connectionPool.get().use { conn ->
+                val pipeline = RedisPipelineBuilder(conn)
+                val sizeBeforeChange = pipeline.scard(this@SithsSet.name)
+                val otherSetKey = randomUUID()
+                pipeline.sadd(otherSetKey, otherSetHead, *otherSetTail)
+                val sizeAfterChange = pipeline.sinterstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
+                pipeline.del(otherSetKey)
+                pipeline.exec(inTransaction = true)
 
-        val sizePriorToChange = (pipelineResults[0] as RespInteger).value
-        return when (val sinterstoreResponse = pipelineResults[2]) {
-            is RespInteger -> sinterstoreResponse.value != sizePriorToChange
-            else -> sinterstoreResponse.handleAsUnexpected()
+                return@use sizeBeforeChange != sizeAfterChange
+            }
         }
     }
 
