@@ -396,6 +396,7 @@ class SithsClientTest : FunSpec({
         }
     }
 
+    // TODO: Use rpush for tests? This way the assertions are easier to understand
     context("lists") {
         test("lpush") {
             // ARRANGE
@@ -443,6 +444,32 @@ class SithsClientTest : FunSpec({
 
                 // ASSERT
                 popped shouldBe listOf("key3", "key2")
+            }
+        }
+
+        context("lpos") {
+            test("without count") {
+                // ARRANGE
+                val list = randomUUID()
+                siths.rpush(list, "v1", "v2", "v3", "v2")
+
+                // ACT
+                val idx = siths.lpos(list, "v2", rank = 2, maxlen = 1000)
+
+                // ASSERT
+                idx shouldBe 3
+            }
+
+            test("with count") {
+                // ARRANGE
+                val list = randomUUID()
+                siths.rpush(list, "v1", "v2", "v3", "v2")
+
+                // ACT
+                val idxs = siths.lpos(list, "v2", count = 2, maxlen = 1000)
+
+                // ASSERT
+                idxs shouldBe listOf(1, 3)
             }
         }
     }

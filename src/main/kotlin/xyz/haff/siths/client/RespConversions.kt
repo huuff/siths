@@ -143,6 +143,6 @@ fun RespType<*>.toLongOrNull(): Long? = when (this) {
 }
 
 fun RespType<*>.toLongList(): List<Long> = when (this) {
-    is RespArray -> contentsOfType<Long>()
+    is RespArray -> contentsOfType<RespInteger>().map { it.value } // TODO: return actual contents so map is not necessary?
     else -> handleAsUnexpected()
 }
