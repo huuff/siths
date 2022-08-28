@@ -396,23 +396,22 @@ class SithsClientTest : FunSpec({
         }
     }
 
-    // TODO: Use rpush for tests? This way the assertions are easier to understand
     context("lists") {
         test("lpush") {
             // ARRANGE
             val list = randomUUID()
 
             // ACT
-            siths.lpush(list, "key1", "key2", "key3")
+            siths.rpush(list, "key1", "key2", "key3")
 
             // ASSERT
-            siths.lrange(list, 0, -1) shouldBe listOf("key3", "key2", "key1")
+            siths.lrange(list, 0, -1) shouldBe listOf("key1", "key2", "key3")
         }
 
         test("llen") {
             // ARRANGE
             val list = randomUUID()
-            siths.lpush(list, "key1", "key2", "key3")
+            siths.rpush(list, "key1", "key2", "key3")
 
             // ACT
             val length = siths.llen(list)
@@ -425,25 +424,22 @@ class SithsClientTest : FunSpec({
             test("single lpop") {
                 // ARRANGE
                 val list = randomUUID()
-                siths.lpush(list, "key1", "key2", "key3")
+                siths.rpush(list, "key1", "key2", "key3")
 
                 // ACT
                 val popped = siths.lpop(list)
 
                 // ASSERT
-                popped shouldBe "key3"
+                popped shouldBe "key1"
             }
 
             test("rpop many") {
                 // ARRANGE
                 val list = randomUUID()
-                siths.lpush(list, "key1", "key2", "key3")
+                siths.rpush(list, "key1", "key2", "key3")
 
-                // ACT
-                val popped = siths.rpop(list, 2)
-
-                // ASSERT
-                popped shouldBe listOf("key3", "key2")
+                // ACT & ASSERT
+                siths.rpop(list, 2) shouldBe  listOf("key3", "key2")
             }
         }
 

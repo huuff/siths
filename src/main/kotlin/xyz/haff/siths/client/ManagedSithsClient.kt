@@ -121,7 +121,7 @@ class ManagedSithsClient(
         = pool.get().use { it.lpop(key) }
 
     override suspend fun rpop(key: String, count: Int): List<String>
-        = pool.get().use { it.lpop(key, count) }
+        = pool.get().use { it.rpop(key, count) }
 
     override suspend fun rpop(key: String): String?
         = pool.get().use { it.rpop(key) }
