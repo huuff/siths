@@ -21,9 +21,11 @@ class SithsDSL(val pool: SithsConnectionPool) {
             with (StandaloneSithsClient(conn)) {
                 try {
                     evalSha(script.sha, keys, args)
-                } catch (e: RedisScriptNotLoadedException) { // TODO: Maybe we could pipeline these two commands so they happen in a single connection?
-                    scriptLoad(script.code)
-                    evalSha(script.sha, keys, args)
+                } catch (e: RedisScriptNotLoadedException) {
+                    pipelined {
+                        scriptLoad(script.code)
+                        evalSha(script.sha, keys, args)
+                    }[1]
                 }
             }
         }
