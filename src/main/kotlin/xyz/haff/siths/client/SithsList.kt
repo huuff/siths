@@ -107,8 +107,7 @@ class SithsList<T : Any>(
         return runBlocking { client.lrem(name, serialize(element), count = 1 ) == 1L}
     }
 
-    override fun removeAll(elements: Collection<T>): Boolean {
-        return runBlocking {
+    override fun removeAll(elements: Collection<T>): Boolean = runBlocking {
             connectionPool.get().use { conn ->
                 val pipeline = RedisPipelineBuilder(conn)
                 val responses = elements.map {
@@ -118,10 +117,17 @@ class SithsList<T : Any>(
                 responses.asSequence().map { it.get() }.reduce(Long::plus) != 0L
             }
         }
-    }
 
-    override fun removeAt(index: Int): T {
-        TODO("Not yet implemented")
+    override fun removeAt(index: Int): T = runBlocking {
+        connectionPool.get().use { conn ->
+            val pipeline = RedisPipelineBuilder(conn)
+            val removedElement = pipeline.lindex(name, index)
+            val removeMarker = randomUUID()
+            pipeline.lset(name, index, removeMarker)
+            pipeline.lrem(name, removeMarker, count = 1)
+            pipeline.exec(inTransaction = true)
+            return@use deserialize(removedElement.get() ?: throw IndexOutOfBoundsException(index))
+        }
     }
 
     override fun retainAll(elements: Collection<T>): Boolean {
