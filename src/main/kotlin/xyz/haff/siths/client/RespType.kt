@@ -6,7 +6,11 @@ import xyz.haff.siths.common.RedisScriptNotLoadedException
 sealed interface RespType<T> {
     val value: T
 
-    fun isOk() = this is RespSimpleString && this.value == "OK"
+    fun isOk() = when (this) {
+        is RespSimpleString -> value == "OK"
+        is RespError -> throwAsException()
+        else -> false
+    }
 }
 
 data class RespSimpleString(override val value: String) : RespType<String>

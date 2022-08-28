@@ -191,5 +191,5 @@ class RedisCommandBuilder : Siths<
                 + maxlen?.let { RedisCommand("MAXLEN", it) })
 
     override suspend fun lset(key: String, index: Int, element: Any): RedisCommand
-        = RedisCommand("LSET", index, element)
+        = RedisCommand("LSET", key, index, element)
 }

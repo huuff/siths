@@ -468,6 +468,22 @@ class SithsClientTest : FunSpec({
                 idxs shouldBe listOf(1, 3)
             }
         }
+
+        test("lset") {
+            // ARRANGE
+            val list = randomUUID()
+            siths.rpush(list, "v1", "v2", "v3")
+
+            // SANITY CHECK
+            siths.lindex(list, 1) shouldBe "v2"
+
+            // ACT
+            val wasChanged = siths.lset(list, 1, "v999")
+
+            // ASSERT
+            wasChanged shouldBe true
+            siths.lindex(list, 1) shouldBe "v999"
+        }
     }
 
     test("ping") {
