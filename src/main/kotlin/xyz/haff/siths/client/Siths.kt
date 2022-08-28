@@ -64,6 +64,7 @@ interface Siths<
     suspend fun lrange(key: String, start: Int, stop: Int): StringListResponseType
     suspend fun lpos(key: String, element: Any, rank: Int? = null, maxlen: Int? = null): NullableLongResponseType
     suspend fun lpos(key: String, element: Any, rank: Int? = null, count: Int, maxlen: Int? = null): LongListResponseType
+    suspend fun lset(key: String, index: Int, element: Any): BooleanResponseType
 
     suspend fun clientList(): ClientListResponseType
     suspend fun ping(): BooleanResponseType

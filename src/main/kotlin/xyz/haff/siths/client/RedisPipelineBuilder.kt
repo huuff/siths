@@ -365,4 +365,11 @@ class RedisPipelineBuilder(
         )
     )
 
+    override suspend fun lset(key: String, index: Int, element: Any): QueuedResponse<Boolean> = addOperation(
+        Operation(
+            command = commandBuilder.lset(key, index, element),
+            response = QueuedResponse(RespType<*>::isOk)
+        )
+    )
+
 }

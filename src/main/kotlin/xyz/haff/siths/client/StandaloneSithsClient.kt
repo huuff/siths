@@ -134,6 +134,9 @@ class StandaloneSithsClient(
     override suspend fun lpos(key: String, element: Any, rank: Int?, count: Int, maxlen: Int?): List<Long>
         = connection.runCommand(commandBuilder.lpos(key, element, rank, count, maxlen)).toLongList()
 
+    override suspend fun lset(key: String, index: Int, element: Any): Boolean
+        = connection.runCommand(commandBuilder.lset(key, index, element)).isOk()
+
     override suspend fun clientList(): List<RedisClient>
         = connection.runCommand(commandBuilder.clientList()).toClientList()
 
