@@ -2,8 +2,7 @@ package xyz.haff.siths.client
 
 import kotlin.time.Duration
 
-// TODO: Call it operation?
-private data class CommandAndResponse<T>(val command: RedisCommand, val response: QueuedResponse<T>)
+private data class Operation<T>(val command: RedisCommand, val response: QueuedResponse<T>)
 
 // TODO: Is PipelineBuilder the correct name? It's not simply a builder since it also executes it
 class RedisPipelineBuilder(
@@ -27,10 +26,10 @@ class RedisPipelineBuilder(
         QueuedResponse<Map<String, Boolean>>,
         QueuedResponse<List<String>>
         > {
-    private val operations = mutableListOf<CommandAndResponse<*>>()
+    private val operations = mutableListOf<Operation<*>>()
     val length get() = operations.size
 
-    private fun <T> addOperation(operation: CommandAndResponse<T>): QueuedResponse<T> {
+    private fun <T> addOperation(operation: Operation<T>): QueuedResponse<T> {
         operations += operation
         return operation.response
     }
@@ -73,24 +72,24 @@ class RedisPipelineBuilder(
         exclusiveMode: ExclusiveMode?,
         timeToLive: Duration?
     ): QueuedResponse<Unit> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.set(key, value, exclusiveMode, timeToLive),
             response = QueuedResponse(RespType<*>::toUnit)
         )
     )
 
     override suspend fun get(key: String): QueuedResponse<String> {
-        return addOperation(CommandAndResponse(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringNonNull)))
+        return addOperation(Operation(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringNonNull)))
     }
 
     override suspend fun del(key: String, vararg rest: String): QueuedResponse<Long> =
-        addOperation(CommandAndResponse(commandBuilder.del(key, *rest), QueuedResponse(RespType<*>::toLong)))
+        addOperation(Operation(commandBuilder.del(key, *rest), QueuedResponse(RespType<*>::toLong)))
 
     override suspend fun ttl(key: String): QueuedResponse<Duration?> =
-        addOperation(CommandAndResponse(commandBuilder.ttl(key), QueuedResponse(RespType<*>::toDurationOrNull)))
+        addOperation(Operation(commandBuilder.ttl(key), QueuedResponse(RespType<*>::toDurationOrNull)))
 
     override suspend fun scriptLoad(script: String): QueuedResponse<String> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.scriptLoad(script),
             response = QueuedResponse(RespType<*>::toStringNonNull)
         )
@@ -98,7 +97,7 @@ class RedisPipelineBuilder(
 
     override suspend fun evalSha(sha: String, keys: List<String>, args: List<String>): QueuedResponse<RespType<*>> =
         addOperation(
-            CommandAndResponse(
+            Operation(
                 command = commandBuilder.evalSha(sha, keys, args),
                 response = QueuedResponse(RespType<*>::throwOnError)
             )
@@ -106,18 +105,18 @@ class RedisPipelineBuilder(
 
     override suspend fun eval(script: String, keys: List<String>, args: List<String>): QueuedResponse<RespType<*>> =
         addOperation(
-            CommandAndResponse(
+            Operation(
                 command = commandBuilder.eval(script, keys, args),
                 response = QueuedResponse(RespType<*>::throwOnError)
             )
         )
 
     override suspend fun incrBy(key: String, value: Long): QueuedResponse<Long> =
-        addOperation(CommandAndResponse(commandBuilder.incrBy(key, value), QueuedResponse(RespType<*>::toLong)))
+        addOperation(Operation(commandBuilder.incrBy(key, value), QueuedResponse(RespType<*>::toLong)))
 
     override suspend fun exists(key: String, vararg rest: String): QueuedResponse<Boolean> {
         return addOperation(
-            CommandAndResponse(
+            Operation(
                 command = commandBuilder.exists(key, *rest),
                 response = QueuedResponse(converter = { it.existenceToBoolean(setOf(key, *rest).size.toLong()) })
             )
@@ -129,41 +128,41 @@ class RedisPipelineBuilder(
         duration: Duration,
         expirationCondition: ExpirationCondition?
     ): QueuedResponse<Boolean> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.expire(key, duration, expirationCondition),
             response = QueuedResponse(RespType<*>::integerToBoolean)
         )
     )
 
     override suspend fun sadd(key: String, value: Any, vararg rest: Any): QueuedResponse<Long> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.sadd(key, value, *rest),
             response = QueuedResponse(RespType<*>::toLong)
         )
     )
 
     override suspend fun smembers(key: String): QueuedResponse<Set<String>> =
-        addOperation(CommandAndResponse(commandBuilder.smembers(key), QueuedResponse(RespType<*>::toStringSet)))
+        addOperation(Operation(commandBuilder.smembers(key), QueuedResponse(RespType<*>::toStringSet)))
 
     override suspend fun sismember(key: String, member: Any): QueuedResponse<Boolean> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.sismember(key, member),
             response = QueuedResponse(RespType<*>::integerToBoolean)
         )
     )
 
     override suspend fun scard(key: String): QueuedResponse<Long> =
-        addOperation(CommandAndResponse(commandBuilder.scard(key), QueuedResponse(RespType<*>::toLong)))
+        addOperation(Operation(commandBuilder.scard(key), QueuedResponse(RespType<*>::toLong)))
 
     override suspend fun srem(key: String, member: Any, vararg rest: Any): QueuedResponse<Long> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.srem(key, member, *rest),
             response = QueuedResponse(RespType<*>::toLong)
         )
     )
 
     override suspend fun sintercard(key: String, vararg rest: String, limit: Int?): QueuedResponse<Long> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.sintercard(key, rest = rest, limit = limit),
             response = QueuedResponse(RespType<*>::toLong)
         )
@@ -171,7 +170,7 @@ class RedisPipelineBuilder(
 
     override suspend fun sdiffstore(destination: String, key: String, vararg rest: String): QueuedResponse<Long> =
         addOperation(
-            CommandAndResponse(
+            Operation(
                 command = commandBuilder.sdiffstore(destination, key, *rest),
                 response = QueuedResponse(RespType<*>::toLong)
             )
@@ -179,7 +178,7 @@ class RedisPipelineBuilder(
 
     override suspend fun sinterstore(destination: String, key: String, vararg rest: String): QueuedResponse<Long> =
         addOperation(
-            CommandAndResponse(
+            Operation(
                 command = commandBuilder.sinterstore(destination, key, *rest),
                 response = QueuedResponse(RespType<*>::toLong)
             )
@@ -191,29 +190,29 @@ class RedisPipelineBuilder(
         match: String?,
         count: Int?
     ): QueuedResponse<RedisCursor<String>> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.sscan(key, cursor, match, count),
             response = QueuedResponse(RespType<*>::toStringCursor)
         )
     )
 
     override suspend fun clientList(): QueuedResponse<List<RedisClient>> =
-        addOperation(CommandAndResponse(commandBuilder.clientList(), QueuedResponse(RespType<*>::toClientList)))
+        addOperation(Operation(commandBuilder.clientList(), QueuedResponse(RespType<*>::toClientList)))
 
     override suspend fun ping(): QueuedResponse<Boolean> =
-        addOperation(CommandAndResponse(commandBuilder.ping(), QueuedResponse(RespType<*>::pongToBoolean)))
+        addOperation(Operation(commandBuilder.ping(), QueuedResponse(RespType<*>::pongToBoolean)))
 
     // SET OPERATIONS
 
     override suspend fun sdiff(key: String, vararg rest: String): QueuedResponse<Set<String>> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.sdiff(key, *rest),
             response = QueuedResponse(RespType<*>::toStringSet)
         )
     )
 
     override suspend fun sinter(key: String, vararg rest: String): QueuedResponse<Set<String>> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.sinter(key, *rest),
             response = QueuedResponse(RespType<*>::toStringSet)
         )
@@ -221,7 +220,7 @@ class RedisPipelineBuilder(
 
     override suspend fun smove(source: String, destination: String, member: Any): QueuedResponse<Boolean> =
         addOperation(
-            CommandAndResponse(
+            Operation(
                 command = commandBuilder.smove(source, destination, member),
                 response = QueuedResponse(RespType<*>::integerToBoolean)
             )
@@ -229,21 +228,21 @@ class RedisPipelineBuilder(
 
     override suspend fun spop(key: String): QueuedResponse<String?> =
         addOperation(
-            CommandAndResponse(
+            Operation(
                 command = commandBuilder.spop(key),
                 response = QueuedResponse(RespType<*>::toStringOrNull)
             )
         )
 
     override suspend fun spop(key: String, count: Int?): QueuedResponse<Set<String>> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.spop(key, count),
             response = QueuedResponse(RespType<*>::bulkOrArrayToStringSet)
         )
     )
 
     override suspend fun srandmember(key: String): QueuedResponse<String?> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.srandmember(key),
             response = QueuedResponse(RespType<*>::toStringOrNull)
         )
@@ -251,7 +250,7 @@ class RedisPipelineBuilder(
 
     override suspend fun srandmember(key: String, count: Int?): QueuedResponse<Set<String>> {
         return addOperation(
-            CommandAndResponse(
+            Operation(
                 command = commandBuilder.srandmember(key, count),
                 response = QueuedResponse(RespType<*>::bulkOrArrayToStringSet)
             )
@@ -259,7 +258,7 @@ class RedisPipelineBuilder(
     }
 
     override suspend fun sunion(key: String, vararg rest: String): QueuedResponse<Set<String>> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.sunion(key, *rest),
             response = QueuedResponse(RespType<*>::toStringSet)
         )
@@ -267,7 +266,7 @@ class RedisPipelineBuilder(
 
     override suspend fun sunionstore(destination: String, key: String, vararg rest: String): QueuedResponse<Long> =
         addOperation(
-            CommandAndResponse(
+            Operation(
                 commandBuilder.sunionstore(destination, key, *rest),
                 QueuedResponse(RespType<*>::toLong)
             )
@@ -278,7 +277,7 @@ class RedisPipelineBuilder(
         member: Any,
         vararg rest: Any
     ): QueuedResponse<Map<String, Boolean>> = addOperation(
-        CommandAndResponse(
+        Operation(
             commandBuilder.smismember(key, member, *rest),
             QueuedResponse(converter = { it.toStringToBooleanMap(member, *rest) })
         )
@@ -287,10 +286,10 @@ class RedisPipelineBuilder(
     // LIST OPERATIONS
 
     override suspend fun llen(key: String): QueuedResponse<Long> =
-        addOperation(CommandAndResponse(commandBuilder.llen(key), QueuedResponse(RespType<*>::toLong)))
+        addOperation(Operation(commandBuilder.llen(key), QueuedResponse(RespType<*>::toLong)))
 
     override suspend fun lindex(key: String, index: Int): QueuedResponse<String?> =
-        addOperation(CommandAndResponse(commandBuilder.lindex(key, index), QueuedResponse(RespType<*>::toStringOrNull)))
+        addOperation(Operation(commandBuilder.lindex(key, index), QueuedResponse(RespType<*>::toStringOrNull)))
 
     override suspend fun linsert(
         key: String,
@@ -299,47 +298,47 @@ class RedisPipelineBuilder(
         element: Any
     ): QueuedResponse<Long?> =
         addOperation(
-            CommandAndResponse(
+            Operation(
                 command = commandBuilder.linsert(key, relativePosition, pivot, element),
                 response = QueuedResponse(RespType<*>::toPositiveLongOrNull)
             )
         )
 
     override suspend fun lpop(key: String, count: Int): QueuedResponse<List<String>> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.lpop(key, count),
             response = QueuedResponse(RespType<*>::bulkOrArrayToStringList)
         )
     )
 
     override suspend fun lpop(key: String): QueuedResponse<String?> =
-        addOperation(CommandAndResponse(commandBuilder.lpop(key), QueuedResponse(RespType<*>::toStringOrNull)))
+        addOperation(Operation(commandBuilder.lpop(key), QueuedResponse(RespType<*>::toStringOrNull)))
 
     override suspend fun rpop(key: String, count: Int): QueuedResponse<List<String>> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.rpop(key, count),
             response = QueuedResponse(RespType<*>::bulkOrArrayToStringList)
         )
     )
 
     override suspend fun rpop(key: String): QueuedResponse<String?> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.rpop(key),
             response = QueuedResponse(RespType<*>::toStringOrNull)
         )
     )
 
     override suspend fun lpush(key: String, element: Any, vararg rest: Any): QueuedResponse<Long> =
-        addOperation(CommandAndResponse(commandBuilder.lpush(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
+        addOperation(Operation(commandBuilder.lpush(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
 
     override suspend fun rpush(key: String, element: Any, vararg rest: Any): QueuedResponse<Long> =
-        addOperation(CommandAndResponse(commandBuilder.rpush(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
+        addOperation(Operation(commandBuilder.rpush(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
 
     override suspend fun lrem(key: String, element: Any, count: Int): QueuedResponse<Long> =
-        addOperation(CommandAndResponse(commandBuilder.lrem(key, element, count), QueuedResponse(RespType<*>::toLong)))
+        addOperation(Operation(commandBuilder.lrem(key, element, count), QueuedResponse(RespType<*>::toLong)))
 
     override suspend fun lrange(key: String, start: Int, stop: Int): QueuedResponse<List<String>> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.lrange(key, start, stop),
             response = QueuedResponse(RespType<*>::toStringList)
         )
@@ -347,7 +346,7 @@ class RedisPipelineBuilder(
 
     override suspend fun lpos(key: String, element: Any, rank: Int?, maxlen: Int?): QueuedResponse<Long?> =
         addOperation(
-            CommandAndResponse(
+            Operation(
                 command = commandBuilder.lpos(key, element, rank, maxlen),
                 response = QueuedResponse(RespType<*>::toLongOrNull)
             )
@@ -360,7 +359,7 @@ class RedisPipelineBuilder(
         count: Int,
         maxlen: Int?
     ): QueuedResponse<List<Long>> = addOperation(
-        CommandAndResponse(
+        Operation(
             command = commandBuilder.lpos(key, element, rank, count, maxlen),
             response = QueuedResponse(RespType<*>::toLongList)
         )
