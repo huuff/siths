@@ -161,4 +161,17 @@ class SithsListTest : FunSpec({
         list[1] shouldBe "v999"
     }
 
+    test("removeAt") {
+        // ARRANGE
+        val list = SithsList.ofStrings(pool)
+        list.addAll(listOf("v1", "v2", "v3", "v4"))
+
+        // ACT
+        val removedElement = list.removeAt(2)
+
+        // ASSERT
+        removedElement shouldBe "v3"
+        list.subList(0, list.size) shouldBe listOf("v1", "v2", "v4")
+    }
+
 })
