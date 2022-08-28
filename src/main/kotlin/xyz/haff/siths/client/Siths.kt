@@ -62,7 +62,6 @@ interface Siths<
     suspend fun rpush(key: String, element: Any, vararg rest: Any): LongResponseType
     suspend fun lrem(key: String, element: Any, count: Int = 0): LongResponseType
     suspend fun lrange(key: String, start: Int, stop: Int): StringListResponseType
-    // TODO: Test
     suspend fun lpos(key: String, element: Any, rank: Int? = null, maxlen: Int? = null): NullableLongResponseType
     suspend fun lpos(key: String, element: Any, rank: Int? = null, count: Int, maxlen: Int? = null): LongListResponseType
 
