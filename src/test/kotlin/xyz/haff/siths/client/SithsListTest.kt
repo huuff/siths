@@ -6,15 +6,19 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.makeSithsPool
 
-// TODO: create a single lateinit pool and reuse it
 class SithsListTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine")) {
         withExposedPorts(6379)
     }
+    lateinit var pool: SithsConnectionPool
+
+    beforeAny {
+        pool = makeSithsPool(container)
+    }
 
     test("can add elements") {
         // ARRANGE
-        val list = SithsList.ofStrings(makeSithsPool(container))
+        val list = SithsList.ofStrings(pool)
 
         // ACT
         val listModified1 = list.add("v1")
@@ -29,7 +33,7 @@ class SithsListTest : FunSpec({
 
     test("isEmpty") {
         // ARRANGE
-        val list = SithsList.ofStrings(makeSithsPool(container))
+        val list = SithsList.ofStrings(pool)
 
         // ACT & ASSERT
         list.isEmpty() shouldBe true
@@ -37,7 +41,7 @@ class SithsListTest : FunSpec({
 
     test("get") {
         // ARRANGE
-        val list = SithsList.ofStrings(makeSithsPool(container))
+        val list = SithsList.ofStrings(pool)
         list += "v1"
         list += "v2"
         list += "v3"
@@ -51,7 +55,7 @@ class SithsListTest : FunSpec({
 
     test("addAll") {
         // ARRANGE
-        val list = SithsList.ofStrings(makeSithsPool(container))
+        val list = SithsList.ofStrings(pool)
 
         // ACT
         val wasModified = list.addAll(listOf("v1", "v2", "v3"))
@@ -63,7 +67,7 @@ class SithsListTest : FunSpec({
 
     test("remove") {
         // ARRANGE
-        val list = SithsList.ofStrings(makeSithsPool(container))
+        val list = SithsList.ofStrings(pool)
         list.addAll(listOf("v1", "v2", "v3"))
 
         // ACT
@@ -77,7 +81,7 @@ class SithsListTest : FunSpec({
     context("removeAll") {
         test("actually removing") {
             // ARRANGE
-            val list = SithsList.ofStrings(makeSithsPool(container))
+            val list = SithsList.ofStrings(pool)
             list.addAll(listOf("v1", "v2", "v3"))
 
             // ACT
@@ -90,7 +94,7 @@ class SithsListTest : FunSpec({
 
         test("without removing") {
             // ARRANGE
-            val list = SithsList.ofStrings(makeSithsPool(container))
+            val list = SithsList.ofStrings(pool)
             list.addAll(listOf("v1", "v2", "v3"))
 
             // ACT
@@ -103,7 +107,7 @@ class SithsListTest : FunSpec({
 
         test("contains") {
             // ARRANGE
-            val list = SithsList.ofStrings(makeSithsPool(container))
+            val list = SithsList.ofStrings(pool)
             list.addAll(listOf("v1", "v2", "v3"))
 
             // ACT & ASSERT
