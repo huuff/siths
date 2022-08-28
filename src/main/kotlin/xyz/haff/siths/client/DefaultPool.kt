@@ -6,7 +6,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-// TODO: Somewhere else?
 class ExhaustedPoolException(maxResources: Int) : RuntimeException("This pool has all $maxResources resources busy")
 
 class DefaultPool<ResourceType, PooledResourceType: PooledResource<ResourceType>>(
