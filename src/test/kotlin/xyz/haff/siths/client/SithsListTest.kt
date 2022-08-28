@@ -117,12 +117,24 @@ class SithsListTest : FunSpec({
         }
 
         test("indexOf") {
+            // ARRANGE
             val list = SithsList.ofStrings(pool)
             list.addAll(listOf("v1", "v2", "v3"))
 
             // ACT & ASSERT
             list.indexOf("v2") shouldBe 1
             list.indexOf("v8") shouldBe -1
+        }
+
+        test("lastIndexOf") {
+            // ARRANGE
+            val list = SithsList.ofStrings(pool)
+            list.addAll(listOf("v1", "v2", "v1", "v3"))
+
+            // ACT & ASSERT
+            list.lastIndexOf("v1") shouldBe 2
+            list.lastIndexOf("v2") shouldBe 1
+            list.lastIndexOf("v8") shouldBe -1
         }
     }
 

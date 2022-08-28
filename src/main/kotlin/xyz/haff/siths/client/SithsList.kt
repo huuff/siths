@@ -47,9 +47,8 @@ class SithsList<T : Any>(
         TODO("Not yet implemented")
     }
 
-    override fun lastIndexOf(element: T): Int {
-        TODO("Not yet implemented")
-    }
+    override fun lastIndexOf(element: T): Int
+        = runBlocking { client.lpos(name, serialize(element), rank = -1)?.toInt() ?: -1 }
 
     override fun add(element: T): Boolean {
         return runBlocking {
