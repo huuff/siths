@@ -128,8 +128,15 @@ class SithsList<T : Any>(
         TODO("Not yet implemented")
     }
 
-    override fun set(index: Int, element: T): T {
-        TODO("Not yet implemented")
+    // TODO: Test
+    override fun set(index: Int, element: T): T = runBlocking {
+        connectionPool.get().use { conn ->
+            val pipeline = RedisPipelineBuilder(conn)
+            val previousElement = pipeline.lindex(name, index)
+            pipeline.lset(name, index, serialize(element))
+            pipeline.exec(inTransaction = true)
+            return@use deserialize(previousElement.get() ?: throw IndexOutOfBoundsException(index))
+        }
     }
 
     /**
