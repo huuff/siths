@@ -3,6 +3,7 @@ package xyz.haff.siths.client
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.makeSithsPool
 
@@ -113,6 +114,15 @@ class SithsListTest : FunSpec({
             // ACT & ASSERT
             ("v1" in list) shouldBe true
             ("v8" in list) shouldBe false
+        }
+
+        test("indexOf") {
+            val list = SithsList.ofStrings(pool)
+            list.addAll(listOf("v1", "v2", "v3"))
+
+            // ACT & ASSERT
+            list.indexOf("v2") shouldBe 1
+            list.indexOf("v8") shouldBe -1
         }
     }
 

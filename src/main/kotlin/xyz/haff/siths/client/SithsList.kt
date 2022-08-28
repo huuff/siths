@@ -26,7 +26,7 @@ class SithsList<T : Any>(
         get() = runBlocking { client.llen(name) }.toInt()
 
     override fun contains(element: T): Boolean
-        = runBlocking { client.lpos(name, element) != null }
+        = runBlocking { client.lpos(name, serialize(element)) != null }
 
     override fun containsAll(elements: Collection<T>): Boolean {
         TODO("Use LPOS")
@@ -38,9 +38,8 @@ class SithsList<T : Any>(
             ?: throw IndexOutOfBoundsException(index)
     }
 
-    override fun indexOf(element: T): Int {
-        TODO("Not yet implemented")
-    }
+    override fun indexOf(element: T): Int
+        = runBlocking { client.lpos(name, serialize(element))?.toInt() ?: -1 }
 
     override fun isEmpty(): Boolean = this.size == 0
 
