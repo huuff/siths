@@ -28,8 +28,14 @@ class SithsList<T : Any>(
     override fun contains(element: T): Boolean
         = runBlocking { client.lpos(name, serialize(element)) != null }
 
-    override fun containsAll(elements: Collection<T>): Boolean {
-        TODO("Use LPOS")
+    override fun containsAll(elements: Collection<T>): Boolean
+        = runBlocking {
+            connectionPool.get().use { conn ->
+                val pipeline = RedisPipelineBuilder(conn)
+                val responses = elements.map { elem -> pipeline.lpos(name, serialize(elem)) }
+                pipeline.exec(inTransaction = true)
+                return@use responses.map { it.get() }.all { it != null }
+            }
     }
 
     override fun get(index: Int): T = runBlocking {

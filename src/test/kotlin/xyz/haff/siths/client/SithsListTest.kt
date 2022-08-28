@@ -136,6 +136,16 @@ class SithsListTest : FunSpec({
             list.lastIndexOf("v2") shouldBe 1
             list.lastIndexOf("v8") shouldBe -1
         }
+
+        test("contains all") {
+            // ARRANGE
+            val list = SithsList.ofStrings(pool)
+            list.addAll(listOf("v1", "v2", "v3", "v4"))
+
+            // ACT & ASSERT
+            list.containsAll(listOf("v1", "v3")) shouldBe true
+            list.containsAll(listOf("v1", "v2", "v5")) shouldBe false
+        }
     }
 
 })
