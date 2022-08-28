@@ -128,7 +128,6 @@ class SithsList<T : Any>(
         TODO("Not yet implemented")
     }
 
-    // TODO: Test
     override fun set(index: Int, element: T): T = runBlocking {
         connectionPool.get().use { conn ->
             val pipeline = RedisPipelineBuilder(conn)

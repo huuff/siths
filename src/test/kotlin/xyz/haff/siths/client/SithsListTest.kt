@@ -105,47 +105,60 @@ class SithsListTest : FunSpec({
             wasModified shouldBe false
             list.subList(0, list.size) shouldBe listOf("v1", "v2", "v3")
         }
+    }
 
-        test("contains") {
-            // ARRANGE
-            val list = SithsList.ofStrings(pool)
-            list.addAll(listOf("v1", "v2", "v3"))
+    test("contains") {
+        // ARRANGE
+        val list = SithsList.ofStrings(pool)
+        list.addAll(listOf("v1", "v2", "v3"))
 
-            // ACT & ASSERT
-            ("v1" in list) shouldBe true
-            ("v8" in list) shouldBe false
-        }
+        // ACT & ASSERT
+        ("v1" in list) shouldBe true
+        ("v8" in list) shouldBe false
+    }
 
-        test("indexOf") {
-            // ARRANGE
-            val list = SithsList.ofStrings(pool)
-            list.addAll(listOf("v1", "v2", "v3"))
+    test("indexOf") {
+        // ARRANGE
+        val list = SithsList.ofStrings(pool)
+        list.addAll(listOf("v1", "v2", "v3"))
 
-            // ACT & ASSERT
-            list.indexOf("v2") shouldBe 1
-            list.indexOf("v8") shouldBe -1
-        }
+        // ACT & ASSERT
+        list.indexOf("v2") shouldBe 1
+        list.indexOf("v8") shouldBe -1
+    }
 
-        test("lastIndexOf") {
-            // ARRANGE
-            val list = SithsList.ofStrings(pool)
-            list.addAll(listOf("v1", "v2", "v1", "v3"))
+    test("lastIndexOf") {
+        // ARRANGE
+        val list = SithsList.ofStrings(pool)
+        list.addAll(listOf("v1", "v2", "v1", "v3"))
 
-            // ACT & ASSERT
-            list.lastIndexOf("v1") shouldBe 2
-            list.lastIndexOf("v2") shouldBe 1
-            list.lastIndexOf("v8") shouldBe -1
-        }
+        // ACT & ASSERT
+        list.lastIndexOf("v1") shouldBe 2
+        list.lastIndexOf("v2") shouldBe 1
+        list.lastIndexOf("v8") shouldBe -1
+    }
 
-        test("contains all") {
-            // ARRANGE
-            val list = SithsList.ofStrings(pool)
-            list.addAll(listOf("v1", "v2", "v3", "v4"))
+    test("contains all") {
+        // ARRANGE
+        val list = SithsList.ofStrings(pool)
+        list.addAll(listOf("v1", "v2", "v3", "v4"))
 
-            // ACT & ASSERT
-            list.containsAll(listOf("v1", "v3")) shouldBe true
-            list.containsAll(listOf("v1", "v2", "v5")) shouldBe false
-        }
+        // ACT & ASSERT
+        list.containsAll(listOf("v1", "v3")) shouldBe true
+        list.containsAll(listOf("v1", "v2", "v5")) shouldBe false
+    }
+
+    test("set") {
+        // ARRANGE
+        val list = SithsList.ofStrings(pool)
+        list.addAll(listOf("v1", "v2", "v3"))
+
+        // ACT
+        val previousElement = list.set(1, "v999")
+
+        // ASSERT
+        previousElement shouldBe "v2"
+        list[1] shouldBe "v999"
     }
 
 })
