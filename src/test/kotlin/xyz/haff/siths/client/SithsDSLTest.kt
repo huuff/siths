@@ -7,6 +7,7 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.scripts.RedisScript
 
@@ -30,14 +31,15 @@ class SithsDSLTest : FunSpec({
     test("correctly pipelines") {
         // ARRANGE
         val pool = makeSithsPool(container)
+        val key = randomUUID()
 
         // ACT
         val pipelineResult = withRedis(pool) {
             pipelined {
-                set("pipelined-key", "0")
-                get("pipelined-key")
-                incrBy("pipelined-key", 1)
-                get("pipelined-key")
+                set(key, "0")
+                get(key)
+                incrBy(key, 1)
+                get(key)
             }
         }
 
@@ -53,14 +55,15 @@ class SithsDSLTest : FunSpec({
     test("correctly makes transaction") {
         // ARRANGE
         val pool = makeSithsPool(container)
+        val key = randomUUID()
 
         // ACT
         val pipelineResult = withRedis(pool) {
             transactional {
-                set("pipelined-key", "0")
-                get("pipelined-key")
-                incrBy("pipelined-key", 1)
-                get("pipelined-key")
+                set(key, "0")
+                get(key)
+                incrBy(key, 1)
+                get(key)
             }
         }
 

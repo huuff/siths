@@ -31,8 +31,9 @@ class SithsClientTest : FunSpec({
 
     test("can set and get a value") {
         // ACT
-        siths.set("key", "value")
-        val value = siths.getOrNull("key")
+        val key = randomUUID()
+        siths.set(key, "value")
+        val value = siths.getOrNull(key)
 
         // ASSERT
         value shouldBe "value"
@@ -40,17 +41,19 @@ class SithsClientTest : FunSpec({
 
     test("del deletes key") {
         // ARRANGE
-        siths.set("future-deleted-key1", "value")
-        siths.set("future-deleted-key2", "value")
+        val futureDeletedKey1 = randomUUID()
+        val futureDeletedKey2 = randomUUID()
+        siths.set(futureDeletedKey1, "value")
+        siths.set(futureDeletedKey2, "value")
 
         // SANITY CHECK
-        siths.exists("future-deleted-key1", "future-deleted-key2") shouldBe true
+        siths.exists(futureDeletedKey1, futureDeletedKey2) shouldBe true
 
         // ACT
-        siths.del("future-deleted-key1", "future-deleted-key2") shouldBe 2
+        siths.del(futureDeletedKey1, futureDeletedKey2) shouldBe 2
 
         // ASSERT
-        siths.exists("future-deleted-key1", "future-deleted-key2") shouldBe false
+        siths.exists(futureDeletedKey1, futureDeletedKey2) shouldBe false
     }
 
     test("clientList contains current connection") {
@@ -112,20 +115,22 @@ class SithsClientTest : FunSpec({
         context("SET ... (NX|XX)") {
             test("SET ... NX does not set if the key exists") {
                 // ARRANGE
-                siths.set("nxkey", "test1")
+                val key = randomUUID()
+                siths.set(key, "test1")
 
                 // ACT
-                siths.set("nxkey", "test2", exclusiveMode = NX)
+                siths.set(key, "test2", exclusiveMode = NX)
 
                 // ASSERT
-                siths.get("nxkey") shouldBe "test1"
+                siths.get(key) shouldBe "test1"
             }
             test("SET ... XX does not set if the key does not exist") {
                 // ACT
-                siths.set("xxkey", "testvalue", exclusiveMode = XX)
+                val key = randomUUID()
+                siths.set(key, "testvalue", exclusiveMode = XX)
 
                 // ASSERT
-                siths.getOrNull("xxkey") shouldBe null
+                siths.getOrNull(key) shouldBe null
             }
         }
 
