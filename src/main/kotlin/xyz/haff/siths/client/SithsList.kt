@@ -3,6 +3,7 @@ package xyz.haff.siths.client
 import kotlinx.coroutines.runBlocking
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
+import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.scripts.RedisScripts
 
 // TODO: Try to find the redis error for a non-existent index and convert it to IndexOutOfBoundsException?
@@ -152,8 +153,18 @@ class SithsList<T : Any>(
         }
     }
 
-    override fun retainAll(elements: Collection<T>): Boolean {
-        TODO("Not yet implemented")
+    // TODO: Three round-trips to the server because I can't run runScript in a single pipeline...
+    override fun retainAll(elements: Collection<T>): Boolean = runBlocking {
+        val temporaryOtherList = randomUUID()
+        val (otherHead, otherTail) = elements.map(serialize).toTypedArray().headAndTail()
+        client.rpush(temporaryOtherList, otherHead, *otherTail)
+
+        val response = withRedis(connectionPool) {
+            runScript(RedisScripts.LIST_RETAIN_ALL, keys = listOf(this@SithsList.name, temporaryOtherList))
+        }.luaBooleanToBoolean()
+        client.del(temporaryOtherList)
+
+        return@runBlocking response
     }
 
     override fun set(index: Int, element: T): T = runBlocking {

@@ -234,4 +234,17 @@ class SithsListTest : FunSpec({
         }
     }
 
+    test("retainAll") {
+        // ARRANGE
+        val list = SithsList.ofStrings(pool)
+        list.addAll(listOf("v1", "v2", "v3", "v4", "v5"))
+
+        // ACT
+        val wasChanged = list.retainAll(listOf("v2", "v3"))
+
+        // ASSERT
+        wasChanged shouldBe true
+        list.subList(0, list.size) shouldBe listOf("v2", "v3")
+    }
+
 })

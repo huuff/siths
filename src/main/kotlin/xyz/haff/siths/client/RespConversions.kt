@@ -146,3 +146,9 @@ fun RespType<*>.toLongList(): List<Long> = when (this) {
     is RespArray -> contentsOfType<RespInteger>().map { it.value }
     else -> handleAsUnexpected()
 }
+
+fun RespType<*>.luaBooleanToBoolean(): Boolean = when {
+    this is RespInteger && value == 1L -> true
+    this is RespNullResponse -> false
+    else -> this.handleAsUnexpected()
+}

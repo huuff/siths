@@ -31,6 +31,7 @@ class RedisScriptsTest : FunSpec({
         siths.lrange(list, 0, -1) shouldBe listOf("v1", "v2", "v999", "v3")
     }
 
+    // TODO: Assert the script's response!
     test("list retain all") {
         // ARRANGE
         val list1 = randomUUID()
