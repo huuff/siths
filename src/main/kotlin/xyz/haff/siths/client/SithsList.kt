@@ -5,6 +5,7 @@ import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.scripts.RedisScripts
 import kotlin.math.floor
+import kotlin.math.max
 import kotlin.math.min
 
 // TODO: Try to find the redis error for a non-existent index and convert it to IndexOutOfBoundsException?
@@ -121,22 +122,10 @@ class SithsList<T : Any>(
         runBlocking { client.del(name) }
     }
 
-    // TODO: Too much duplication? UPDATE: Just use the below with index 0
-    override fun listIterator(): MutableListIterator<T> = runBlocking {
-        connectionPool.get().use { conn ->
-            val pipeline = RedisPipelineBuilder(conn)
-            val cursorContents = pipeline.lrange(name, 0, maxCursorSize - 1)
-            val size = pipeline.llen(name)
-            pipeline.exec(inTransaction = true)
-            return@use ListIterator(
-                lastCursor = Cursor(cursorContents.get().map(deserialize).toMutableList(), 0, cursorContents.get().size - 1),
-                size = size.get().toInt()
-            )
-        }
-    }
+    override fun listIterator(): MutableListIterator<T> = listIterator(0)
 
     override fun listIterator(index: Int): MutableListIterator<T> = runBlocking {
-        val elementsBeforeIndex = index - 1
+        val elementsBeforeIndex = max(index - 1, 0)
         // The start of the list, or the requested index minus half the cursor length
         val cursorStart = index - floor(min(elementsBeforeIndex.toDouble(), maxCursorSize.toDouble()/2)).toInt()
 
