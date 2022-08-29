@@ -58,7 +58,7 @@ class SithsList<T : Any>(
             val size = pipeline.llen(name)
             pipeline.exec(inTransaction = true)
             return@use Iterator(
-                lastCursor = Cursor(cursorContents.get().map(deserialize), 0, cursorContents.get().size - 1),
+                lastCursor = Cursor(cursorContents.get().map(deserialize).toMutableList(), 0, cursorContents.get().size - 1),
                 size = size.get().toInt()
             )
         }
@@ -174,30 +174,36 @@ class SithsList<T : Any>(
     }
 
     private val MAX_ELEMENTS_PER_CURSOR = 10
-    data class Cursor<T>(val contents: List<T>, val start: Int, val stop: Int)
+    data class Cursor<T>(val contents: MutableList<T>, val start: Int, var stop: Int)
     inner class Iterator(
         private var lastCursor: Cursor<T>,
-        private val size: Int
+        private var size: Int
     ): MutableIterator<T> {
         private var currentIndex: Int = -1
+        private val currentIndexInCursor get() = currentIndex - lastCursor.start
 
         override fun hasNext(): Boolean = currentIndex < (size - 1)
 
         override fun next(): T = if (currentIndex < lastCursor.stop) {
             currentIndex++
-            lastCursor.contents[currentIndex - lastCursor.start]
+            lastCursor.contents[currentIndexInCursor]
         } else { // TODO: Check that size didn't change to throw a ConcurrentModificationException?
             val remainingElements = size - lastCursor.stop
             val cursorSize = if (remainingElements < MAX_ELEMENTS_PER_CURSOR) { remainingElements } else { MAX_ELEMENTS_PER_CURSOR }
             val newStart = lastCursor.stop + 1
             val newStop = newStart + (cursorSize - 1)
-            lastCursor = Cursor(runBlocking { client.lrange(name, newStart, newStop) }.map(deserialize), newStart, newStop)
+            lastCursor = Cursor(runBlocking { client.lrange(name, newStart, newStop) }.map(deserialize).toMutableList(), newStart, newStop)
             currentIndex++
             lastCursor.contents[0]
         }
 
         override fun remove() {
-            TODO("Not yet implemented")
+            if (currentIndex != -1) {
+                lastCursor.contents.removeAt(currentIndexInCursor)
+                size--
+                lastCursor.stop--
+                removeAt(currentIndex)
+            }
         }
 
     }

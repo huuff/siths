@@ -199,19 +199,39 @@ class SithsListTest : FunSpec({
     }
 
     context("iterator") {
-        // ARRANGE
-        val list = SithsList.ofStrings(pool)
-        val elements = (1..100).map { "v$it" }
-        list.addAll(elements)
+        test("correctly iterated") {
+            // ARRANGE
+            val list = SithsList.ofStrings(pool)
+            val elements = (1..100).map { "v$it" }
+            list.addAll(elements)
 
-        // ACT
-        val iteratedElements = mutableListOf<String>()
-        for (elem in list.iterator()) {
-            iteratedElements += elem
+            // ACT
+            val iteratedElements = mutableListOf<String>()
+            for (elem in list.iterator()) {
+                iteratedElements += elem
+            }
+
+            // ASSERT
+            iteratedElements shouldBe elements
         }
 
-        // ASSERT
-        iteratedElements shouldBe elements
+        test("can remove elements") {
+            // ARRANGE
+            val list = SithsList.ofStrings(pool)
+            val elements = (1..100).map { it.toString() }
+            list.addAll(elements)
+
+            // ACT
+            val iterator = list.iterator()
+            while (iterator.hasNext()) {
+                val value = iterator.next()
+                if (value.toInt() % 3 == 0)
+                    iterator.remove() // Remove multiples of 3
+            }
+
+            // ASSERT
+            list.subList(0, list.size) shouldBe elements.filter { it.toInt() % 3 != 0 }
+        }
     }
 
 })
