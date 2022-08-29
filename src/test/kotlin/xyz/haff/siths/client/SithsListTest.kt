@@ -3,7 +3,6 @@ package xyz.haff.siths.client
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.makeSithsPool
 
@@ -304,6 +303,21 @@ class SithsListTest : FunSpec({
 
             // ASSERT
             list.subList(0, list.size) shouldBe listOf("1", "2", "THREE", "4", "5")
+        }
+
+        test("at a specific index") {
+            // ARRANGE
+            val list = SithsList.ofStrings(pool, maxCursorSize = 2)
+            val elements = (1..10).map { it.toString() }
+            list.addAll(elements)
+            val iterator = list.listIterator(7)
+            val consumedElements = mutableListOf<String>()
+
+            // ACT
+            while (iterator.hasNext()) { consumedElements += iterator.next() }
+
+            // ASSERT
+            consumedElements shouldBe listOf("8", "9", "10")
         }
     }
 

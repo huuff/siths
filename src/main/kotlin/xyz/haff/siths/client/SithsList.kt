@@ -3,8 +3,9 @@ package xyz.haff.siths.client
 import kotlinx.coroutines.runBlocking
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
-import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.scripts.RedisScripts
+import kotlin.math.floor
+import kotlin.math.min
 
 // TODO: Try to find the redis error for a non-existent index and convert it to IndexOutOfBoundsException?
 class SithsList<T : Any>(
@@ -120,7 +121,7 @@ class SithsList<T : Any>(
         runBlocking { client.del(name) }
     }
 
-    // TODO: Too much duplication?
+    // TODO: Too much duplication? UPDATE: Just use the below with index 0
     override fun listIterator(): MutableListIterator<T> = runBlocking {
         connectionPool.get().use { conn ->
             val pipeline = RedisPipelineBuilder(conn)
@@ -134,8 +135,23 @@ class SithsList<T : Any>(
         }
     }
 
-    override fun listIterator(index: Int): MutableListIterator<T> {
-        TODO("Not yet implemented")
+    override fun listIterator(index: Int): MutableListIterator<T> = runBlocking {
+        val elementsBeforeIndex = index - 1
+        // The start of the list, or the requested index minus half the cursor length
+        val cursorStart = index - floor(min(elementsBeforeIndex.toDouble(), maxCursorSize.toDouble()/2)).toInt()
+
+        return@runBlocking connectionPool.get().use { conn ->
+            val pipeline = RedisPipelineBuilder(conn)
+            val size = pipeline.llen(name)
+            val cursorContents = pipeline.lrange(name, cursorStart, cursorStart + maxCursorSize)
+            pipeline.exec(inTransaction = true)
+            return@use ListIterator(
+                lastCursor = Cursor(cursorContents.get().map(deserialize).toMutableList(), cursorStart, cursorStart + (cursorContents.get().size - 1)),
+                size = size.get().toInt(),
+                currentIndex = index - 1,
+            )
+
+        }
     }
 
     override fun remove(element: T): Boolean {
@@ -200,9 +216,9 @@ class SithsList<T : Any>(
     data class Cursor<T>(val contents: MutableList<T>, val start: Int, var stop: Int)
     open inner class Iterator(
         protected var lastCursor: Cursor<T>,
-        protected var size: Int
+        protected var size: Int,
+        protected var currentIndex: Int = lastCursor.start - 1
     ): MutableIterator<T> {
-        protected var currentIndex: Int = -1
         protected val currentIndexInCursor get() = currentIndex - lastCursor.start
 
         override fun hasNext(): Boolean = currentIndex < (size - 1)
@@ -233,8 +249,9 @@ class SithsList<T : Any>(
 
     inner class ListIterator(
         lastCursor: Cursor<T>,
-        size: Int
-    ): MutableListIterator<T>, Iterator(lastCursor, size){
+        size: Int,
+        currentIndex: Int = lastCursor.start - 1
+    ): MutableListIterator<T>, Iterator(lastCursor, size, currentIndex) {
         override fun hasPrevious(): Boolean = currentIndex > -1
 
         override fun nextIndex(): Int = if (hasNext()) { currentIndex + 1 } else { size }
@@ -275,7 +292,7 @@ class SithsList<T : Any>(
         override fun set(element: T) {
             if (currentIndex != -1) {
                 runBlocking { client.lset(name, currentIndex, serialize(element)) }
-                lastCursor.contents.set(currentIndexInCursor, element)
+                lastCursor.contents[currentIndexInCursor] = element
             }
         }
 
