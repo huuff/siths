@@ -79,10 +79,9 @@ class SithsClientTest : FunSpec({
 
         // ACT
         siths.set(key, value)
-        val savedValue = siths.get(key)
 
         // ASSERT
-        savedValue shouldBe value
+        siths.get(key) shouldBe value
     }
 
     test("incrBy works") {
@@ -154,7 +153,7 @@ class SithsClientTest : FunSpec({
             val script = RedisScript(code = """return 'Hello World!' """)
             val sha = siths.scriptLoad(script.code)
 
-            // ACT
+            // ACT & ASSERT
             val response = siths.evalSha(sha)
 
             // ASSERT
@@ -187,11 +186,8 @@ class SithsClientTest : FunSpec({
             val set = randomUUID();
             siths.sadd(set, "test1", "test2")
 
-            // ACT
-            val members = siths.smembers(set)
-
-            // ASSERT
-            members shouldBe setOf("test1", "test2")
+            // ACT & ASSERT
+            siths.smembers(set) shouldBe setOf("test1", "test2")
         }
 
         test("we can remove an element") {
@@ -217,11 +213,8 @@ class SithsClientTest : FunSpec({
             siths.sadd(set1, "key1", "key2")
             siths.sadd(set2, "key2", "key3")
 
-            // ACT
-            val intersection = siths.sintercard(set1, set2)
-
-            // ASSERT
-            intersection shouldBe 1L
+            // ACT & ASSERT
+            siths.sintercard(set1, set2) shouldBe 1L
         }
 
         test("sdiffstore") {
@@ -278,11 +271,8 @@ class SithsClientTest : FunSpec({
             val set2 = randomUUID()
             siths.sadd(set2, "key3")
 
-            // ACT
-            val difference = siths.sdiff(set1, set2)
-
-            // ASSERT
-            difference shouldBe setOf("key1", "key2")
+            // ACT & ASSERT
+            siths.sdiff(set1, set2) shouldBe setOf("key1", "key2")
         }
 
         test("sinter") {
@@ -292,11 +282,8 @@ class SithsClientTest : FunSpec({
             val set2 = randomUUID()
             siths.sadd(set2, "key3")
 
-            // ACT
-            val intersection = siths.sinter(set1, set2)
-
-            // ASSERT
-            intersection shouldBe setOf("key3")
+            // ACT & ASSERT
+             siths.sinter(set1, set2) shouldBe setOf("key3")
         }
 
         test("smove") {
@@ -355,10 +342,7 @@ class SithsClientTest : FunSpec({
             siths.sadd(set2, "key3")
 
             // ACT
-            val union = siths.sunion(set1, set2)
-
-            // ASSERT
-            union shouldBe setOf("key1", "key2", "key3")
+            siths.sunion(set1, set2) shouldBe setOf("key1", "key2", "key3")
         }
 
         test("sunionstore") {
@@ -382,11 +366,8 @@ class SithsClientTest : FunSpec({
             val set = randomUUID()
             siths.sadd(set, "key1", "key3", "key5")
 
-            // ACT
-            val membershipMap = siths.smismember(set, "key1", "key2", "key3", "key4", "key5")
-
-            // ASSERT
-            membershipMap shouldBe mapOf(
+            // ACT & ASSERT
+            siths.smismember(set, "key1", "key2", "key3", "key4", "key5") shouldBe mapOf(
                 "key1" to true,
                 "key2" to false,
                 "key3" to true,
@@ -413,11 +394,8 @@ class SithsClientTest : FunSpec({
             val list = randomUUID()
             siths.rpush(list, "key1", "key2", "key3")
 
-            // ACT
-            val length = siths.llen(list)
-
-            // ASSERT
-            length shouldBe 3
+            // ACT & ASSERT
+            siths.llen(list) shouldBe 3
         }
 
         context("lpop and rpop") {
@@ -426,11 +404,8 @@ class SithsClientTest : FunSpec({
                 val list = randomUUID()
                 siths.rpush(list, "key1", "key2", "key3")
 
-                // ACT
-                val popped = siths.lpop(list)
-
-                // ASSERT
-                popped shouldBe "key1"
+                // ACT & ASSERT
+                siths.lpop(list) shouldBe "key1"
             }
 
             test("rpop many") {
@@ -449,11 +424,8 @@ class SithsClientTest : FunSpec({
                 val list = randomUUID()
                 siths.rpush(list, "v1", "v2", "v3", "v2")
 
-                // ACT
-                val idx = siths.lpos(list, "v2", rank = 2, maxlen = 1000)
-
-                // ASSERT
-                idx shouldBe 3
+                // ACT & ASSERT
+                siths.lpos(list, "v2", rank = 2, maxlen = 1000) shouldBe 3
             }
 
             test("with count") {
@@ -461,11 +433,8 @@ class SithsClientTest : FunSpec({
                 val list = randomUUID()
                 siths.rpush(list, "v1", "v2", "v3", "v2")
 
-                // ACT
-                val idxs = siths.lpos(list, "v2", count = 2, maxlen = 1000)
-
-                // ASSERT
-                idxs shouldBe listOf(1, 3)
+                // ACT & ASSERT
+                siths.lpos(list, "v2", count = 2, maxlen = 1000) shouldBe listOf(1, 3)
             }
         }
 
@@ -487,11 +456,8 @@ class SithsClientTest : FunSpec({
     }
 
     test("ping") {
-        // ACT
-        val response = siths.ping()
-
-        // ASSERT
-        response shouldBe true
+        // ACT & ASSERT
+        siths.ping() shouldBe true
     }
 
     context("expire") {
@@ -515,11 +481,8 @@ class SithsClientTest : FunSpec({
             val key = randomUUID()
             siths.set(key, "value", timeToLive = 10.seconds)
 
-            // ACT
-            val commandWorked = siths.expire(key, 10.seconds, expirationCondition = ExpirationCondition.NX)
-
-            // ASSERT
-            commandWorked shouldBe false
+            // ACT & ASSERT
+            siths.expire(key, 10.seconds, expirationCondition = ExpirationCondition.NX) shouldBe false
         }
     }
 
