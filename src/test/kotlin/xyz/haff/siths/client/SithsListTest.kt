@@ -257,17 +257,35 @@ class SithsListTest : FunSpec({
             val retrievedElements = mutableListOf<String>()
 
             // advance iterator to the end
-            while (iterator.hasNext()) println(iterator.next())
+            while (iterator.hasNext()) iterator.next()
 
             // ACT
             while (iterator.hasPrevious()) {
                 val previous = iterator.previous()
-                println(previous)
                 retrievedElements += previous
             }
 
             // ASSERT
             retrievedElements shouldBe elements.reversed()
+        }
+
+        test("add") {
+            // ARRANGE
+            val list = SithsList.ofStrings(pool, maxCursorSize = 2)
+            val elements = (1..5).map { it.toString() }
+            list.addAll(elements)
+            val iterator = list.listIterator()
+
+            // ACT
+            while (iterator.hasNext()) {
+                val elem = iterator.next()
+                val elemAsNumber = elem.toIntOrNull()
+                if ((elemAsNumber != null) && elemAsNumber % 2 == 0)
+                    iterator.add("EVEN") // Adds EVEN after every even number
+            }
+
+            // ASSERT
+            list.subList(0, list.size) shouldBe listOf("1", "2", "EVEN", "3", "4", "EVEN", "5")
         }
     }
 

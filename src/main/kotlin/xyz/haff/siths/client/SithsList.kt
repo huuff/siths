@@ -211,7 +211,6 @@ class SithsList<T : Any>(
             currentIndex++
             lastCursor.contents[currentIndexInCursor]
         } else {
-            println("retrieved a next cursor")
             val remainingElements = size - lastCursor.stop
             val cursorSize = if (remainingElements < maxCursorSize) { remainingElements } else { maxCursorSize }
             val newStart = lastCursor.stop + 1
@@ -257,7 +256,20 @@ class SithsList<T : Any>(
         override fun previousIndex(): Int = currentIndex
 
         override fun add(element: T) {
-            TODO("Not yet implemented")
+            size++
+            lastCursor.stop++
+            val positionToInsert = when {
+                currentIndexInCursor < 0 -> 0
+                currentIndexInCursor >= lastCursor.contents.size -> lastCursor.contents.size
+                else -> currentIndexInCursor+1
+            }
+            lastCursor.contents.add(positionToInsert, element)
+
+            runBlocking {
+                withRedis(connectionPool) {
+                    runScript(RedisScripts.LIST_INSERT_AT, keys = listOf(name), args = listOf(currentIndex.toString(), serialize(element)))
+                }
+            }
         }
 
         override fun set(element: T) {
