@@ -84,14 +84,28 @@ class SithsClientTest : FunSpec({
         siths.get(key) shouldBe value
     }
 
-    test("incrBy works") {
+    test("incrby") {
         // ACT
-        siths.set("incremented-key", "0")
-        val response = siths.incrBy("incremented-key", 1)
+        val key = randomUUID()
+        siths.set(key, "0")
+        val response = siths.incrBy(key, 1)
 
         // ASSERT
         response shouldBe 1
-        siths.get("incremented-key") shouldBe "1"
+        siths.get(key) shouldBe "1"
+    }
+
+    test("incrByFloat") {
+        // ARRANGE
+        val key = randomUUID()
+        siths.set(key, "1")
+
+        // ACT
+        val incremented = siths.incrByFloat(key, 3.33)
+
+        // ASSERT
+        incremented shouldBe 4.33
+        siths.get(key) shouldBe "4.33"
     }
 
     context("set parameters") {

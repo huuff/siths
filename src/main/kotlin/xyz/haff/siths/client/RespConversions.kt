@@ -152,3 +152,8 @@ fun RespType<*>.luaBooleanToBoolean(): Boolean = when {
     this is RespNullResponse -> false
     else -> this.handleAsUnexpected()
 }
+
+fun RespType<*>.toDouble(): Double = when (this) {
+    is RespBulkString -> value.toDouble()
+    else -> handleAsUnexpected()
+}

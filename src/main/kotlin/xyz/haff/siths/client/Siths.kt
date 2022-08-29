@@ -8,6 +8,7 @@ interface Siths<
         NullableStringResponseType,
         RespResponseType,
         LongResponseType,
+        DoubleResponseType,
         NullableLongResponseType,
         LongListResponseType,
         ClientListResponseType,
@@ -26,6 +27,7 @@ interface Siths<
     suspend fun evalSha(sha: String, keys: List<String> = listOf(), args: List<String> = listOf()): RespResponseType
     suspend fun eval(script: String, keys: List<String> = listOf(), args: List<String> = listOf()): RespResponseType
     suspend fun incrBy(key: String, value: Long): LongResponseType
+    suspend fun incrByFloat(key: String, value: Double): DoubleResponseType
     suspend fun exists(key: String, vararg rest: String): BooleanResponseType
     suspend fun expire(key: String, duration: Duration, expirationCondition: ExpirationCondition? = null): BooleanResponseType
     suspend fun persist(key: String): BooleanResponseType

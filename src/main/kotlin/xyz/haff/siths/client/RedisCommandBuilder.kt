@@ -17,6 +17,7 @@ class RedisCommandBuilder : Siths<
         RedisCommand,
         RedisCommand,
         RedisCommand,
+        RedisCommand,
         > {
 
     override suspend fun get(key: String) = RedisCommand("GET", key)
@@ -52,6 +53,8 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun incrBy(key: String, value: Long) = RedisCommand("INCRBY", key, value)
 
+    override suspend fun incrByFloat(key: String, value: Double): RedisCommand = RedisCommand("INCRBYFLOAT", key, value)
+
     override suspend fun clientList() = RedisCommand("CLIENT", "LIST")
 
     override suspend fun eval(script: String, keys: List<String>, args: List<String>) = RedisCommand(
@@ -64,7 +67,15 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun exists(key: String, vararg rest: String) = RedisCommand("EXISTS", key, *rest)
 
+    override suspend fun expire(key: String, duration: Duration, expirationCondition: ExpirationCondition?)
+            = RedisCommand("PEXPIRE", key, duration.inWholeMilliseconds, expirationCondition)
+
     override suspend fun ping(): RedisCommand = RedisCommand("PING")
+
+    override suspend fun persist(key: String): RedisCommand
+            = RedisCommand("PERSIST", key)
+
+    // SET OPERATIONS
 
     override suspend fun sadd(key: String, value: String, vararg rest: String) = RedisCommand(
         "SADD",
@@ -109,9 +120,6 @@ class RedisCommandBuilder : Siths<
 
         return command
     }
-    
-    override suspend fun expire(key: String, duration: Duration, expirationCondition: ExpirationCondition?)
-        = RedisCommand("PEXPIRE", key, duration.inWholeMilliseconds, expirationCondition)
 
     override suspend fun sdiff(key: String, vararg rest: String): RedisCommand
         = RedisCommand("SDIFF", key, *rest)
@@ -192,7 +200,4 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun lset(key: String, index: Int, element: String): RedisCommand
         = RedisCommand("LSET", key, index, element)
-
-    override suspend fun persist(key: String): RedisCommand
-        = RedisCommand("PERSIST", key)
 }

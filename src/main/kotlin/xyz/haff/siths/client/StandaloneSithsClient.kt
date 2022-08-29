@@ -35,6 +35,9 @@ class StandaloneSithsClient(
     override suspend fun incrBy(key: String, value: Long): Long
         = connection.runCommand(commandBuilder.incrBy(key, value)).toLong()
 
+    override suspend fun incrByFloat(key: String, value: Double): Double
+        = connection.runCommand(commandBuilder.incrByFloat(key, value)).toDouble()
+
     // SET OPERATIONS
 
     override suspend fun sadd(key: String, value: String, vararg rest: String): Long

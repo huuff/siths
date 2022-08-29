@@ -43,6 +43,9 @@ class ManagedSithsClient(
     override suspend fun incrBy(key: String, value: Long): Long
         = pool.get().use { it.incrBy(key, value) }
 
+    override suspend fun incrByFloat(key: String, value: Double): Double
+        = pool.get().use { it.incrByFloat(key, value) }
+
     override suspend fun exists(key: String, vararg rest: String): Boolean
         = pool.get().use { it.exists(key, *rest) }
 

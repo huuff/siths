@@ -16,6 +16,7 @@ class RedisPipelineBuilder(
         QueuedResponse<String?>,
         QueuedResponse<RespType<*>>,
         QueuedResponse<Long>,
+        QueuedResponse<Double>,
         QueuedResponse<Long?>,
         QueuedResponse<List<Long>>,
         QueuedResponse<List<RedisClient>>,
@@ -113,6 +114,9 @@ class RedisPipelineBuilder(
 
     override suspend fun incrBy(key: String, value: Long): QueuedResponse<Long> =
         addOperation(Operation(commandBuilder.incrBy(key, value), QueuedResponse(RespType<*>::toLong)))
+
+    override suspend fun incrByFloat(key: String, value: Double): QueuedResponse<Double>
+        = addOperation(Operation(commandBuilder.incrByFloat(key, value), QueuedResponse(RespType<*>::toDouble)))
 
     override suspend fun exists(key: String, vararg rest: String): QueuedResponse<Boolean> {
         return addOperation(
