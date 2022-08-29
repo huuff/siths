@@ -174,4 +174,16 @@ class SithsListTest : FunSpec({
         list.subList(0, list.size) shouldBe listOf("v1", "v2", "v4")
     }
 
+    test("add") {
+        // ARRANGE
+        val list = SithsList.ofStrings(pool)
+        list.addAll(listOf("v1", "v2", "v3", "v4"))
+
+        // ACT
+        list.add(2, "v999")
+
+        // ASSERT
+        list.subList(0, list.size) shouldBe listOf("v1", "v2", "v3", "v999", "v4")
+    }
+
 })

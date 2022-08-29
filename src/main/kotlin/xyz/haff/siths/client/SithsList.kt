@@ -3,6 +3,8 @@ package xyz.haff.siths.client
 import kotlinx.coroutines.runBlocking
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
+import xyz.haff.siths.scripts.RedisScript
+import xyz.haff.siths.scripts.RedisScripts
 
 class SithsList<T : Any>(
     private val connectionPool: SithsConnectionPool,
@@ -69,8 +71,11 @@ class SithsList<T : Any>(
     }
 
     override fun add(index: Int, element: T) {
-        // TODO: A bit complex but I must do it, check https://stackoverflow.com/questions/21692456/insert-value-by-index-in-redis-list
-        TODO("Not yet implemented")
+        runBlocking {
+            withRedis(connectionPool) {
+                runScript(RedisScripts.LIST_INSERT_AT, keys = listOf(name), args = listOf(index.toString(), serialize(element)))
+            }
+        }
     }
 
     override fun addAll(index: Int, elements: Collection<T>): Boolean {
