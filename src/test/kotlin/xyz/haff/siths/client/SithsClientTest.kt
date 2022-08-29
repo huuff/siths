@@ -522,4 +522,21 @@ class SithsClientTest : FunSpec({
             commandWorked shouldBe false
         }
     }
+
+    test("persist") {
+        // ARRANGE
+        val key = randomUUID()
+        siths.set(key, "value")
+        siths.expire(key, 10.seconds)
+
+        // SANITY CHECK
+        siths.ttl(key) shouldNotBe null
+
+        // ACT
+        val wasPersisted = siths.persist(key)
+
+        // ASSERT
+        wasPersisted shouldBe true
+        siths.ttl(key) shouldBe null
+    }
 })
