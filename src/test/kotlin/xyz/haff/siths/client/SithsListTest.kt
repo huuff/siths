@@ -287,6 +287,24 @@ class SithsListTest : FunSpec({
             // ASSERT
             list.subList(0, list.size) shouldBe listOf("1", "2", "EVEN", "3", "4", "EVEN", "5")
         }
+
+        test("set") {
+            // ARRANGE
+            val list = SithsList.ofStrings(pool, maxCursorSize = 2)
+            val elements = (1..5).map { it.toString() }
+            list.addAll(elements)
+            val iterator = list.listIterator()
+
+            // ACT
+            while (iterator.hasNext()) {
+                val elem = iterator.next()
+                if (elem == "3")
+                    iterator.set("THREE")
+            }
+
+            // ASSERT
+            list.subList(0, list.size) shouldBe listOf("1", "2", "THREE", "4", "5")
+        }
     }
 
 })

@@ -273,7 +273,10 @@ class SithsList<T : Any>(
         }
 
         override fun set(element: T) {
-            TODO("Not yet implemented")
+            if (currentIndex != -1) {
+                runBlocking { client.lset(name, currentIndex, serialize(element)) }
+                lastCursor.contents.set(currentIndexInCursor, element)
+            }
         }
 
     }
