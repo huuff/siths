@@ -198,4 +198,20 @@ class SithsListTest : FunSpec({
         list.subList(0, list.size) shouldBe listOf("v1", "v2", "v3", "v997", "v998", "v999", "v4")
     }
 
+    context("iterator") {
+        // ARRANGE
+        val list = SithsList.ofStrings(pool)
+        val elements = (1..100).map { "v$it" }
+        list.addAll(elements)
+
+        // ACT
+        val iteratedElements = mutableListOf<String>()
+        for (elem in list.iterator()) {
+            iteratedElements += elem
+        }
+
+        // ASSERT
+        iteratedElements shouldBe elements
+    }
+
 })

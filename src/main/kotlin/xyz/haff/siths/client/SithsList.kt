@@ -3,7 +3,6 @@ package xyz.haff.siths.client
 import kotlinx.coroutines.runBlocking
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
-import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.scripts.RedisScripts
 
 // TODO: Try to find the redis error for a non-existent index and convert it to IndexOutOfBoundsException?
@@ -52,8 +51,17 @@ class SithsList<T : Any>(
 
     override fun isEmpty(): Boolean = this.size == 0
 
-    override fun iterator(): MutableIterator<T> {
-        TODO("Not yet implemented")
+    override fun iterator(): MutableIterator<T> = runBlocking {
+        connectionPool.get().use { conn ->
+            val pipeline = RedisPipelineBuilder(conn)
+            val cursorContents = pipeline.lrange(name, 0, MAX_ELEMENTS_PER_CURSOR - 1)
+            val size = pipeline.llen(name)
+            pipeline.exec(inTransaction = true)
+            return@use Iterator(
+                lastCursor = Cursor(cursorContents.get().map(deserialize), 0, cursorContents.get().size - 1),
+                size = size.get().toInt()
+            )
+        }
     }
 
     override fun lastIndexOf(element: T): Int
@@ -163,5 +171,34 @@ class SithsList<T : Any>(
      */
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
         return runBlocking { client.lrange(name, fromIndex, toIndex - 1) }.map(deserialize).toMutableList()
+    }
+
+    private val MAX_ELEMENTS_PER_CURSOR = 10
+    data class Cursor<T>(val contents: List<T>, val start: Int, val stop: Int)
+    inner class Iterator(
+        private var lastCursor: Cursor<T>,
+        private val size: Int
+    ): MutableIterator<T> {
+        private var currentIndex: Int = -1
+
+        override fun hasNext(): Boolean = currentIndex < (size - 1)
+
+        override fun next(): T = if (currentIndex < lastCursor.stop) {
+            currentIndex++
+            lastCursor.contents[currentIndex - lastCursor.start]
+        } else { // TODO: Check that size didn't change to throw a ConcurrentModificationException?
+            val remainingElements = size - lastCursor.stop
+            val cursorSize = if (remainingElements < MAX_ELEMENTS_PER_CURSOR) { remainingElements } else { MAX_ELEMENTS_PER_CURSOR }
+            val newStart = lastCursor.stop + 1
+            val newStop = newStart + (cursorSize - 1)
+            lastCursor = Cursor(runBlocking { client.lrange(name, newStart, newStop) }.map(deserialize), newStart, newStop)
+            currentIndex++
+            lastCursor.contents[0]
+        }
+
+        override fun remove() {
+            TODO("Not yet implemented")
+        }
+
     }
 }
