@@ -238,9 +238,7 @@ class SithsList<T : Any>(
     ): MutableListIterator<T>, Iterator(lastCursor, size){
         override fun hasPrevious(): Boolean = currentIndex > -1
 
-        override fun nextIndex(): Int {
-            TODO("Not yet implemented")
-        }
+        override fun nextIndex(): Int = if (hasNext()) { currentIndex + 1 } else { size }
 
         override fun previous(): T = if (currentIndex >= lastCursor.start) {
             lastCursor.contents[currentIndexInCursor].also {
@@ -256,9 +254,7 @@ class SithsList<T : Any>(
             lastCursor.contents[lastCursor.contents.size - 1]
         }
 
-        override fun previousIndex(): Int {
-            TODO("Not yet implemented")
-        }
+        override fun previousIndex(): Int = currentIndex
 
         override fun add(element: T) {
             TODO("Not yet implemented")
