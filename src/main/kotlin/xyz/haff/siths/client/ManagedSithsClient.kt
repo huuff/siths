@@ -16,7 +16,7 @@ class ManagedSithsClient(
         connectionPool: SithsConnectionPool
     ): this(SithsClientPool(connectionPool))
 
-    override suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode?, timeToLive: Duration?)
+    override suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode?, timeToLive: Duration?)
         = pool.get().use { it.set(key, value, exclusiveMode, timeToLive) }
 
     override suspend fun del(key: String, vararg rest: String): Long
@@ -48,22 +48,22 @@ class ManagedSithsClient(
 
     // SET OPERATIONS
 
-    override suspend fun sadd(key: String, value: Any, vararg rest: Any): Long
+    override suspend fun sadd(key: String, value: String, vararg rest: String): Long
         = pool.get().use { it.sadd(key, value, *rest) }
 
     override suspend fun smembers(key: String): Set<String>
         = pool.get().use { it.smembers(key) }
 
-    override suspend fun sismember(key: String, member: Any): Boolean
+    override suspend fun sismember(key: String, member: String): Boolean
         = pool.get().use { it.sismember(key, member) }
 
-    override suspend fun smismember(key: String, member: Any, vararg rest: Any): Map<String, Boolean>
+    override suspend fun smismember(key: String, member: String, vararg rest: String): Map<String, Boolean>
         = pool.get().use { it.smismember(key, member, *rest) }
 
     override suspend fun scard(key: String): Long
         = pool.get().use { it.scard(key) }
 
-    override suspend fun srem(key: String, member: Any, vararg rest: Any): Long
+    override suspend fun srem(key: String, member: String, vararg rest: String): Long
         = pool.get().use { it.srem(key, member, *rest) }
 
     override suspend fun sintercard(key: String, vararg rest: String, limit: Int?): Long
@@ -78,7 +78,7 @@ class ManagedSithsClient(
     override suspend fun sinter(key: String, vararg rest: String): Set<String>
         = pool.get().use { it.sinter(key, *rest) }
 
-    override suspend fun smove(source: String, destination: String, member: Any): Boolean
+    override suspend fun smove(source: String, destination: String, member: String): Boolean
         = pool.get().use { it.smove(source, destination, member) }
 
     override suspend fun spop(key: String): String?
@@ -111,7 +111,7 @@ class ManagedSithsClient(
     override suspend fun lindex(key: String, index: Int): String?
         = pool.get().use { it.lindex(key, index) }
 
-    override suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: Any, element: Any): Long?
+    override suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: String, element: String): Long?
         = pool.get().use { it.linsert(key, relativePosition, pivot, element) }
 
     override suspend fun lpop(key: String, count: Int): List<String>
@@ -126,25 +126,25 @@ class ManagedSithsClient(
     override suspend fun rpop(key: String): String?
         = pool.get().use { it.rpop(key) }
 
-    override suspend fun lpush(key: String, element: Any, vararg rest: Any): Long
+    override suspend fun lpush(key: String, element: String, vararg rest: String): Long
         = pool.get().use { it.lpush(key, element, *rest) }
 
-    override suspend fun rpush(key: String, element: Any, vararg rest: Any): Long
+    override suspend fun rpush(key: String, element: String, vararg rest: String): Long
         = pool.get().use { it.rpush(key, element, *rest)}
 
-    override suspend fun lrem(key: String, element: Any, count: Int): Long
+    override suspend fun lrem(key: String, element: String, count: Int): Long
         = pool.get().use { it.lrem(key, element, count) }
 
     override suspend fun lrange(key: String, start: Int, stop: Int): List<String>
         = pool.get().use { it.lrange(key, start, stop) }
 
-    override suspend fun lpos(key: String, element: Any, rank: Int?, maxlen: Int?): Long?
+    override suspend fun lpos(key: String, element: String, rank: Int?, maxlen: Int?): Long?
         = pool.get().use { it.lpos(key, element, rank, maxlen) }
 
-    override suspend fun lpos(key: String, element: Any, rank: Int?, count: Int, maxlen: Int?): List<Long>
+    override suspend fun lpos(key: String, element: String, rank: Int?, count: Int, maxlen: Int?): List<Long>
         = pool.get().use { it.lpos(key, element, rank, count, maxlen) }
 
-    override suspend fun lset(key: String, index: Int, element: Any): Boolean
+    override suspend fun lset(key: String, index: Int, element: String): Boolean
         = pool.get().use { it.lset(key, index, element) }
 
     override suspend fun clientList(): List<RedisClient>

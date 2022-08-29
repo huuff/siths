@@ -21,8 +21,8 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun get(key: String) = RedisCommand("GET", key)
 
-    override suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode?, timeToLive: Duration?): RedisCommand {
-        val mainCommand = RedisCommand("SET", key, value.toString(), exclusiveMode?.toString())
+    override suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode?, timeToLive: Duration?): RedisCommand {
+        val mainCommand = RedisCommand("SET", key, value, exclusiveMode?.toString())
 
         return if (timeToLive == null) {
             mainCommand
@@ -66,18 +66,18 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun ping(): RedisCommand = RedisCommand("PING")
 
-    override suspend fun sadd(key: String, value: Any, vararg rest: Any) = RedisCommand(
+    override suspend fun sadd(key: String, value: String, vararg rest: String) = RedisCommand(
         "SADD",
         key,
-        value.toString(),
+        value,
         *rest,
     )
 
     override suspend fun smembers(key: String): RedisCommand = RedisCommand("SMEMBERS", key)
 
-    override suspend fun sismember(key: String, member: Any) = RedisCommand("SISMEMBER", key, member.toString())
+    override suspend fun sismember(key: String, member: String) = RedisCommand("SISMEMBER", key, member)
     override suspend fun scard(key: String): RedisCommand = RedisCommand("SCARD", key)
-    override suspend fun srem(key: String, member: Any, vararg rest: Any): RedisCommand
+    override suspend fun srem(key: String, member: String, vararg rest: String): RedisCommand
         = RedisCommand("SREM", key, member, *rest)
 
     override suspend fun sintercard(key: String, vararg rest: String, limit: Int?): RedisCommand {
@@ -119,7 +119,7 @@ class RedisCommandBuilder : Siths<
     override suspend fun sinter(key: String, vararg rest: String): RedisCommand
         = RedisCommand("SINTER", key, *rest)
 
-    override suspend fun smove(source: String, destination: String, member: Any): RedisCommand
+    override suspend fun smove(source: String, destination: String, member: String): RedisCommand
         = RedisCommand("SMOVE", source, destination, member)
 
     override suspend fun spop(key: String): RedisCommand
@@ -140,7 +140,7 @@ class RedisCommandBuilder : Siths<
     override suspend fun sunionstore(destination: String, key: String, vararg rest: String): RedisCommand
         = RedisCommand("SUNIONSTORE", destination, key, *rest)
 
-    override suspend fun smismember(key: String, member: Any, vararg rest: Any)
+    override suspend fun smismember(key: String, member: String, vararg rest: String)
         = RedisCommand("SMISMEMBER", key, member, *rest)
 
     override suspend fun llen(key: String): RedisCommand
@@ -152,8 +152,8 @@ class RedisCommandBuilder : Siths<
     override suspend fun linsert(
         key: String,
         relativePosition: RelativePosition,
-        pivot: Any,
-        element: Any
+        pivot: String,
+        element: String
     ): RedisCommand = RedisCommand("LINSERT", key, relativePosition, pivot, element)
 
     override suspend fun lpop(key: String, count: Int): RedisCommand
@@ -166,31 +166,31 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun rpop(key: String): RedisCommand = RedisCommand("RPOP", key)
 
-    override suspend fun lpush(key: String, element: Any, vararg rest: Any): RedisCommand
+    override suspend fun lpush(key: String, element: String, vararg rest: String): RedisCommand
         = RedisCommand("LPUSH", key, element, *rest)
 
-    override suspend fun rpush(key: String, element: Any, vararg rest: Any): RedisCommand
+    override suspend fun rpush(key: String, element: String, vararg rest: String): RedisCommand
         = RedisCommand("RPUSH", key, element, *rest)
 
-    override suspend fun lrem(key: String, element: Any, count: Int): RedisCommand
+    override suspend fun lrem(key: String, element: String, count: Int): RedisCommand
         = RedisCommand("LREM", key, count, element)
 
     override suspend fun lrange(key: String, start: Int, stop: Int): RedisCommand
         = RedisCommand("LRANGE", key, start, stop)
 
-    override suspend fun lpos(key: String, element: Any, rank: Int?, maxlen: Int?)
+    override suspend fun lpos(key: String, element: String, rank: Int?, maxlen: Int?)
         = (RedisCommand("LPOS", key, element)
             + rank?.let { RedisCommand("RANK", it) }
             + maxlen?.let { RedisCommand("MAXLEN", it)}
     )
 
-    override suspend fun lpos(key: String, element: Any, rank: Int?, count: Int, maxlen: Int?): RedisCommand
+    override suspend fun lpos(key: String, element: String, rank: Int?, count: Int, maxlen: Int?): RedisCommand
         = (RedisCommand("LPOS", key, element)
                 + rank?.let { RedisCommand("RANK", it) }
                 + RedisCommand("COUNT", count)
                 + maxlen?.let { RedisCommand("MAXLEN", it) })
 
-    override suspend fun lset(key: String, index: Int, element: Any): RedisCommand
+    override suspend fun lset(key: String, index: Int, element: String): RedisCommand
         = RedisCommand("LSET", key, index, element)
 
     override suspend fun persist(key: String): RedisCommand

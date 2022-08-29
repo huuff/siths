@@ -87,7 +87,7 @@ class SithsClientTest : FunSpec({
 
     test("incrBy works") {
         // ACT
-        siths.set("incremented-key", 0)
+        siths.set("incremented-key", "0")
         val response = siths.incrBy("incremented-key", 1)
 
         // ASSERT

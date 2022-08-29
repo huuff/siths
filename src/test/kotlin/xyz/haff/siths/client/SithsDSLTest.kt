@@ -34,7 +34,7 @@ class SithsDSLTest : FunSpec({
         // ACT
         val pipelineResult = withRedis(pool) {
             pipelined {
-                set("pipelined-key", 0)
+                set("pipelined-key", "0")
                 get("pipelined-key")
                 incrBy("pipelined-key", 1)
                 get("pipelined-key")
@@ -57,7 +57,7 @@ class SithsDSLTest : FunSpec({
         // ACT
         val pipelineResult = withRedis(pool) {
             transactional {
-                set("pipelined-key", 0)
+                set("pipelined-key", "0")
                 get("pipelined-key")
                 incrBy("pipelined-key", 1)
                 get("pipelined-key")

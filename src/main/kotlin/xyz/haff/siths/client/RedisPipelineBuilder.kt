@@ -68,7 +68,7 @@ class RedisPipelineBuilder(
 
     override suspend fun set(
         key: String,
-        value: Any,
+        value: String,
         exclusiveMode: ExclusiveMode?,
         timeToLive: Duration?
     ): QueuedResponse<Unit> = addOperation(
@@ -148,7 +148,7 @@ class RedisPipelineBuilder(
         addOperation(Operation(commandBuilder.ping(), QueuedResponse(RespType<*>::pongToBoolean)))
 
     // SET OPERATIONS
-    override suspend fun sadd(key: String, value: Any, vararg rest: Any): QueuedResponse<Long> = addOperation(
+    override suspend fun sadd(key: String, value: String, vararg rest: String): QueuedResponse<Long> = addOperation(
         Operation(
             command = commandBuilder.sadd(key, value, *rest),
             response = QueuedResponse(RespType<*>::toLong)
@@ -158,7 +158,7 @@ class RedisPipelineBuilder(
     override suspend fun smembers(key: String): QueuedResponse<Set<String>> =
         addOperation(Operation(commandBuilder.smembers(key), QueuedResponse(RespType<*>::toStringSet)))
 
-    override suspend fun sismember(key: String, member: Any): QueuedResponse<Boolean> = addOperation(
+    override suspend fun sismember(key: String, member: String): QueuedResponse<Boolean> = addOperation(
         Operation(
             command = commandBuilder.sismember(key, member),
             response = QueuedResponse(RespType<*>::integerToBoolean)
@@ -168,7 +168,7 @@ class RedisPipelineBuilder(
     override suspend fun scard(key: String): QueuedResponse<Long> =
         addOperation(Operation(commandBuilder.scard(key), QueuedResponse(RespType<*>::toLong)))
 
-    override suspend fun srem(key: String, member: Any, vararg rest: Any): QueuedResponse<Long> = addOperation(
+    override suspend fun srem(key: String, member: String, vararg rest: String): QueuedResponse<Long> = addOperation(
         Operation(
             command = commandBuilder.srem(key, member, *rest),
             response = QueuedResponse(RespType<*>::toLong)
@@ -224,7 +224,7 @@ class RedisPipelineBuilder(
         )
     )
 
-    override suspend fun smove(source: String, destination: String, member: Any): QueuedResponse<Boolean> =
+    override suspend fun smove(source: String, destination: String, member: String): QueuedResponse<Boolean> =
         addOperation(
             Operation(
                 command = commandBuilder.smove(source, destination, member),
@@ -280,8 +280,8 @@ class RedisPipelineBuilder(
 
     override suspend fun smismember(
         key: String,
-        member: Any,
-        vararg rest: Any
+        member: String,
+        vararg rest: String
     ): QueuedResponse<Map<String, Boolean>> = addOperation(
         Operation(
             commandBuilder.smismember(key, member, *rest),
@@ -300,8 +300,8 @@ class RedisPipelineBuilder(
     override suspend fun linsert(
         key: String,
         relativePosition: RelativePosition,
-        pivot: Any,
-        element: Any
+        pivot: String,
+        element: String
     ): QueuedResponse<Long?> =
         addOperation(
             Operation(
@@ -334,13 +334,13 @@ class RedisPipelineBuilder(
         )
     )
 
-    override suspend fun lpush(key: String, element: Any, vararg rest: Any): QueuedResponse<Long> =
+    override suspend fun lpush(key: String, element: String, vararg rest: String): QueuedResponse<Long> =
         addOperation(Operation(commandBuilder.lpush(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
 
-    override suspend fun rpush(key: String, element: Any, vararg rest: Any): QueuedResponse<Long> =
+    override suspend fun rpush(key: String, element: String, vararg rest: String): QueuedResponse<Long> =
         addOperation(Operation(commandBuilder.rpush(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
 
-    override suspend fun lrem(key: String, element: Any, count: Int): QueuedResponse<Long> =
+    override suspend fun lrem(key: String, element: String, count: Int): QueuedResponse<Long> =
         addOperation(Operation(commandBuilder.lrem(key, element, count), QueuedResponse(RespType<*>::toLong)))
 
     override suspend fun lrange(key: String, start: Int, stop: Int): QueuedResponse<List<String>> = addOperation(
@@ -350,7 +350,7 @@ class RedisPipelineBuilder(
         )
     )
 
-    override suspend fun lpos(key: String, element: Any, rank: Int?, maxlen: Int?): QueuedResponse<Long?> =
+    override suspend fun lpos(key: String, element: String, rank: Int?, maxlen: Int?): QueuedResponse<Long?> =
         addOperation(
             Operation(
                 command = commandBuilder.lpos(key, element, rank, maxlen),
@@ -360,7 +360,7 @@ class RedisPipelineBuilder(
 
     override suspend fun lpos(
         key: String,
-        element: Any,
+        element: String,
         rank: Int?,
         count: Int,
         maxlen: Int?
@@ -371,7 +371,7 @@ class RedisPipelineBuilder(
         )
     )
 
-    override suspend fun lset(key: String, index: Int, element: Any): QueuedResponse<Boolean> = addOperation(
+    override suspend fun lset(key: String, index: Int, element: String): QueuedResponse<Boolean> = addOperation(
         Operation(
             command = commandBuilder.lset(key, index, element),
             response = QueuedResponse(RespType<*>::isOk)

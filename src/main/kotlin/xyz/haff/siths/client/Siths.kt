@@ -18,7 +18,7 @@ interface Siths<
         StringToBooleanMapResponseType,
         StringListResponseType,
         > {
-    suspend fun set(key: String, value: Any, exclusiveMode: ExclusiveMode? = null, timeToLive: Duration? = null): UnitResponseType
+    suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode? = null, timeToLive: Duration? = null): UnitResponseType
     suspend fun get(key: String): StringResponseType
     suspend fun del(key: String, vararg rest: String): LongResponseType
     suspend fun ttl(key: String): DurationResponseType?
@@ -31,17 +31,17 @@ interface Siths<
     suspend fun persist(key: String): BooleanResponseType
 
     // SETS
-    suspend fun sadd(key: String, value: Any, vararg rest: Any): LongResponseType
+    suspend fun sadd(key: String, value: String, vararg rest: String): LongResponseType
     suspend fun smembers(key: String): StringSetResponseType
-    suspend fun sismember(key: String, member: Any): BooleanResponseType
-    suspend fun smismember(key: String, member: Any, vararg rest: Any): StringToBooleanMapResponseType
+    suspend fun sismember(key: String, member: String): BooleanResponseType
+    suspend fun smismember(key: String, member: String, vararg rest: String): StringToBooleanMapResponseType
     suspend fun scard(key: String): LongResponseType
-    suspend fun srem(key: String, member: Any, vararg rest: Any): LongResponseType
+    suspend fun srem(key: String, member: String, vararg rest: String): LongResponseType
     suspend fun sintercard(key: String, vararg rest: String, limit: Int? = null): LongResponseType
     suspend fun sdiffstore(destination: String, key: String, vararg rest: String): LongResponseType
     suspend fun sdiff(key: String, vararg rest: String): StringSetResponseType
     suspend fun sinter(key: String, vararg rest: String): StringSetResponseType
-    suspend fun smove(source: String, destination: String, member: Any): BooleanResponseType
+    suspend fun smove(source: String, destination: String, member: String): BooleanResponseType
     suspend fun spop(key: String): NullableStringResponseType
     suspend fun spop(key: String, count: Int? = null): StringSetResponseType
     suspend fun srandmember(key: String): NullableStringResponseType
@@ -54,18 +54,18 @@ interface Siths<
     // LISTS
     suspend fun llen(key: String): LongResponseType
     suspend fun lindex(key: String, index: Int): NullableStringResponseType
-    suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: Any, element: Any): NullableLongResponseType
+    suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: String, element: String): NullableLongResponseType
     suspend fun lpop(key: String, count: Int): StringListResponseType
     suspend fun lpop(key: String): NullableStringResponseType
     suspend fun rpop(key: String, count: Int): StringListResponseType
     suspend fun rpop(key: String): NullableStringResponseType
-    suspend fun lpush(key: String, element: Any, vararg rest: Any): LongResponseType
-    suspend fun rpush(key: String, element: Any, vararg rest: Any): LongResponseType
-    suspend fun lrem(key: String, element: Any, count: Int = 0): LongResponseType
+    suspend fun lpush(key: String, element: String, vararg rest: String): LongResponseType
+    suspend fun rpush(key: String, element: String, vararg rest: String): LongResponseType
+    suspend fun lrem(key: String, element: String, count: Int = 0): LongResponseType
     suspend fun lrange(key: String, start: Int, stop: Int): StringListResponseType
-    suspend fun lpos(key: String, element: Any, rank: Int? = null, maxlen: Int? = null): NullableLongResponseType
-    suspend fun lpos(key: String, element: Any, rank: Int? = null, count: Int, maxlen: Int? = null): LongListResponseType
-    suspend fun lset(key: String, index: Int, element: Any): BooleanResponseType
+    suspend fun lpos(key: String, element: String, rank: Int? = null, maxlen: Int? = null): NullableLongResponseType
+    suspend fun lpos(key: String, element: String, rank: Int? = null, count: Int, maxlen: Int? = null): LongListResponseType
+    suspend fun lset(key: String, index: Int, element: String): BooleanResponseType
 
     suspend fun clientList(): ClientListResponseType
     suspend fun ping(): BooleanResponseType

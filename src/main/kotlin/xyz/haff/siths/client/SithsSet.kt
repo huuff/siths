@@ -8,8 +8,8 @@ import java.util.*
 class SithsSet<T : Any>(
     private val connectionPool: SithsConnectionPool,
     val name: String = "set:${UUID.randomUUID()}",
-    private val serializer: (T) -> String,
-    private val deserializer: (String) -> T
+    private val serialize: (T) -> String,
+    private val deserialize: (String) -> T
 ) : MutableSet<T> {
     private val client = ManagedSithsClient(pool = SithsClientPool(connectionPool))
 
@@ -22,10 +22,10 @@ class SithsSet<T : Any>(
             SithsSet(connectionPool = sithsConnectionPool, name = name, { it }, { it })
     }
 
-    override fun add(element: T): Boolean = runBlocking { client.sadd(name, element) == 1L }
+    override fun add(element: T): Boolean = runBlocking { client.sadd(name, serialize(element)) == 1L }
 
     override fun addAll(elements: Collection<T>): Boolean {
-        val (head, tail) = elements.map(serializer).toTypedArray().headAndTail()
+        val (head, tail) = elements.map(serialize).toTypedArray().headAndTail()
         val addedCount = runBlocking { client.sadd(name, head, *tail) }
         return addedCount.toInt() != 0
     }
@@ -34,12 +34,12 @@ class SithsSet<T : Any>(
         runBlocking { client.del(name) }
     }
 
-    override fun iterator(): MutableIterator<T> = Iterator(runBlocking { client.sscan(name).map(deserializer) })
+    override fun iterator(): MutableIterator<T> = Iterator(runBlocking { client.sscan(name).map(deserialize) })
 
-    override fun remove(element: T): Boolean = runBlocking { client.srem(name, element) != 0L }
+    override fun remove(element: T): Boolean = runBlocking { client.srem(name, serialize(element)) != 0L }
 
     override fun removeAll(elements: Collection<T>): Boolean {
-        val (otherSetHead, otherSetTail) = elements.map(serializer).toTypedArray().headAndTail()
+        val (otherSetHead, otherSetTail) = elements.map(serialize).toTypedArray().headAndTail()
         return runBlocking {
             connectionPool.get().use { conn ->
                 val otherSetKey = randomUUID()
@@ -56,7 +56,7 @@ class SithsSet<T : Any>(
     }
 
     override fun retainAll(elements: Collection<T>): Boolean {
-        val (otherSetHead, otherSetTail) = elements.map(serializer).toTypedArray().headAndTail()
+        val (otherSetHead, otherSetTail) = elements.map(serialize).toTypedArray().headAndTail()
         return runBlocking {
             connectionPool.get().use { conn ->
                 val pipeline = RedisPipelineBuilder(conn)
@@ -75,10 +75,10 @@ class SithsSet<T : Any>(
     override val size: Int
         get() = runBlocking { client.scard(name).toInt() }
 
-    override fun contains(element: T): Boolean = runBlocking { client.sismember(name, element) }
+    override fun contains(element: T): Boolean = runBlocking { client.sismember(name, serialize(element)) }
 
     override fun containsAll(elements: Collection<T>): Boolean {
-        val otherSet = elements.map(serializer).toTypedArray()
+        val otherSet = elements.map(serialize).toTypedArray()
         val (otherSetHead, otherSetTail) = otherSet.headAndTail()
         return runBlocking {
             connectionPool.get().use { conn ->
@@ -111,7 +111,7 @@ class SithsSet<T : Any>(
             positionWithinLastCursor++
             // XXX: Overflowed the last cursor, but there are more elements
             if (positionWithinLastCursor >= lastCursorResult.contents.size && hasNext()) {
-                lastCursorResult = runBlocking { client.sscan(name, lastCursorResult.next).map(deserializer) }
+                lastCursorResult = runBlocking { client.sscan(name, lastCursorResult.next).map(deserialize) }
                 positionWithinLastCursor = 0
             }
         }
@@ -120,7 +120,7 @@ class SithsSet<T : Any>(
             if (lastResult != null) {
                 // XXX: Non-null assertion is correct, since if `lastResult` has changed, it must have changed to a non-null value
                 // (see `next()`)
-                runBlocking { client.srem(name, serializer(lastResult!!)) }
+                runBlocking { client.srem(name, serialize(lastResult!!)) }
             }
         }
     }
