@@ -25,6 +25,12 @@ object RedisScripts {
     )
 
     /**
+     *  Inserts at a specific position in a list, the algorithm is:
+     *      1. Save existing key at position
+     *      2. Insert a random marker
+     *      3. Insert after the random marker
+     *      4. Put the previous value at the marker's position
+     *
      *  KEYS[1]: List key
      *  ARGV[1]: Position at which to insert
      *  ARGV[1:]: Elements to insert

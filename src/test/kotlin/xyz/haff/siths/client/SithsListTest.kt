@@ -174,7 +174,7 @@ class SithsListTest : FunSpec({
         list.subList(0, list.size) shouldBe listOf("v1", "v2", "v4")
     }
 
-    test("add") {
+    test("add at index") {
         // ARRANGE
         val list = SithsList.ofStrings(pool)
         list.addAll(listOf("v1", "v2", "v3", "v4"))
@@ -184,6 +184,18 @@ class SithsListTest : FunSpec({
 
         // ASSERT
         list.subList(0, list.size) shouldBe listOf("v1", "v2", "v3", "v999", "v4")
+    }
+
+    test("addAll at index") {
+        // ARRANGE
+        val list = SithsList.ofStrings(pool)
+        list.addAll(listOf("v1", "v2", "v3", "v4"))
+
+        // ACT
+        list.addAll(2, listOf("v997", "v998", "v999"))
+
+        // ASSERT
+        list.subList(0, list.size) shouldBe listOf("v1", "v2", "v3", "v997", "v998", "v999", "v4")
     }
 
 })

@@ -6,6 +6,7 @@ import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.scripts.RedisScripts
 
+// TODO: Try to find the redis error for a non-existent index and convert it to IndexOutOfBoundsException?
 class SithsList<T : Any>(
     private val connectionPool: SithsConnectionPool,
     val name: String = "list:${randomUUID()}",
@@ -65,7 +66,7 @@ class SithsList<T : Any>(
                 val sizePriorToUpdate = pipeline.llen(name)
                 val sizeAfterUpdate = pipeline.rpush(name, serialize(element))
                 pipeline.exec(inTransaction = true)
-                sizePriorToUpdate != sizeAfterUpdate
+                sizePriorToUpdate.get() != sizeAfterUpdate.get()
             }
         }
     }
@@ -79,7 +80,15 @@ class SithsList<T : Any>(
     }
 
     override fun addAll(index: Int, elements: Collection<T>): Boolean {
-        TODO("Not yet implemented")
+        runBlocking {
+            withRedis(connectionPool) {
+                runScript(RedisScripts.LIST_INSERT_AT, keys = listOf(name), args = listOf(index.toString()) + elements.toList().map(serialize))
+            }
+        }
+
+        // XXX: A little hacky... returns whether the passed collection wasn't empty, since only in that case would the list be unchanged
+        // (all others, such as index non-existent, should fail with an error)
+        return elements.isNotEmpty()
     }
 
     override fun addAll(elements: Collection<T>): Boolean {
@@ -91,7 +100,7 @@ class SithsList<T : Any>(
                 val sizePriorToUpdate = pipeline.llen(name)
                 val sizeAfterUpdate = pipeline.rpush(name, head, *tail)
                 pipeline.exec(inTransaction = true)
-                sizePriorToUpdate != sizeAfterUpdate
+                sizePriorToUpdate.get() != sizeAfterUpdate.get()
             }
         }
     }
