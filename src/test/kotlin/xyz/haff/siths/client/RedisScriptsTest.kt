@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeSithsClient
 import xyz.haff.siths.scripts.RedisScripts
@@ -31,7 +32,6 @@ class RedisScriptsTest : FunSpec({
         siths.lrange(list, 0, -1) shouldBe listOf("v1", "v2", "v999", "v3")
     }
 
-    // TODO: Assert the script's response!
     test("list retain all") {
         // ARRANGE
         val list1 = randomUUID()
@@ -40,9 +40,10 @@ class RedisScriptsTest : FunSpec({
         siths.rpush(list2, "v2", "v3")
 
         // ACT
-        siths.eval(RedisScripts.LIST_RETAIN_ALL.code, keys = listOf(list1, list2))
+        val response = siths.eval(RedisScripts.LIST_RETAIN_ALL.code, keys = listOf(list1, list2))
 
         // ASSERT
+        response.value shouldBe 1
         siths.lrange(list1, 0, -1) shouldBe listOf("v2", "v3")
     }
 })
