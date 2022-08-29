@@ -37,7 +37,7 @@ publishing {
             pom {
                 packaging = "jar"
                 name.set(project.name)
-                description.set("Small Redis utility library built on top of Jedis")
+                description.set("Coroutines-based Redis client library")
 
                 url.set("https://github.com/huuff/siths")
                 scm {
