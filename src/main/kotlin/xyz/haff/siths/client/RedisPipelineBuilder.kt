@@ -134,6 +134,20 @@ class RedisPipelineBuilder(
         )
     )
 
+    override suspend fun persist(key: String): QueuedResponse<Boolean> = addOperation(
+        Operation(
+            command = commandBuilder.persist(key),
+            response = QueuedResponse(RespType<*>::integerToBoolean)
+        )
+    )
+
+    override suspend fun clientList(): QueuedResponse<List<RedisClient>> =
+        addOperation(Operation(commandBuilder.clientList(), QueuedResponse(RespType<*>::toClientList)))
+
+    override suspend fun ping(): QueuedResponse<Boolean> =
+        addOperation(Operation(commandBuilder.ping(), QueuedResponse(RespType<*>::pongToBoolean)))
+
+    // SET OPERATIONS
     override suspend fun sadd(key: String, value: Any, vararg rest: Any): QueuedResponse<Long> = addOperation(
         Operation(
             command = commandBuilder.sadd(key, value, *rest),
@@ -195,14 +209,6 @@ class RedisPipelineBuilder(
             response = QueuedResponse(RespType<*>::toStringCursor)
         )
     )
-
-    override suspend fun clientList(): QueuedResponse<List<RedisClient>> =
-        addOperation(Operation(commandBuilder.clientList(), QueuedResponse(RespType<*>::toClientList)))
-
-    override suspend fun ping(): QueuedResponse<Boolean> =
-        addOperation(Operation(commandBuilder.ping(), QueuedResponse(RespType<*>::pongToBoolean)))
-
-    // SET OPERATIONS
 
     override suspend fun sdiff(key: String, vararg rest: String): QueuedResponse<Set<String>> = addOperation(
         Operation(

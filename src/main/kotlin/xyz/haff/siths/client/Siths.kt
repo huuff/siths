@@ -28,6 +28,7 @@ interface Siths<
     suspend fun incrBy(key: String, value: Long): LongResponseType
     suspend fun exists(key: String, vararg rest: String): BooleanResponseType
     suspend fun expire(key: String, duration: Duration, expirationCondition: ExpirationCondition? = null): BooleanResponseType
+    suspend fun persist(key: String): BooleanResponseType
 
     // SETS
     suspend fun sadd(key: String, value: Any, vararg rest: Any): LongResponseType

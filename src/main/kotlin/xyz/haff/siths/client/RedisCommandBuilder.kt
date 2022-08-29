@@ -192,4 +192,7 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun lset(key: String, index: Int, element: Any): RedisCommand
         = RedisCommand("LSET", key, index, element)
+
+    override suspend fun persist(key: String): RedisCommand
+        = RedisCommand("PERSIST", key)
 }

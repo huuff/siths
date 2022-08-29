@@ -144,4 +144,7 @@ class StandaloneSithsClient(
 
     override suspend fun expire(key: String, duration: Duration, expirationCondition: ExpirationCondition?): Boolean
         = connection.runCommand(commandBuilder.expire(key, duration, expirationCondition)).integerToBoolean()
+
+    override suspend fun persist(key: String): Boolean
+        = connection.runCommand(commandBuilder.persist(key)).integerToBoolean()
 }

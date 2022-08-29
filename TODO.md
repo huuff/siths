@@ -5,7 +5,6 @@
 * Set `codecov.io`
 
 ## Siths
-* Implement `PERSIST`
 * Implement `EXPIREAT`
 * Implement `ZSET` operations! I had forgotten
 * Implement a distributed counter!

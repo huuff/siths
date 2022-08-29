@@ -155,4 +155,7 @@ class ManagedSithsClient(
 
     override suspend fun expire(key: String, duration: Duration, expirationCondition: ExpirationCondition?): Boolean
         = pool.get().use { it.expire(key, duration, expirationCondition) }
+
+    override suspend fun persist(key: String): Boolean
+        = pool.get().use { it.persist(key) }
 }
