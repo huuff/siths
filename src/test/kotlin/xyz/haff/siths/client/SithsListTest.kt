@@ -247,4 +247,28 @@ class SithsListTest : FunSpec({
         list.subList(0, list.size) shouldBe listOf("v2", "v3")
     }
 
+    context("listIterator") {
+        test("correctly iterates backwards") {
+            // ARRANGE
+            val list = SithsList.ofStrings(pool, maxCursorSize = 5)
+            val elements = (1..15).map { it.toString() }
+            list.addAll(elements)
+            val iterator = list.listIterator()
+            val retrievedElements = mutableListOf<String>()
+
+            // advance iterator to the end
+            while (iterator.hasNext()) println(iterator.next())
+
+            // ACT
+            while (iterator.hasPrevious()) {
+                val previous = iterator.previous()
+                println(previous)
+                retrievedElements += previous
+            }
+
+            // ASSERT
+            retrievedElements shouldBe elements.reversed()
+        }
+    }
+
 })

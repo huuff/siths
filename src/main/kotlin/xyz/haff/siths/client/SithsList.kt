@@ -11,17 +11,19 @@ class SithsList<T : Any>(
     private val connectionPool: SithsConnectionPool,
     val name: String = "list:${randomUUID()}",
     private val serialize: (T) -> String,
-    private val deserialize: (String) -> T
+    private val deserialize: (String) -> T,
+    private val maxCursorSize: Int = 10,
 ) : MutableList<T> {
     private val client = ManagedSithsClient(connectionPool)
 
     companion object {
         @JvmStatic
-        fun ofStrings(connectionPool: SithsConnectionPool, name: String = "list:${randomUUID()}") = SithsList(
+        fun ofStrings(connectionPool: SithsConnectionPool, name: String = "list:${randomUUID()}", maxCursorSize: Int = 10) = SithsList(
             connectionPool = connectionPool,
             name = name,
             serialize = { it },
             deserialize = { it },
+            maxCursorSize = maxCursorSize,
         )
     }
 
@@ -55,7 +57,7 @@ class SithsList<T : Any>(
     override fun iterator(): MutableIterator<T> = runBlocking {
         connectionPool.get().use { conn ->
             val pipeline = RedisPipelineBuilder(conn)
-            val cursorContents = pipeline.lrange(name, 0, MAX_ELEMENTS_PER_CURSOR - 1)
+            val cursorContents = pipeline.lrange(name, 0, maxCursorSize - 1)
             val size = pipeline.llen(name)
             pipeline.exec(inTransaction = true)
             return@use Iterator(
@@ -118,8 +120,18 @@ class SithsList<T : Any>(
         runBlocking { client.del(name) }
     }
 
-    override fun listIterator(): MutableListIterator<T> {
-        TODO("Not yet implemented")
+    // TODO: Too much duplication?
+    override fun listIterator(): MutableListIterator<T> = runBlocking {
+        connectionPool.get().use { conn ->
+            val pipeline = RedisPipelineBuilder(conn)
+            val cursorContents = pipeline.lrange(name, 0, maxCursorSize - 1)
+            val size = pipeline.llen(name)
+            pipeline.exec(inTransaction = true)
+            return@use ListIterator(
+                lastCursor = Cursor(cursorContents.get().map(deserialize).toMutableList(), 0, cursorContents.get().size - 1),
+                size = size.get().toInt()
+            )
+        }
     }
 
     override fun listIterator(index: Int): MutableListIterator<T> {
@@ -185,14 +197,13 @@ class SithsList<T : Any>(
     }
 
     // TODO: Use locks somehow to prevent concurrent modifications?
-    private val MAX_ELEMENTS_PER_CURSOR = 10
     data class Cursor<T>(val contents: MutableList<T>, val start: Int, var stop: Int)
-    inner class Iterator(
-        private var lastCursor: Cursor<T>,
-        private var size: Int
+    open inner class Iterator(
+        protected var lastCursor: Cursor<T>,
+        protected var size: Int
     ): MutableIterator<T> {
-        private var currentIndex: Int = -1
-        private val currentIndexInCursor get() = currentIndex - lastCursor.start
+        protected var currentIndex: Int = -1
+        protected val currentIndexInCursor get() = currentIndex - lastCursor.start
 
         override fun hasNext(): Boolean = currentIndex < (size - 1)
 
@@ -200,8 +211,9 @@ class SithsList<T : Any>(
             currentIndex++
             lastCursor.contents[currentIndexInCursor]
         } else {
+            println("retrieved a next cursor")
             val remainingElements = size - lastCursor.stop
-            val cursorSize = if (remainingElements < MAX_ELEMENTS_PER_CURSOR) { remainingElements } else { MAX_ELEMENTS_PER_CURSOR }
+            val cursorSize = if (remainingElements < maxCursorSize) { remainingElements } else { maxCursorSize }
             val newStart = lastCursor.stop + 1
             val newStop = newStart + (cursorSize - 1)
             lastCursor = Cursor(runBlocking { client.lrange(name, newStart, newStop) }.map(deserialize).toMutableList(), newStart, newStop)
@@ -216,6 +228,44 @@ class SithsList<T : Any>(
                 lastCursor.stop--
                 removeAt(currentIndex)
             }
+        }
+
+    }
+
+    inner class ListIterator(
+        lastCursor: Cursor<T>,
+        size: Int
+    ): MutableListIterator<T>, Iterator(lastCursor, size){
+        override fun hasPrevious(): Boolean = currentIndex > -1
+
+        override fun nextIndex(): Int {
+            TODO("Not yet implemented")
+        }
+
+        override fun previous(): T = if (currentIndex >= lastCursor.start) {
+            lastCursor.contents[currentIndexInCursor].also {
+                currentIndex--
+            }
+        } else {
+            val elementsBeforeCurrentCursor = lastCursor.start
+            val cursorSize = if (elementsBeforeCurrentCursor < maxCursorSize) { elementsBeforeCurrentCursor } else { maxCursorSize }
+            val newStart = lastCursor.start - cursorSize
+            val newStop = lastCursor.start - 1
+            lastCursor = Cursor(runBlocking { client.lrange(name, newStart, newStop) }.map(deserialize).toMutableList(), newStart, newStop)
+            currentIndex--
+            lastCursor.contents[lastCursor.contents.size - 1]
+        }
+
+        override fun previousIndex(): Int {
+            TODO("Not yet implemented")
+        }
+
+        override fun add(element: T) {
+            TODO("Not yet implemented")
+        }
+
+        override fun set(element: T) {
+            TODO("Not yet implemented")
         }
 
     }
