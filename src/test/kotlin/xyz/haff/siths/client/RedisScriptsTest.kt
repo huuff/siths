@@ -30,4 +30,18 @@ class RedisScriptsTest : FunSpec({
         // ASSERT
         siths.lrange(list, 0, -1) shouldBe listOf("v1", "v2", "v999", "v3")
     }
+
+    test("list retain all") {
+        // ARRANGE
+        val list1 = randomUUID()
+        siths.rpush(list1, "v1", "v2", "v3", "v4", "v5")
+        val list2 = randomUUID()
+        siths.rpush(list2, "v2", "v3")
+
+        // ACT
+        siths.eval(RedisScripts.LIST_RETAIN_ALL.code, keys = listOf(list1, list2))
+
+        // ASSERT
+        siths.lrange(list1, 0, -1) shouldBe listOf("v2", "v3")
+    }
 })

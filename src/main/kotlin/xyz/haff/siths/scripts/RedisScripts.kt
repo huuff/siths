@@ -49,4 +49,24 @@ object RedisScripts {
         
         redis.call("lset", list, index, previous_val)
     """.trimIndent())
+
+
+    val LIST_RETAIN_ALL = RedisScript("""
+        local destination = KEYS[1]
+        local other = KEYS[2]
+        local changed_list = false
+        local delete_marker = math.random()
+        
+        for pos = 0, redis.call("llen", destination) - 1 do
+            local current_element = redis.call("lindex", destination, pos)
+            local position_in_other = redis.call("lpos", other, current_element)
+            if not position_in_other then
+                redis.call("lset", destination, pos, delete_marker)
+                changed_list = true
+            end
+        end
+        
+        redis.call("lrem", destination, 0, delete_marker)
+        return changed_list
+    """.trimIndent())
 }

@@ -173,6 +173,7 @@ class SithsList<T : Any>(
         return runBlocking { client.lrange(name, fromIndex, toIndex - 1) }.map(deserialize).toMutableList()
     }
 
+    // TODO: Use locks somehow to prevent concurrent modifications?
     private val MAX_ELEMENTS_PER_CURSOR = 10
     data class Cursor<T>(val contents: MutableList<T>, val start: Int, var stop: Int)
     inner class Iterator(
@@ -187,7 +188,7 @@ class SithsList<T : Any>(
         override fun next(): T = if (currentIndex < lastCursor.stop) {
             currentIndex++
             lastCursor.contents[currentIndexInCursor]
-        } else { // TODO: Check that size didn't change to throw a ConcurrentModificationException?
+        } else {
             val remainingElements = size - lastCursor.stop
             val cursorSize = if (remainingElements < MAX_ELEMENTS_PER_CURSOR) { remainingElements } else { MAX_ELEMENTS_PER_CURSOR }
             val newStart = lastCursor.stop + 1
