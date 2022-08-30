@@ -229,4 +229,7 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun blpop(keys: List<String>, timeout: Duration?): RedisCommand
         = RedisCommand("BLPOP", *keys.toTypedArray(), durationToFloatSeconds(timeout))
+
+    override suspend fun blpop(key: String, timeout: Duration?): RedisCommand
+        = RedisCommand("BLPOP", key, durationToFloatSeconds(timeout))
 }

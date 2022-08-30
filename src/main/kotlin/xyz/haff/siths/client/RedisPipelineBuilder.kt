@@ -438,6 +438,13 @@ class RedisPipelineBuilder(
             )
         )
 
+    override suspend fun blpop(key: String, timeout: Duration?): QueuedResponse<String?> = addOperation(
+        Operation(
+            command = commandBuilder.blpop(key, timeout),
+            response = QueuedResponse({ it.toSourceAndStringOrNull()?.data })
+        )
+    )
+
     override suspend fun lmove(
         source: String,
         destination: String,

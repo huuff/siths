@@ -172,6 +172,9 @@ class StandaloneSithsClient(
     override suspend fun blpop(keys: List<String>, timeout: Duration?): SourceAndData<String>?
         = connection.runCommand(commandBuilder.blpop(keys, timeout)).toSourceAndStringOrNull()
 
+    override suspend fun blpop(key: String, timeout: Duration?): String?
+        = connection.runCommand(commandBuilder.blpop(key, timeout)).toSourceAndStringOrNull()?.data
+
     override suspend fun clientList(): List<RedisClient>
         = connection.runCommand(commandBuilder.clientList()).toClientList()
 
