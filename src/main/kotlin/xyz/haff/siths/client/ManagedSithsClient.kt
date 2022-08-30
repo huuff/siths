@@ -130,6 +130,9 @@ class ManagedSithsClient(
     ): SourceAndData<List<String>>?
         = pool.get().use { it.lmpop(keys, end, count) }
 
+    override suspend fun lmpop(key: String, end: ListEnd, count: Int?): List<String>
+        = pool.get().use { it.lmpop(key, end, count)}
+
     override suspend fun rpop(key: String, count: Int?): List<String>
         = pool.get().use { it.rpop(key, count) }
 

@@ -116,6 +116,9 @@ class StandaloneSithsClient(
     override suspend fun lmpop(keys: List<String>, end: ListEnd, count: Int?): SourceAndData<List<String>>?
         = connection.runCommand(commandBuilder.lmpop(keys, end, count)).toSourceAndStringListOrNull()
 
+    override suspend fun lmpop(key: String, end: ListEnd, count: Int?): List<String>
+        = lmpop(listOf(key), end, count)?.data ?: listOf()
+
     override suspend fun rpop(key: String, count: Int?): List<String>
         = connection.runCommand(commandBuilder.rpop(key, count)).bulkOrArrayToStringList()
 

@@ -3,6 +3,8 @@ package xyz.haff.siths.client
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
+private fun countSubCommand(count: Int?) = count?.let { RedisCommand("COUNT", it )}
+
 class RedisCommandBuilder : Siths<
         RedisCommand,
         RedisCommand,
@@ -110,19 +112,10 @@ class RedisCommandBuilder : Siths<
     override suspend fun sinterstore(destination: String, key: String, vararg rest: String): RedisCommand
         = RedisCommand("SINTERSTORE", destination, key, *rest)
 
-    override suspend fun sscan(key: String, cursor: Long, match: String?, count: Int?): RedisCommand {
-        var command = RedisCommand("SSCAN", key, cursor)
-
-        if (match != null) {
-            command += RedisCommand("MATCH", match)
-        }
-
-        if (count != null) {
-            command += RedisCommand("COUNT", count)
-        }
-
-        return command
-    }
+    override suspend fun sscan(key: String, cursor: Long, match: String?, count: Int?): RedisCommand
+        = (RedisCommand("SSCAN", key, cursor)
+            + match?.let { RedisCommand("MATCH", match) }
+            + countSubCommand(count))
 
     override suspend fun sdiff(key: String, vararg rest: String): RedisCommand
         = RedisCommand("SDIFF", key, *rest)
@@ -173,7 +166,10 @@ class RedisCommandBuilder : Siths<
     override suspend fun lpop(key: String): RedisCommand = RedisCommand("LPOP", key)
 
     override suspend fun lmpop(keys: List<String>, end: ListEnd, count: Int?): RedisCommand
-        = RedisCommand("LMPOP", keys.size, *keys.toTypedArray(), end) + count?.let { RedisCommand("COUNT", it) }
+        = RedisCommand("LMPOP", keys.size, *keys.toTypedArray(), end) + countSubCommand(count)
+
+    override suspend fun lmpop(key: String, end: ListEnd, count: Int?): RedisCommand
+        = lmpop(listOf(key), end, count)
 
     override suspend fun rpop(key: String, count: Int?): RedisCommand
         = RedisCommand("RPOP", key, count)
@@ -207,7 +203,7 @@ class RedisCommandBuilder : Siths<
     override suspend fun lpos(key: String, element: String, rank: Int?, count: Int, maxlen: Int?): RedisCommand
         = (RedisCommand("LPOS", key, element)
                 + rank?.let { RedisCommand("RANK", it) }
-                + RedisCommand("COUNT", count)
+                + countSubCommand(count)!!
                 + maxlen?.let { RedisCommand("MAXLEN", it) })
 
     override suspend fun lset(key: String, index: Int, element: String): RedisCommand

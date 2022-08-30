@@ -480,20 +480,36 @@ class SithsClientTest : FunSpec({
             siths.lindex(list, 1) shouldBe "v999"
         }
 
-        test("lmpop") {
-            // ARRANGE
-            val key1 = randomUUID()
-            siths.rpush(key1, "v1", "v3", "v5")
-            val key2 = randomUUID()
+        context("lmpop") {
+            test("two lists") {
+                // ARRANGE
+                val key1 = randomUUID()
+                siths.rpush(key1, "v1", "v3", "v5")
+                val key2 = randomUUID()
 
-            // ACT
-            val response = siths.lmpop(listOf(key1, key2), ListEnd.RIGHT, 2)
+                // ACT
+                val response = siths.lmpop(listOf(key1, key2), ListEnd.RIGHT, 2)
 
-            // ASSERT
-            response shouldNotBe null
-            response!!
-            response.source shouldBe key1
-            response.data shouldBe listOf("v5", "v3")
+                // ASSERT
+                response shouldNotBe null
+                response!!
+                response.source shouldBe key1
+                response.data shouldBe listOf("v5", "v3")
+            }
+
+            test("a single list") {
+                // ARRANGE
+                val key = randomUUID()
+                siths.rpush(key, "v1", "v3", "v5")
+
+                // ACT
+                val response = siths.lmpop(key, ListEnd.LEFT, 2)
+
+                // ASSERT
+                response shouldNotBe null
+                response!!
+                response shouldBe listOf("v1", "v3")
+            }
         }
 
         test("ltrim") {
