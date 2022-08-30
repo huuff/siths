@@ -157,3 +157,19 @@ fun RespType<*>.toDouble(): Double = when (this) {
     is RespBulkString -> value.toDouble()
     else -> handleAsUnexpected()
 }
+
+fun RespType<*>.toSourceAndStringListOrNull(): SourceAndData<List<String>>? = when (this) {
+    is RespArray -> when (this.value.size) {
+        0 -> null
+        2 -> {
+           if (value[0] !is RespBulkString || value[1] !is RespArray) { handleAsUnexpected() }
+
+           SourceAndData(
+               source = (value[0] as RespBulkString).value,
+               data = (value[1] as RespArray).contentsOfType<RespBulkString>().map { it.value }
+           )
+        }
+        else -> handleAsUnexpected()
+    }
+    else -> handleAsUnexpected()
+}

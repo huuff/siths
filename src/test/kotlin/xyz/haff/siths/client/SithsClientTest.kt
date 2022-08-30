@@ -521,4 +521,20 @@ class SithsClientTest : FunSpec({
         wasPersisted shouldBe true
         siths.ttl(key) shouldBe null
     }
+
+    test("lmpop") {
+        // ARRANGE
+        val key1 = randomUUID()
+        siths.rpush(key1, "v1", "v3", "v5")
+        val key2 = randomUUID()
+
+        // ACT
+        val response = siths.lmpop(listOf(key1, key2), ListEnd.RIGHT, 2)
+
+        // ASSERT
+        response shouldNotBe null
+        response!!
+        response.source shouldBe key1
+        response.data shouldBe listOf("v5", "v3")
+    }
 })

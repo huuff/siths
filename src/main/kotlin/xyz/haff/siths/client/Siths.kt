@@ -18,6 +18,7 @@ interface Siths<
         BooleanResponseType,
         StringToBooleanMapResponseType,
         StringListResponseType,
+        NullableSourceAndStringListType,
         > {
     suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode? = null, timeToLive: Duration? = null): UnitResponseType
     suspend fun get(key: String): StringResponseType
@@ -57,9 +58,10 @@ interface Siths<
     suspend fun llen(key: String): LongResponseType
     suspend fun lindex(key: String, index: Int): NullableStringResponseType
     suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: String, element: String): NullableLongResponseType
-    suspend fun lpop(key: String, count: Int): StringListResponseType
+    suspend fun lpop(key: String, count: Int? = null): StringListResponseType
+    suspend fun lmpop(keys: List<String>, end: ListEnd, count: Int? = null): NullableSourceAndStringListType
     suspend fun lpop(key: String): NullableStringResponseType
-    suspend fun rpop(key: String, count: Int): StringListResponseType
+    suspend fun rpop(key: String, count: Int? = null): StringListResponseType
     suspend fun rpop(key: String): NullableStringResponseType
     suspend fun lpush(key: String, element: String, vararg rest: String): LongResponseType
     suspend fun rpush(key: String, element: String, vararg rest: String): LongResponseType

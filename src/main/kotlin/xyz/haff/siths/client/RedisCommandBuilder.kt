@@ -18,6 +18,7 @@ class RedisCommandBuilder : Siths<
         RedisCommand,
         RedisCommand,
         RedisCommand,
+        RedisCommand,
         > {
 
     override suspend fun get(key: String) = RedisCommand("GET", key)
@@ -164,12 +165,15 @@ class RedisCommandBuilder : Siths<
         element: String
     ): RedisCommand = RedisCommand("LINSERT", key, relativePosition, pivot, element)
 
-    override suspend fun lpop(key: String, count: Int): RedisCommand
+    override suspend fun lpop(key: String, count: Int?): RedisCommand
         = RedisCommand("LPOP", key, count)
 
     override suspend fun lpop(key: String): RedisCommand = RedisCommand("LPOP", key)
 
-    override suspend fun rpop(key: String, count: Int): RedisCommand
+    override suspend fun lmpop(keys: List<String>, end: ListEnd, count: Int?): RedisCommand
+        = RedisCommand("LMPOP", keys.size, *keys.toTypedArray(), end) + count?.let { RedisCommand("COUNT", it) }
+
+    override suspend fun rpop(key: String, count: Int?): RedisCommand
         = RedisCommand("RPOP", key, count)
 
     override suspend fun rpop(key: String): RedisCommand = RedisCommand("RPOP", key)

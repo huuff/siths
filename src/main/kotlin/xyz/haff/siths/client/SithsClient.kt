@@ -23,7 +23,8 @@ interface SithsClient : Siths<
         RedisCursor<String>,
         Boolean,
         Map<String, Boolean>,
-        List<String>
+        List<String>,
+        SourceAndData<List<String>>?
         > {
 
     suspend fun getOrNull(key: String): String?

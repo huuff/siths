@@ -25,7 +25,8 @@ class RedisPipelineBuilder(
         QueuedResponse<RedisCursor<String>>,
         QueuedResponse<Boolean>,
         QueuedResponse<Map<String, Boolean>>,
-        QueuedResponse<List<String>>
+        QueuedResponse<List<String>>,
+        QueuedResponse<SourceAndData<List<String>>?>
         > {
     private val operations = mutableListOf<Operation<*>>()
     val length get() = operations.size
@@ -115,8 +116,8 @@ class RedisPipelineBuilder(
     override suspend fun incrBy(key: String, value: Long): QueuedResponse<Long> =
         addOperation(Operation(commandBuilder.incrBy(key, value), QueuedResponse(RespType<*>::toLong)))
 
-    override suspend fun incrByFloat(key: String, value: Double): QueuedResponse<Double>
-        = addOperation(Operation(commandBuilder.incrByFloat(key, value), QueuedResponse(RespType<*>::toDouble)))
+    override suspend fun incrByFloat(key: String, value: Double): QueuedResponse<Double> =
+        addOperation(Operation(commandBuilder.incrByFloat(key, value), QueuedResponse(RespType<*>::toDouble)))
 
     override suspend fun exists(key: String, vararg rest: String): QueuedResponse<Boolean> {
         return addOperation(
@@ -314,7 +315,7 @@ class RedisPipelineBuilder(
             )
         )
 
-    override suspend fun lpop(key: String, count: Int): QueuedResponse<List<String>> = addOperation(
+    override suspend fun lpop(key: String, count: Int?): QueuedResponse<List<String>> = addOperation(
         Operation(
             command = commandBuilder.lpop(key, count),
             response = QueuedResponse(RespType<*>::bulkOrArrayToStringList)
@@ -324,7 +325,15 @@ class RedisPipelineBuilder(
     override suspend fun lpop(key: String): QueuedResponse<String?> =
         addOperation(Operation(commandBuilder.lpop(key), QueuedResponse(RespType<*>::toStringOrNull)))
 
-    override suspend fun rpop(key: String, count: Int): QueuedResponse<List<String>> = addOperation(
+    override suspend fun lmpop(keys: List<String>, end: ListEnd, count: Int?): QueuedResponse<SourceAndData<List<String>>?>
+    = addOperation(
+        Operation(
+            command = commandBuilder.lmpop(keys, end, count),
+            response = QueuedResponse(RespType<*>::toSourceAndStringListOrNull)
+        )
+    )
+
+    override suspend fun rpop(key: String, count: Int?): QueuedResponse<List<String>> = addOperation(
         Operation(
             command = commandBuilder.rpop(key, count),
             response = QueuedResponse(RespType<*>::bulkOrArrayToStringList)

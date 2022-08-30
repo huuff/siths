@@ -117,13 +117,20 @@ class ManagedSithsClient(
     override suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: String, element: String): Long?
         = pool.get().use { it.linsert(key, relativePosition, pivot, element) }
 
-    override suspend fun lpop(key: String, count: Int): List<String>
+    override suspend fun lpop(key: String, count: Int?): List<String>
         = pool.get().use { it.lpop(key, count) }
 
     override suspend fun lpop(key: String): String?
         = pool.get().use { it.lpop(key) }
 
-    override suspend fun rpop(key: String, count: Int): List<String>
+    override suspend fun lmpop(
+        keys: List<String>,
+        end: ListEnd,
+        count: Int?
+    ): SourceAndData<List<String>>?
+        = pool.get().use { it.lmpop(keys, end, count) }
+
+    override suspend fun rpop(key: String, count: Int?): List<String>
         = pool.get().use { it.rpop(key, count) }
 
     override suspend fun rpop(key: String): String?
