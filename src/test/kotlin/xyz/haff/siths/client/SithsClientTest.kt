@@ -10,13 +10,20 @@ import io.kotest.matchers.comparables.shouldBeGreaterThanOrEqualTo
 import io.kotest.matchers.comparables.shouldBeLessThanOrEqualTo
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import xyz.haff.siths.scripts.RedisScript
-import xyz.haff.siths.client.ExclusiveMode.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import xyz.haff.koy.timed
+import xyz.haff.siths.client.ExclusiveMode.NX
+import xyz.haff.siths.client.ExclusiveMode.XX
 import xyz.haff.siths.common.RedisScriptNotLoadedException
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeRedisConnection
 import xyz.haff.siths.makeSithsClient
+import xyz.haff.siths.scripts.RedisScript
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class SithsClientTest : FunSpec({
@@ -144,8 +151,8 @@ class SithsClientTest : FunSpec({
             ttl!!
             // XXX: Assuming no more than two seconds pass between setting and checking...
             // TODO: Can I make a generic `shouldBeInRange` kotest matcher?
-            ttl shouldBeGreaterThanOrEqualTo  8.seconds
-            ttl shouldBeLessThanOrEqualTo  10.seconds
+            ttl shouldBeGreaterThanOrEqualTo 8.seconds
+            ttl shouldBeLessThanOrEqualTo 10.seconds
         }
     }
 
@@ -181,9 +188,9 @@ class SithsClientTest : FunSpec({
 
         test("fails when script doesn't exist") {
             // ACT & ASSERT
-           shouldThrow<RedisScriptNotLoadedException> {
-               siths.evalSha("b16b7ff836ae87a150204570d9d82178ece81c8e")
-           }
+            shouldThrow<RedisScriptNotLoadedException> {
+                siths.evalSha("b16b7ff836ae87a150204570d9d82178ece81c8e")
+            }
         }
     }
 
@@ -302,7 +309,7 @@ class SithsClientTest : FunSpec({
             siths.sadd(set2, "key3")
 
             // ACT & ASSERT
-             siths.sinter(set1, set2) shouldBe setOf("key3")
+            siths.sinter(set1, set2) shouldBe setOf("key3")
         }
 
         test("smove") {
@@ -433,7 +440,7 @@ class SithsClientTest : FunSpec({
                 siths.rpush(list, "key1", "key2", "key3")
 
                 // ACT & ASSERT
-                siths.rpop(list, 2) shouldBe  listOf("key3", "key2")
+                siths.rpop(list, 2) shouldBe listOf("key3", "key2")
             }
         }
 
@@ -541,6 +548,37 @@ class SithsClientTest : FunSpec({
             // ASSERT
             element shouldBe "v1"
             siths.lrange(destination, 0, -1) shouldBe listOf("v2", "v4", "v6", "v1")
+        }
+
+        context("blocking") {
+            test("brpop fail") {
+                // ARRANGE
+                val key = randomUUID()
+
+                // ACT
+                val popped = siths.brpop(listOf(key), 20.milliseconds)
+
+                // ASSERT
+                popped shouldBe null
+            }
+
+            test("brpop blocks") {
+                // ARRANGE
+                val key = randomUUID()
+
+                // ACT
+                val popped = async { timed { siths.brpop(listOf(key)) } }
+                withContext(Dispatchers.Default) {
+                    delay(10)
+                    siths.lpush(key, "value")
+                }
+
+                // ASSERT
+                val (result, time) = popped.await()
+                result?.data shouldBe "value"
+                result?.source shouldBe key
+                time shouldBeGreaterThanOrEqualTo 10
+            }
         }
     }
 

@@ -26,7 +26,8 @@ class RedisPipelineBuilder(
         QueuedResponse<Boolean>,
         QueuedResponse<Map<String, Boolean>>,
         QueuedResponse<List<String>>,
-        QueuedResponse<SourceAndData<List<String>>?>
+        QueuedResponse<SourceAndData<List<String>>?>,
+        QueuedResponse<SourceAndData<String>?>,
         > {
     private val operations = mutableListOf<Operation<*>>()
     val length get() = operations.size
@@ -406,6 +407,14 @@ class RedisPipelineBuilder(
             response = QueuedResponse(RespType<*>::assertOk)
         )
     )
+
+    override suspend fun brpop(keys: List<String>, timeout: Duration?): QueuedResponse<SourceAndData<String>?> =
+        addOperation(
+            Operation(
+                command = commandBuilder.brpop(keys, timeout),
+                response = QueuedResponse(RespType<*>::toSourceAndStringOrNull)
+            )
+        )
 
     override suspend fun lmove(
         source: String,

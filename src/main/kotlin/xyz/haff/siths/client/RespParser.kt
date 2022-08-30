@@ -43,15 +43,19 @@ value class RespParser(private val channel: ByteReadChannel) {
         COLON -> parseInteger()
         DOLLAR -> {
             val length = channel.readUTF8Line()!!.toInt()
-            if (length == -1)
+            if (length == -1) {
                 RespNullResponse
-            else {
+            } else {
                 parseBulkString(length)
             }
         }
         ASTERISK -> {
             val length = channel.readUTF8Line()!!.toInt()
-            parseArray(length)
+            if (length == -1) {
+                RespNullResponse
+            } else {
+                parseArray(length)
+            }
         }
         else -> throw RuntimeException("Unknown response type: '$responseType'")
     }

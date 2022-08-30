@@ -24,7 +24,8 @@ interface SithsClient : Siths<
         Boolean,
         Map<String, Boolean>,
         List<String>,
-        SourceAndData<List<String>>?
+        SourceAndData<List<String>>?,
+        SourceAndData<String>?,
         > {
 
     suspend fun getOrNull(key: String): String?

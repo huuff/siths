@@ -173,6 +173,9 @@ class ManagedSithsClient(
         destinationEnd: ListEnd
     ): String = pool.get().use { it.lmove(source, destination, sourceEnd, destinationEnd) }
 
+    override suspend fun brpop(keys: List<String>, timeout: Duration?): SourceAndData<String>?
+        = pool.get().use { it.brpop(keys, timeout) }
+
     override suspend fun clientList(): List<RedisClient>
         = pool.get().use { it.clientList() }
 

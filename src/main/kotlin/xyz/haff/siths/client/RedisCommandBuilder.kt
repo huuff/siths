@@ -1,8 +1,10 @@
 package xyz.haff.siths.client
 
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 class RedisCommandBuilder : Siths<
+        RedisCommand,
         RedisCommand,
         RedisCommand,
         RedisCommand,
@@ -221,4 +223,7 @@ class RedisCommandBuilder : Siths<
         destinationEnd: ListEnd
     ): RedisCommand
         = RedisCommand("LMOVE", source, destination, sourceEnd, destinationEnd)
+
+    override suspend fun brpop(keys: List<String>, timeout: Duration?): RedisCommand
+        = RedisCommand("BRPOP", *keys.toTypedArray(), timeout?.let { timeout.toDouble(DurationUnit.SECONDS) } ?: "0")
 }
