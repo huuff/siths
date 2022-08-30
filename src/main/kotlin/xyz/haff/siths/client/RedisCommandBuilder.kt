@@ -204,4 +204,7 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun lset(key: String, index: Int, element: String): RedisCommand
         = RedisCommand("LSET", key, index, element)
+
+    override suspend fun ltrim(key: String, start: Int, stop: Int): RedisCommand
+        = RedisCommand("LTRIM", key, start, stop)
 }

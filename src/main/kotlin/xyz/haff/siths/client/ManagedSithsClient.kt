@@ -157,6 +157,9 @@ class ManagedSithsClient(
     override suspend fun lset(key: String, index: Int, element: String): Boolean
         = pool.get().use { it.lset(key, index, element) }
 
+    override suspend fun ltrim(key: String, start: Int, stop: Int)
+        = pool.get().use { it.ltrim(key, start, stop) }
+
     override suspend fun clientList(): List<RedisClient>
         = pool.get().use { it.clientList() }
 

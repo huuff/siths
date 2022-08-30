@@ -472,6 +472,34 @@ class SithsClientTest : FunSpec({
             wasChanged shouldBe true
             siths.lindex(list, 1) shouldBe "v999"
         }
+
+        test("lmpop") {
+            // ARRANGE
+            val key1 = randomUUID()
+            siths.rpush(key1, "v1", "v3", "v5")
+            val key2 = randomUUID()
+
+            // ACT
+            val response = siths.lmpop(listOf(key1, key2), ListEnd.RIGHT, 2)
+
+            // ASSERT
+            response shouldNotBe null
+            response!!
+            response.source shouldBe key1
+            response.data shouldBe listOf("v5", "v3")
+        }
+
+        test("ltrim") {
+            // ARRANGE
+            val key = randomUUID()
+            siths.rpush(key, "v1", "v2", "v3", "v4", "v5")
+
+            // ACT
+            siths.ltrim(key, 1, 3)
+
+            // ASSERT
+            siths.lrange(key, 0, -1) shouldBe listOf("v2", "v3", "v4")
+        }
     }
 
     test("ping") {
@@ -520,21 +548,5 @@ class SithsClientTest : FunSpec({
         // ASSERT
         wasPersisted shouldBe true
         siths.ttl(key) shouldBe null
-    }
-
-    test("lmpop") {
-        // ARRANGE
-        val key1 = randomUUID()
-        siths.rpush(key1, "v1", "v3", "v5")
-        val key2 = randomUUID()
-
-        // ACT
-        val response = siths.lmpop(listOf(key1, key2), ListEnd.RIGHT, 2)
-
-        // ASSERT
-        response shouldNotBe null
-        response!!
-        response.source shouldBe key1
-        response.data shouldBe listOf("v5", "v3")
     }
 })

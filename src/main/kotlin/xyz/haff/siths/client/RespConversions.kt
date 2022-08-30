@@ -173,3 +173,7 @@ fun RespType<*>.toSourceAndStringListOrNull(): SourceAndData<List<String>>? = wh
     }
     else -> handleAsUnexpected()
 }
+
+fun RespType<*>.assertOk() {
+    isOk()
+}

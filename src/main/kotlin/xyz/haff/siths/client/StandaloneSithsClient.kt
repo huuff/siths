@@ -143,6 +143,9 @@ class StandaloneSithsClient(
     override suspend fun lset(key: String, index: Int, element: String): Boolean
         = connection.runCommand(commandBuilder.lset(key, index, element)).isOk()
 
+    override suspend fun ltrim(key: String, start: Int, stop: Int)
+        = connection.runCommand(commandBuilder.ltrim(key, start, stop)).assertOk()
+
     override suspend fun clientList(): List<RedisClient>
         = connection.runCommand(commandBuilder.clientList()).toClientList()
 

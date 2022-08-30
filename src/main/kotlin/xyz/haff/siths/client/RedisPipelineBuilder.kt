@@ -325,8 +325,11 @@ class RedisPipelineBuilder(
     override suspend fun lpop(key: String): QueuedResponse<String?> =
         addOperation(Operation(commandBuilder.lpop(key), QueuedResponse(RespType<*>::toStringOrNull)))
 
-    override suspend fun lmpop(keys: List<String>, end: ListEnd, count: Int?): QueuedResponse<SourceAndData<List<String>>?>
-    = addOperation(
+    override suspend fun lmpop(
+        keys: List<String>,
+        end: ListEnd,
+        count: Int?
+    ): QueuedResponse<SourceAndData<List<String>>?> = addOperation(
         Operation(
             command = commandBuilder.lmpop(keys, end, count),
             response = QueuedResponse(RespType<*>::toSourceAndStringListOrNull)
@@ -391,4 +394,10 @@ class RedisPipelineBuilder(
         )
     )
 
+    override suspend fun ltrim(key: String, start: Int, stop: Int): QueuedResponse<Unit> = addOperation(
+        Operation(
+            command = commandBuilder.ltrim(key, start, stop),
+            response = QueuedResponse(RespType<*>::assertOk)
+        )
+    )
 }
