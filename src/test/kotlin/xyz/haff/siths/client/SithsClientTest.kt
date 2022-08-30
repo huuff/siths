@@ -567,7 +567,7 @@ class SithsClientTest : FunSpec({
                 val key = randomUUID()
 
                 // ACT
-                val popped = siths.brpop(listOf(key), 20.milliseconds)
+                val popped = siths.brpop(key, 20.milliseconds)
 
                 // ASSERT
                 popped shouldBe null
@@ -578,7 +578,7 @@ class SithsClientTest : FunSpec({
                 val key = randomUUID()
 
                 // ACT
-                val popped = async { timed { siths.brpop(listOf(key)) } }
+                val popped = async { timed { siths.brpop(key) } }
                 withContext(Dispatchers.Default) {
                     delay(10)
                     siths.lpush(key, "value")
@@ -586,8 +586,7 @@ class SithsClientTest : FunSpec({
 
                 // ASSERT
                 val (result, time) = popped.await()
-                result?.data shouldBe "value"
-                result?.source shouldBe key
+                result shouldBe "value"
                 time shouldBeGreaterThanOrEqualTo 10
             }
         }

@@ -76,8 +76,8 @@ interface Siths<
     suspend fun lset(key: String, index: Int, element: String): BooleanResponseType
     suspend fun ltrim(key: String, start: Int, stop: Int): UnitResponseType
     suspend fun lmove(source: String, destination: String, sourceEnd: ListEnd, destinationEnd: ListEnd): StringResponseType
-    // TODO: One version that takes one and another that takes a list?, in fact, the single one could just return a string, and not a source
     suspend fun brpop(keys: List<String>, timeout: Duration? = null): NullableSourceAndStringType
+    suspend fun brpop(key: String, timeout: Duration? = null): NullableStringResponseType
 
     suspend fun clientList(): ClientListResponseType
     suspend fun ping(): BooleanResponseType

@@ -222,4 +222,7 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun brpop(keys: List<String>, timeout: Duration?): RedisCommand
         = RedisCommand("BRPOP", *keys.toTypedArray(), timeout?.let { timeout.toDouble(DurationUnit.SECONDS) } ?: "0")
+
+    override suspend fun brpop(key: String, timeout: Duration?): RedisCommand
+        = RedisCommand("BRPOP", key, timeout?.let { timeout.toDouble(DurationUnit.SECONDS) } ?: "0")
 }
