@@ -175,6 +175,9 @@ class RedisCommandBuilder : Siths<
     override suspend fun blmpop(keys: List<String>, end: ListEnd, count: Int?): RedisCommand
         = RedisCommand("BLMPOP", keys.size, *keys.toTypedArray(), end) + countSubCommand(count)
 
+    override suspend fun blmpop(key: String, end: ListEnd, count: Int?): RedisCommand
+        = RedisCommand("BLMPOP", 1, key, end) + countSubCommand(count)
+
     override suspend fun rpop(key: String, count: Int?): RedisCommand
         = RedisCommand("RPOP", key, count)
 

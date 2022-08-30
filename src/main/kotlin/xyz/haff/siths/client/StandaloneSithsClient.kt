@@ -119,6 +119,9 @@ class StandaloneSithsClient(
     override suspend fun blmpop(keys: List<String>, end: ListEnd, count: Int?): SourceAndData<List<String>>?
         = connection.runCommand(commandBuilder.blmpop(keys, end, count)).toSourceAndStringListOrNull()
 
+    override suspend fun blmpop(key: String, end: ListEnd, count: Int?): List<String>
+        = connection.runCommand(commandBuilder.blmpop(key, end, count)).toSourceAndStringListOrNull()?.data ?: listOf()
+
     override suspend fun lmpop(key: String, end: ListEnd, count: Int?): List<String>
         = lmpop(listOf(key), end, count)?.data ?: listOf()
 

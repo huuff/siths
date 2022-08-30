@@ -133,6 +133,9 @@ class ManagedSithsClient(
     override suspend fun blmpop(keys: List<String>, end: ListEnd, count: Int?): SourceAndData<List<String>>?
         = pool.get().use { it.blmpop(keys, end, count) }
 
+    override suspend fun blmpop(key: String, end: ListEnd, count: Int?): List<String>
+        = pool.get().use { it.blmpop(key, end, count) }
+
     override suspend fun lmpop(key: String, end: ListEnd, count: Int?): List<String>
         = pool.get().use { it.lmpop(key, end, count)}
 

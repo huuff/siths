@@ -59,10 +59,13 @@ interface Siths<
     suspend fun llen(key: String): LongResponseType
     suspend fun lindex(key: String, index: Int): NullableStringResponseType
     suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: String, element: String): NullableLongResponseType
+    // TODO: These ones have even more variations!! With or without a count, they must return either one element or a list
     suspend fun lpop(key: String, count: Int? = null): StringListResponseType
     suspend fun lmpop(keys: List<String>, end: ListEnd, count: Int? = null): NullableSourceAndStringListType
     suspend fun lmpop(key: String, end: ListEnd, count: Int? = null): StringListResponseType
     suspend fun blmpop(keys: List<String>, end: ListEnd, count: Int? = null): NullableSourceAndStringListType
+    suspend fun blmpop(key: String, end: ListEnd, count: Int? = null): StringListResponseType
+
     suspend fun lpop(key: String): NullableStringResponseType
     suspend fun rpop(key: String, count: Int? = null): StringListResponseType
     suspend fun rpop(key: String): NullableStringResponseType
