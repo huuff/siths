@@ -359,6 +359,9 @@ class RedisPipelineBuilder(
     override suspend fun rpush(key: String, element: String, vararg rest: String): QueuedResponse<Long> =
         addOperation(Operation(commandBuilder.rpush(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
 
+    override suspend fun rpushx(key: String, element: String, vararg rest: String): QueuedResponse<Long>
+        = addOperation(Operation(commandBuilder.rpushx(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
+
     override suspend fun lrem(key: String, element: String, count: Int): QueuedResponse<Long> =
         addOperation(Operation(commandBuilder.lrem(key, element, count), QueuedResponse(RespType<*>::toLong)))
 

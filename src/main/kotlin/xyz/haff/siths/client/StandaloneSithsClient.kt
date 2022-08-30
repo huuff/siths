@@ -131,6 +131,9 @@ class StandaloneSithsClient(
     override suspend fun rpush(key: String, element: String, vararg rest: String): Long
         = connection.runCommand(commandBuilder.rpush(key, element, *rest)).toLong()
 
+    override suspend fun rpushx(key: String, element: String, vararg rest: String): Long
+        = connection.runCommand(commandBuilder.rpushx(key, element, *rest)).toLong()
+
     override suspend fun lrem(key: String, element: String, count: Int): Long
         = connection.runCommand(commandBuilder.lrem(key, element, count)).toLong()
 
