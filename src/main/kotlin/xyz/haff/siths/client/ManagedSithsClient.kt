@@ -182,6 +182,9 @@ class ManagedSithsClient(
     override suspend fun brpop(key: String, timeout: Duration?): String?
         = pool.get().use { it.brpop(key, timeout)}
 
+    override suspend fun blpop(keys: List<String>, timeout: Duration?): SourceAndData<String>?
+        = pool.get().use { it.blpop(keys, timeout) }
+
     override suspend fun clientList(): List<RedisClient>
         = pool.get().use { it.clientList() }
 

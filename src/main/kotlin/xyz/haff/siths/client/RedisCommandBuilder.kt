@@ -4,6 +4,7 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 private fun countSubCommand(count: Int?) = count?.let { RedisCommand("COUNT", it )}
+private fun durationToFloatSeconds(duration: Duration?) = duration?.toDouble(DurationUnit.SECONDS) ?: 0.0
 
 class RedisCommandBuilder : Siths<
         RedisCommand,
@@ -221,8 +222,11 @@ class RedisCommandBuilder : Siths<
         = RedisCommand("LMOVE", source, destination, sourceEnd, destinationEnd)
 
     override suspend fun brpop(keys: List<String>, timeout: Duration?): RedisCommand
-        = RedisCommand("BRPOP", *keys.toTypedArray(), timeout?.let { timeout.toDouble(DurationUnit.SECONDS) } ?: "0")
+        = RedisCommand("BRPOP", *keys.toTypedArray(), durationToFloatSeconds(timeout))
 
     override suspend fun brpop(key: String, timeout: Duration?): RedisCommand
-        = RedisCommand("BRPOP", key, timeout?.let { timeout.toDouble(DurationUnit.SECONDS) } ?: "0")
+        = RedisCommand("BRPOP", key, durationToFloatSeconds(timeout))
+
+    override suspend fun blpop(keys: List<String>, timeout: Duration?): RedisCommand
+        = RedisCommand("BLPOP", *keys.toTypedArray(), durationToFloatSeconds(timeout))
 }

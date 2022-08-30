@@ -78,6 +78,7 @@ interface Siths<
     suspend fun lmove(source: String, destination: String, sourceEnd: ListEnd, destinationEnd: ListEnd): StringResponseType
     suspend fun brpop(keys: List<String>, timeout: Duration? = null): NullableSourceAndStringType
     suspend fun brpop(key: String, timeout: Duration? = null): NullableStringResponseType
+    suspend fun blpop(keys: List<String>, timeout: Duration? = null): NullableSourceAndStringType
 
     suspend fun clientList(): ClientListResponseType
     suspend fun ping(): BooleanResponseType
