@@ -181,6 +181,9 @@ class RedisCommandBuilder : Siths<
     override suspend fun lpush(key: String, element: String, vararg rest: String): RedisCommand
         = RedisCommand("LPUSH", key, element, *rest)
 
+    override suspend fun lpushx(key: String, element: String, vararg rest: String): RedisCommand
+        = RedisCommand("LPUSHX", key, element, *rest)
+
     override suspend fun rpush(key: String, element: String, vararg rest: String): RedisCommand
         = RedisCommand("RPUSH", key, element, *rest)
 

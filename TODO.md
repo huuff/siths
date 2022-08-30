@@ -6,6 +6,7 @@
 
 ## Siths
 * Implement `EXPIREAT`
+* Implement `MSET` and `MGET`
 * Implement `ZSET` operations! I had forgotten
 * Implement a distributed counter!
 * Before implementing the `MutableList`, implement ALL list commands

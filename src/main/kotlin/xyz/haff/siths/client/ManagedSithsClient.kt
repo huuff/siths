@@ -139,6 +139,9 @@ class ManagedSithsClient(
     override suspend fun lpush(key: String, element: String, vararg rest: String): Long
         = pool.get().use { it.lpush(key, element, *rest) }
 
+    override suspend fun lpushx(key: String, element: String, vararg rest: String): Long
+        = pool.get().use { it.lpushx(key, element, *rest) }
+
     override suspend fun rpush(key: String, element: String, vararg rest: String): Long
         = pool.get().use { it.rpush(key, element, *rest)}
 

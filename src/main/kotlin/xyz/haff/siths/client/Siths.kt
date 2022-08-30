@@ -64,6 +64,7 @@ interface Siths<
     suspend fun rpop(key: String, count: Int? = null): StringListResponseType
     suspend fun rpop(key: String): NullableStringResponseType
     suspend fun lpush(key: String, element: String, vararg rest: String): LongResponseType
+    suspend fun lpushx(key: String, element: String, vararg rest: String): LongResponseType
     suspend fun rpush(key: String, element: String, vararg rest: String): LongResponseType
     suspend fun lrem(key: String, element: String, count: Int = 0): LongResponseType
     suspend fun lrange(key: String, start: Int, stop: Int): StringListResponseType

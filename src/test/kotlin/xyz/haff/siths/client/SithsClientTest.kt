@@ -500,6 +500,33 @@ class SithsClientTest : FunSpec({
             // ASSERT
             siths.lrange(key, 0, -1) shouldBe listOf("v2", "v3", "v4")
         }
+
+        context("lpushx") {
+            test("without pushing") {
+                // ARRANGE
+                val key = randomUUID()
+
+                // ACT
+                val listSize = siths.lpushx(key, "test")
+
+                // ASSERT
+                listSize shouldBe 0
+                siths.exists(key) shouldBe false
+            }
+
+            test("actually pushing") {
+                // ARRANGE
+                val key = randomUUID()
+                siths.rpush(key, "test1")
+
+                // ACT
+                val listSize = siths.lpushx(key, "test2")
+
+                // ASSERT
+                listSize shouldBe 2
+                siths.lrange(key, 0, -1) shouldBe listOf("test2", "test1")
+            }
+        }
     }
 
     test("ping") {
