@@ -62,6 +62,7 @@ interface Siths<
     suspend fun lpop(key: String, count: Int? = null): StringListResponseType
     suspend fun lmpop(keys: List<String>, end: ListEnd, count: Int? = null): NullableSourceAndStringListType
     suspend fun lmpop(key: String, end: ListEnd, count: Int? = null): StringListResponseType
+    suspend fun blmpop(keys: List<String>, end: ListEnd, count: Int? = null): NullableSourceAndStringListType
     suspend fun lpop(key: String): NullableStringResponseType
     suspend fun rpop(key: String, count: Int? = null): StringListResponseType
     suspend fun rpop(key: String): NullableStringResponseType

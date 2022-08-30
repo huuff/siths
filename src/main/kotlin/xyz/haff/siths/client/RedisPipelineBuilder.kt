@@ -337,6 +337,17 @@ class RedisPipelineBuilder(
         )
     )
 
+    override suspend fun blmpop(
+        keys: List<String>,
+        end: ListEnd,
+        count: Int?
+    ): QueuedResponse<SourceAndData<List<String>>?> = addOperation(
+        Operation(
+            command = commandBuilder.blmpop(keys, end, count),
+            response = QueuedResponse(RespType<*>::toSourceAndStringListOrNull)
+        )
+    )
+
     override suspend fun lmpop(key: String, end: ListEnd, count: Int?): QueuedResponse<List<String>> = addOperation(
         Operation(
             command = commandBuilder.lmpop(key, end, count),
