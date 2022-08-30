@@ -527,6 +527,21 @@ class SithsClientTest : FunSpec({
                 siths.lrange(key, 0, -1) shouldBe listOf("test2", "test1")
             }
         }
+
+        test("lmove") {
+            // ARRANGE
+            val source = randomUUID()
+            siths.rpush(source, "v1", "v3", "v5")
+            val destination = randomUUID()
+            siths.rpush(destination, "v2", "v4", "v6")
+
+            // ACT
+            val element = siths.lmove(source, destination, ListEnd.LEFT, ListEnd.RIGHT)
+
+            // ASSERT
+            element shouldBe "v1"
+            siths.lrange(destination, 0, -1) shouldBe listOf("v2", "v4", "v6", "v1")
+        }
     }
 
     test("ping") {

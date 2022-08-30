@@ -213,4 +213,12 @@ class RedisCommandBuilder : Siths<
 
     override suspend fun ltrim(key: String, start: Int, stop: Int): RedisCommand
         = RedisCommand("LTRIM", key, start, stop)
+
+    override suspend fun lmove(
+        source: String,
+        destination: String,
+        sourceEnd: ListEnd,
+        destinationEnd: ListEnd
+    ): RedisCommand
+        = RedisCommand("LMOVE", source, destination, sourceEnd, destinationEnd)
 }

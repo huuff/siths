@@ -166,6 +166,13 @@ class ManagedSithsClient(
     override suspend fun ltrim(key: String, start: Int, stop: Int)
         = pool.get().use { it.ltrim(key, start, stop) }
 
+    override suspend fun lmove(
+        source: String,
+        destination: String,
+        sourceEnd: ListEnd,
+        destinationEnd: ListEnd
+    ): String = pool.get().use { it.lmove(source, destination, sourceEnd, destinationEnd) }
+
     override suspend fun clientList(): List<RedisClient>
         = pool.get().use { it.clientList() }
 
