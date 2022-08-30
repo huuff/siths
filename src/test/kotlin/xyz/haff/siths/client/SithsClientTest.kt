@@ -502,13 +502,8 @@ class SithsClientTest : FunSpec({
                 val key = randomUUID()
                 siths.rpush(key, "v1", "v3", "v5")
 
-                // ACT
-                val response = siths.lmpop(key, ListEnd.LEFT, 2)
-
-                // ASSERT
-                response shouldNotBe null
-                response!!
-                response shouldBe listOf("v1", "v3")
+                // ACT && ASSERT
+                siths.lmpop(key, ListEnd.LEFT, 2) shouldBe listOf("v1", "v3")
             }
         }
 
