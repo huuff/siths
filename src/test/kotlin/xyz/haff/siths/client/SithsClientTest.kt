@@ -15,13 +15,15 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import xyz.haff.koy.timed
-import xyz.haff.siths.client.ExclusiveMode.NX
-import xyz.haff.siths.client.ExclusiveMode.XX
+import xyz.haff.siths.option.ExclusiveMode.NX
+import xyz.haff.siths.option.ExclusiveMode.XX
 import xyz.haff.siths.common.RedisScriptNotLoadedException
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeRedisConnection
 import xyz.haff.siths.makeSithsClient
+import xyz.haff.siths.option.ExpirationCondition
+import xyz.haff.siths.option.ListEnd
 import xyz.haff.siths.scripts.RedisScript
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds

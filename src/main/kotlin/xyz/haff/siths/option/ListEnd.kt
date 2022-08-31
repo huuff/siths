@@ -1,3 +1,3 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.option
 
 enum class ListEnd { LEFT, RIGHT }

@@ -1,9 +1,9 @@
 package xyz.haff.siths.client
 
+import xyz.haff.siths.option.ExclusiveMode
+import xyz.haff.siths.option.ExpirationCondition
+import xyz.haff.siths.option.ListEnd
 import xyz.haff.siths.protocol.*
-import kotlin.text.toDouble
-import kotlin.text.toLong
-import kotlin.text.toLongOrNull
 import kotlin.time.Duration
 
 private data class Operation<T>(val command: RedisCommand, val response: QueuedResponse<T>)

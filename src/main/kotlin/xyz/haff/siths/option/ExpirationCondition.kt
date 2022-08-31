@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.option
 
 // TODO: Document this so that these comments appear in the javadoc (kdoc?)
 enum class ExpirationCondition {

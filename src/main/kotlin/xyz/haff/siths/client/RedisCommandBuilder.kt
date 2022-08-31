@@ -1,5 +1,8 @@
 package xyz.haff.siths.client
 
+import xyz.haff.siths.option.ExclusiveMode
+import xyz.haff.siths.option.ExpirationCondition
+import xyz.haff.siths.option.ListEnd
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
