@@ -6,6 +6,9 @@ import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 import xyz.haff.siths.common.RedisAuthException
 import xyz.haff.siths.common.RedisUnexpectedRespResponseException
+import xyz.haff.siths.protocol.RespError
+import xyz.haff.siths.protocol.RespParser
+import xyz.haff.siths.protocol.RespType
 import java.util.*
 import kotlin.text.Charsets
 import kotlin.text.toByteArray

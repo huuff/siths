@@ -1,5 +1,6 @@
 package xyz.haff.siths.client
 
+import xyz.haff.siths.protocol.*
 import kotlin.time.Duration
 
 class StandaloneSithsClient(

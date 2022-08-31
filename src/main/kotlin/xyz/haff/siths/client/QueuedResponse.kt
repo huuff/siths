@@ -1,6 +1,7 @@
 package xyz.haff.siths.client
 
 import xyz.haff.siths.common.UnexecutedRedisPipelineException
+import xyz.haff.siths.protocol.RespType
 
 class QueuedResponse<T>(
     private val converter: (RespType<*>) -> T,

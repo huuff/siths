@@ -10,6 +10,8 @@ import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 import xyz.haff.siths.makeRedisConnection
+import xyz.haff.siths.protocol.RespBulkString
+import xyz.haff.siths.protocol.RespSimpleString
 import java.nio.ByteBuffer
 
 class SithsConnectionTest : FunSpec({

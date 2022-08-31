@@ -50,7 +50,9 @@ object RedisScripts {
         redis.call("lset", list, index, previous_val)
     """.trimIndent())
 
-
+    /**
+     * Removes all values in KEYS[1] that are not in KEYS[2]
+     */
     val LIST_RETAIN_ALL = RedisScript("""
         local destination = KEYS[1]
         local other = KEYS[2]

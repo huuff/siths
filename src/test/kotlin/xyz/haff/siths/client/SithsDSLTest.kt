@@ -9,6 +9,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeSithsPool
+import xyz.haff.siths.protocol.RespBulkString
+import xyz.haff.siths.protocol.RespInteger
+import xyz.haff.siths.protocol.RespSimpleString
 import xyz.haff.siths.scripts.RedisScript
 
 class SithsDSLTest : FunSpec({

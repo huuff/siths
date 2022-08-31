@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.protocol
 
 data class RedisCursor<T>(
     val next: Long,

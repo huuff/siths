@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.protocol
 
 import io.ktor.utils.io.*
 import java.nio.ByteBuffer

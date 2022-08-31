@@ -3,6 +3,7 @@ package xyz.haff.siths.client
 import kotlinx.coroutines.runBlocking
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
+import xyz.haff.siths.protocol.luaBooleanToBoolean
 import xyz.haff.siths.scripts.RedisScripts
 import kotlin.math.floor
 import kotlin.math.max

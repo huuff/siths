@@ -1,5 +1,7 @@
 package xyz.haff.siths.client
 
+import xyz.haff.siths.protocol.RedisCursor
+import xyz.haff.siths.protocol.RespType
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 

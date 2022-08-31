@@ -3,6 +3,7 @@ package xyz.haff.siths.client
 import kotlinx.coroutines.runBlocking
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
+import xyz.haff.siths.protocol.RedisCursor
 import java.util.*
 
 class SithsSet<T : Any>(

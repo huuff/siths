@@ -3,6 +3,7 @@ package xyz.haff.siths.client
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import xyz.haff.siths.common.RedisBrokenConnectionException
+import xyz.haff.siths.protocol.RespType
 
 /**
  * This Siths connection is pooled. Actually, just a decorator around a StandaloneSithsConnection, that instead of

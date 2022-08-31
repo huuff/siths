@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.protocol
 
 import xyz.haff.siths.common.RedisException
 import xyz.haff.siths.common.RedisScriptNotLoadedException

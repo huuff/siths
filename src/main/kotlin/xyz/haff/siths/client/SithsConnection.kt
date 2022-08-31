@@ -1,5 +1,7 @@
 package xyz.haff.siths.client
 
+import xyz.haff.siths.protocol.RespType
+
 /**
  * A connection to a Redis database. It comprises two operations:
  *  * Sending a command and getting an abstract representation of the RESP response in return
