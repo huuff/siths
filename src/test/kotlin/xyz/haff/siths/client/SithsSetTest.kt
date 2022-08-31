@@ -7,6 +7,7 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.makeSithsClient
 import xyz.haff.siths.makeSithsPool
+import xyz.haff.siths.protocol.SithsConnectionPool
 
 class SithsSetTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine")) {

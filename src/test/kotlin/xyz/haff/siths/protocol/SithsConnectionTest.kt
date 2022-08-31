@@ -1,18 +1,13 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.protocol
 
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
-import io.ktor.network.selector.*
-import io.ktor.network.sockets.*
-import io.ktor.utils.io.*
-import kotlinx.coroutines.Dispatchers
+import xyz.haff.siths.client.RedisPipeline
+import xyz.haff.siths.client.StandaloneSithsConnection
 import xyz.haff.siths.makeRedisConnection
-import xyz.haff.siths.protocol.RespBulkString
-import xyz.haff.siths.protocol.RespSimpleString
-import java.nio.ByteBuffer
 
 class SithsConnectionTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {

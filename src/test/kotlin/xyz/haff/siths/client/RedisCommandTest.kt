@@ -2,6 +2,7 @@ package xyz.haff.siths.client
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import xyz.haff.siths.protocol.RedisCommand
 
 class RedisCommandTest : FunSpec({
 

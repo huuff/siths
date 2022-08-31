@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.pooling
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex

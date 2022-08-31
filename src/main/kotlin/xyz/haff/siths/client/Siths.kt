@@ -3,6 +3,7 @@ package xyz.haff.siths.client
 import xyz.haff.siths.option.ExclusiveMode
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.option.ListEnd
+import xyz.haff.siths.option.RelativePosition
 import kotlin.time.Duration
 
 interface Siths<

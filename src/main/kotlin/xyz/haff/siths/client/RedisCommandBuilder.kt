@@ -3,10 +3,12 @@ package xyz.haff.siths.client
 import xyz.haff.siths.option.ExclusiveMode
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.option.ListEnd
+import xyz.haff.siths.option.RelativePosition
+import xyz.haff.siths.protocol.RedisCommand
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
-private fun countSubCommand(count: Int?) = count?.let { RedisCommand("COUNT", it )}
+private fun countSubCommand(count: Int?) = count?.let { RedisCommand("COUNT", it ) }
 private fun durationToFloatSeconds(duration: Duration?) = duration?.toDouble(DurationUnit.SECONDS) ?: 0.0
 
 class RedisCommandBuilder : Siths<
@@ -207,7 +209,7 @@ class RedisCommandBuilder : Siths<
     override suspend fun lpos(key: String, element: String, rank: Int?, maxlen: Int?)
         = (RedisCommand("LPOS", key, element)
             + rank?.let { RedisCommand("RANK", it) }
-            + maxlen?.let { RedisCommand("MAXLEN", it)}
+            + maxlen?.let { RedisCommand("MAXLEN", it) }
     )
 
     override suspend fun lpos(key: String, element: String, rank: Int?, count: Int, maxlen: Int?): RedisCommand

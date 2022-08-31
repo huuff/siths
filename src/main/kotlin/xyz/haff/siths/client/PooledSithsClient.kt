@@ -1,6 +1,9 @@
 package xyz.haff.siths.client
 
 import xyz.haff.siths.common.randomUUID
+import xyz.haff.siths.pooling.Pool
+import xyz.haff.siths.pooling.PoolStatus
+import xyz.haff.siths.pooling.PooledResource
 
 class PooledSithsClient(
     override val resource: SithsClient,

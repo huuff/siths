@@ -1,5 +1,8 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.protocol
 
+import xyz.haff.siths.client.StandaloneSithsConnection
+import xyz.haff.siths.pooling.DefaultPool
+import xyz.haff.siths.pooling.Pool
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 

@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.makeSithsPool
+import xyz.haff.siths.protocol.SithsConnectionPool
 
 class SithsListTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine")) {

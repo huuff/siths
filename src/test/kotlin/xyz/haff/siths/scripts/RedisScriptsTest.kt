@@ -1,14 +1,13 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.scripts
 
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
+import xyz.haff.siths.client.SithsClient
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeSithsClient
-import xyz.haff.siths.scripts.RedisScripts
 
 class RedisScriptsTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {

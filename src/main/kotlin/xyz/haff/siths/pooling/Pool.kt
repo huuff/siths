@@ -1,6 +1,6 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.pooling
 
-interface Pool<out ResourceType, out PooledResourceType: PooledResource<ResourceType> > {
+interface Pool<out ResourceType, out PooledResourceType: PooledResource<ResourceType>> {
 
     val currentResources: Int
     suspend fun get(): PooledResourceType

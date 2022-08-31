@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.protocol
 
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
@@ -9,7 +9,6 @@ import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import java.nio.ByteBuffer
 
 class RedisConnectionTest : FunSpec({

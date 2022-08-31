@@ -9,6 +9,9 @@ import io.kotest.matchers.shouldNotBe
 import xyz.haff.siths.common.RedisBrokenConnectionException
 import xyz.haff.siths.makeRedisConnection
 import xyz.haff.siths.makeSithsPool
+import xyz.haff.siths.pooling.ExhaustedPoolException
+import xyz.haff.siths.protocol.RedisCommand
+import xyz.haff.siths.protocol.SithsConnectionPool
 import xyz.haff.siths.suspended
 import java.util.*
 import kotlin.time.Duration.Companion.milliseconds

@@ -4,6 +4,7 @@ import kotlinx.coroutines.delay
 import xyz.haff.siths.common.*
 import xyz.haff.siths.common.buildLockKey
 import xyz.haff.siths.protocol.RespType
+import xyz.haff.siths.protocol.SithsConnectionPool
 import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.scripts.RedisScripts
 import kotlin.time.Duration

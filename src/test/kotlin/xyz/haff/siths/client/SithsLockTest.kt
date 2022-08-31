@@ -11,6 +11,7 @@ import kotlinx.coroutines.delay
 import xyz.haff.siths.common.RedisLockTimeoutException
 import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.protocol.RespNullResponse
+import xyz.haff.siths.protocol.SithsConnectionPool
 import xyz.haff.siths.suspended
 import java.util.*
 import kotlin.time.Duration.Companion.milliseconds

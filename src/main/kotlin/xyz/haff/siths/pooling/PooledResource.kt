@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.pooling
 
 enum class PoolStatus { FREE, BUSY }
 
