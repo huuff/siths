@@ -5,7 +5,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
-import xyz.haff.siths.client.SithsClient
+import xyz.haff.siths.client.api.SithsClient
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeSithsClient
 

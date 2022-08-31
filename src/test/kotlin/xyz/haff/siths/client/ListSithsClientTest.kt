@@ -12,6 +12,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import xyz.haff.koy.timed
+import xyz.haff.siths.client.api.SithsClient
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeSithsClient
 import xyz.haff.siths.option.ListEnd

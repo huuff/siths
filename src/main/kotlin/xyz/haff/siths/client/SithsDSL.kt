@@ -1,6 +1,8 @@
 package xyz.haff.siths.client
 
 import kotlinx.coroutines.delay
+import xyz.haff.siths.client.pooled.ManagedSithsClient
+import xyz.haff.siths.client.pooled.SithsClientPool
 import xyz.haff.siths.common.*
 import xyz.haff.siths.common.buildLockKey
 import xyz.haff.siths.pipelining.RedisPipelineBuilder

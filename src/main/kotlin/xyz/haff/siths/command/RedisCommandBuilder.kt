@@ -1,6 +1,6 @@
 package xyz.haff.siths.command
 
-import xyz.haff.siths.client.RedisCommandReceiver
+import xyz.haff.siths.client.api.RedisCommandReceiver
 import xyz.haff.siths.option.ExclusiveMode
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.option.ListEnd

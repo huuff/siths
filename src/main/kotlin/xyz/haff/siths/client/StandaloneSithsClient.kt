@@ -1,5 +1,8 @@
 package xyz.haff.siths.client
 
+import xyz.haff.siths.client.api.ListSithsClient
+import xyz.haff.siths.client.api.SetSithsClient
+import xyz.haff.siths.client.api.SithsClient
 import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.option.ExclusiveMode
 import xyz.haff.siths.option.ExpirationCondition

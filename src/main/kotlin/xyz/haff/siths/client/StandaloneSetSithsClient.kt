@@ -1,5 +1,6 @@
 package xyz.haff.siths.client
 
+import xyz.haff.siths.client.api.SetSithsClient
 import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.protocol.*
 

@@ -1,5 +1,6 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.client.pooled
 
+import xyz.haff.siths.client.api.SithsClient
 import xyz.haff.siths.option.ExclusiveMode
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.option.ListEnd

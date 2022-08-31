@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.client.api
 
 import xyz.haff.siths.protocol.RedisClient
 import xyz.haff.siths.protocol.RedisCursor

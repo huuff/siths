@@ -5,28 +5,20 @@ import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
-import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.comparables.shouldBeGreaterThanOrEqualTo
 import io.kotest.matchers.comparables.shouldBeLessThanOrEqualTo
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import xyz.haff.koy.timed
+import xyz.haff.siths.client.api.SithsClient
 import xyz.haff.siths.option.ExclusiveMode.NX
 import xyz.haff.siths.option.ExclusiveMode.XX
 import xyz.haff.siths.common.RedisScriptNotLoadedException
-import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeRedisConnection
 import xyz.haff.siths.makeSithsClient
 import xyz.haff.siths.option.ExpirationCondition
-import xyz.haff.siths.option.ListEnd
 import xyz.haff.siths.protocol.StandaloneSithsConnection
 import xyz.haff.siths.scripts.RedisScript
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class SithsClientTest : FunSpec({

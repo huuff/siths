@@ -1,5 +1,6 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.client.pooled
 
+import xyz.haff.siths.client.api.SithsClient
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.pooling.Pool
 import xyz.haff.siths.pooling.PoolStatus

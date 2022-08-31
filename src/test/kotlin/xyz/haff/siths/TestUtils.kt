@@ -4,7 +4,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.testcontainers.containers.GenericContainer
 import redis.clients.jedis.JedisPool
-import xyz.haff.siths.client.ManagedSithsClient
+import xyz.haff.siths.client.pooled.ManagedSithsClient
 import xyz.haff.siths.protocol.RedisConnection
 import xyz.haff.siths.protocol.SithsConnectionPool
 import kotlin.time.Duration

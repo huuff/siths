@@ -1,9 +1,9 @@
 package xyz.haff.siths.dstructures
 
 import kotlinx.coroutines.runBlocking
-import xyz.haff.siths.client.ManagedSithsClient
+import xyz.haff.siths.client.pooled.ManagedSithsClient
 import xyz.haff.siths.pipelining.RedisPipelineBuilder
-import xyz.haff.siths.client.SithsClientPool
+import xyz.haff.siths.client.pooled.SithsClientPool
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.protocol.RedisCursor
