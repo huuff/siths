@@ -1,6 +1,6 @@
 package xyz.haff.siths.protocol
 
-import xyz.haff.siths.client.RedisPipeline
+import xyz.haff.siths.pipelining.RedisPipeline
 import xyz.haff.siths.command.RedisCommand
 
 /**

@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.protocol
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import xyz.haff.siths.command.RedisCommand
 import xyz.haff.siths.common.RedisAuthException
 import xyz.haff.siths.common.RedisUnexpectedRespResponseException
-import xyz.haff.siths.protocol.*
+import xyz.haff.siths.pipelining.RedisPipeline
 import java.util.*
 import kotlin.text.Charsets
 import kotlin.text.toByteArray

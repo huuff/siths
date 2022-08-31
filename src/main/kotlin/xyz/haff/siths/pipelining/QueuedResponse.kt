@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.pipelining
 
 import xyz.haff.siths.common.UnexecutedRedisPipelineException
 import xyz.haff.siths.protocol.RespType

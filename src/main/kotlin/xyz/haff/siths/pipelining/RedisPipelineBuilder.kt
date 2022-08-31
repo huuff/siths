@@ -1,5 +1,8 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.pipelining
 
+import xyz.haff.siths.client.RedisClient
+import xyz.haff.siths.client.Siths
+import xyz.haff.siths.client.SourceAndData
 import xyz.haff.siths.command.RedisCommand
 import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.option.ExclusiveMode

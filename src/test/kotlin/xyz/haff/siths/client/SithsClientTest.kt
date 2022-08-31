@@ -24,6 +24,7 @@ import xyz.haff.siths.makeRedisConnection
 import xyz.haff.siths.makeSithsClient
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.option.ListEnd
+import xyz.haff.siths.protocol.StandaloneSithsConnection
 import xyz.haff.siths.scripts.RedisScript
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds

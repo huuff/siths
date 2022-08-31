@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.pipelining
 
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
@@ -9,6 +9,7 @@ import io.kotest.matchers.comparables.shouldBeLessThanOrEqualTo
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeSithsPool
+import xyz.haff.siths.pipelining.RedisPipelineBuilder
 import kotlin.time.Duration.Companion.seconds
 
 class RedisPipelineBuilderTest : FunSpec({
