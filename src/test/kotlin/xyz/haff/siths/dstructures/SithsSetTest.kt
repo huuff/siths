@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.dstructures
 
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec

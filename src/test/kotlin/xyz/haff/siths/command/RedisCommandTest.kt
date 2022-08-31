@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.command
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
