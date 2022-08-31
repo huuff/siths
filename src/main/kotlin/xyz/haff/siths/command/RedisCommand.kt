@@ -1,4 +1,4 @@
-package xyz.haff.siths.protocol
+package xyz.haff.siths.command
 
 import xyz.haff.siths.client.RedisPipeline
 

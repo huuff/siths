@@ -4,6 +4,7 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import xyz.haff.siths.client.RedisPipeline
 import xyz.haff.siths.client.StandaloneSithsConnection
+import xyz.haff.siths.command.RedisCommand
 import xyz.haff.siths.common.RedisBrokenConnectionException
 import xyz.haff.siths.pooling.Pool
 import xyz.haff.siths.pooling.PoolStatus

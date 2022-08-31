@@ -1,6 +1,6 @@
 package xyz.haff.siths.client
 
-import xyz.haff.siths.protocol.RedisCommand
+import xyz.haff.siths.command.RedisCommand
 
 data class RedisPipeline(
     val commands: List<RedisCommand> = listOf()

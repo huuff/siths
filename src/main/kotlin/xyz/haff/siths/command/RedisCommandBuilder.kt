@@ -1,10 +1,11 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.command
 
+import xyz.haff.siths.client.Siths
 import xyz.haff.siths.option.ExclusiveMode
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.option.ListEnd
 import xyz.haff.siths.option.RelativePosition
-import xyz.haff.siths.protocol.RedisCommand
+import xyz.haff.siths.command.RedisCommand
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 

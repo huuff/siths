@@ -4,6 +4,7 @@ import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
+import xyz.haff.siths.command.RedisCommand
 import xyz.haff.siths.common.RedisAuthException
 import xyz.haff.siths.common.RedisUnexpectedRespResponseException
 import xyz.haff.siths.protocol.*

@@ -7,6 +7,7 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.client.RedisPipeline
 import xyz.haff.siths.client.StandaloneSithsConnection
+import xyz.haff.siths.command.RedisCommand
 import xyz.haff.siths.makeRedisConnection
 
 class SithsConnectionTest : FunSpec({

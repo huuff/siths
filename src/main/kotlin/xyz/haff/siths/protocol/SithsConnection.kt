@@ -1,6 +1,7 @@
 package xyz.haff.siths.protocol
 
 import xyz.haff.siths.client.RedisPipeline
+import xyz.haff.siths.command.RedisCommand
 
 /**
  * A connection to a Redis database. It comprises two operations:
