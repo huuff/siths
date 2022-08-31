@@ -1,18 +1,17 @@
 package xyz.haff.siths.command
 
-import xyz.haff.siths.client.Siths
+import xyz.haff.siths.client.RedisCommandReceiver
 import xyz.haff.siths.option.ExclusiveMode
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.option.ListEnd
 import xyz.haff.siths.option.RelativePosition
-import xyz.haff.siths.command.RedisCommand
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 private fun countSubCommand(count: Int?) = count?.let { RedisCommand("COUNT", it ) }
 private fun durationToFloatSeconds(duration: Duration?) = duration?.toDouble(DurationUnit.SECONDS) ?: 0.0
 
-class RedisCommandBuilder : Siths<
+class RedisCommandBuilder : RedisCommandReceiver<
         RedisCommand,
         RedisCommand,
         RedisCommand,

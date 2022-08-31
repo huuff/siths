@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlinx.kover") version "0.5.0"
     id("maven-publish")
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("org.gradle.test-retry") version "1.0.0"
     id("signing")
 }
 
@@ -22,6 +23,13 @@ tasks.test {
     jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
     finalizedBy(tasks.koverHtmlReport)
     systemProperties["kotest.framework.parallelism"] = 4
+
+    retry {
+        maxRetries.set(1)
+        filter {
+            includeTestsMatching("*SithsLockTest")
+        }
+    }
 }
 
 java {

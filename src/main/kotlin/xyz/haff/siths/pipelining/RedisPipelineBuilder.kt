@@ -1,7 +1,7 @@
 package xyz.haff.siths.pipelining
 
 import xyz.haff.siths.client.RedisClient
-import xyz.haff.siths.client.Siths
+import xyz.haff.siths.client.RedisCommandReceiver
 import xyz.haff.siths.client.SourceAndData
 import xyz.haff.siths.command.RedisCommand
 import xyz.haff.siths.command.RedisCommandBuilder
@@ -20,7 +20,7 @@ class RedisPipelineBuilder(
     // connection without actually using it
     private val connection: SithsConnection,
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder(),
-) : Siths<
+) : RedisCommandReceiver<
         QueuedResponse<Unit>,
         QueuedResponse<String>,
         QueuedResponse<String?>,

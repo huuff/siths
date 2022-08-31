@@ -10,7 +10,7 @@ import kotlin.time.Duration
  *  * Escape the commands that are sent to Redis
  *  * Convert the responses to the appropriate Kotlin types
  */
-interface SithsClient : Siths<
+interface SithsClient : RedisCommandReceiver<
         Unit,
         String,
         String?,
@@ -28,7 +28,7 @@ interface SithsClient : Siths<
         List<String>,
         SourceAndData<List<String>>?,
         SourceAndData<String>?,
-        > {
+        >, ListSithsClient {
 
     suspend fun getOrNull(key: String): String?
 }
