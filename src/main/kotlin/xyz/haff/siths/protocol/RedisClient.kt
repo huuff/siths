@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.protocol
 
 import io.ktor.network.sockets.*
 import kotlin.time.Duration

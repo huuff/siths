@@ -1,8 +1,8 @@
 package xyz.haff.siths.pipelining
 
-import xyz.haff.siths.client.RedisClient
+import xyz.haff.siths.protocol.RedisClient
 import xyz.haff.siths.client.RedisCommandReceiver
-import xyz.haff.siths.client.SourceAndData
+import xyz.haff.siths.protocol.SourceAndData
 import xyz.haff.siths.command.RedisCommand
 import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.option.ExclusiveMode

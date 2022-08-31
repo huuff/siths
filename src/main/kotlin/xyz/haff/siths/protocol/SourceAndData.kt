@@ -1,4 +1,4 @@
-package xyz.haff.siths.client
+package xyz.haff.siths.protocol
 
 /**
  * For those operations that operate on several keys (sources) and return the source that matched, along with the data received

@@ -3,6 +3,7 @@ package xyz.haff.siths.client
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.network.sockets.*
+import xyz.haff.siths.protocol.RedisClient
 import kotlin.time.Duration.Companion.seconds
 
 class RedisClientTest : FunSpec({

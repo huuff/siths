@@ -16,7 +16,6 @@ interface ListRedisCommandReceiver<
         BooleanResponseType,
         UnitResponseType
         > {
-    // LISTS
     suspend fun llen(key: String): LongResponseType
     suspend fun lindex(key: String, index: Int): NullableStringResponseType
     suspend fun linsert(key: String, relativePosition: RelativePosition, pivot: String, element: String): NullableLongResponseType

@@ -13,6 +13,7 @@ import xyz.haff.siths.pooling.ExhaustedPoolException
 import xyz.haff.siths.command.RedisCommand
 import xyz.haff.siths.protocol.SithsConnectionPool
 import xyz.haff.siths.protocol.StandaloneSithsConnection
+import xyz.haff.siths.protocol.parseClientList
 import xyz.haff.siths.suspended
 import java.util.*
 import kotlin.time.Duration.Companion.milliseconds
