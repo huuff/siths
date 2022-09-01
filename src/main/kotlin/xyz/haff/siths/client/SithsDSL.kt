@@ -1,6 +1,8 @@
 package xyz.haff.siths.client
 
 import kotlinx.coroutines.delay
+import xyz.haff.siths.client.api.SithsClient
+import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.client.pooled.ManagedSithsClient
 import xyz.haff.siths.client.pooled.SithsClientPool
 import xyz.haff.siths.common.*
@@ -14,9 +16,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import java.util.*
 
-// TODO: Implement Siths? Delegate it? To avoid using a context receiver
-class SithsDSL(val pool: SithsConnectionPool) {
-    val redis = ManagedSithsClient(pool = SithsClientPool(pool))
+class SithsDSL(val pool: SithsConnectionPool): SithsImmediateClient by ManagedSithsClient(pool = SithsClientPool(pool)) {
 
     /**
      * Tries to run script, and, if not loaded, loads it, then runs it again

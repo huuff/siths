@@ -47,10 +47,10 @@ class SithsLockTest : FunSpec({
         suspended(10) {
             withRedis(makeSithsPool(container)) {
                 withLock("lock") {
-                    redis.incrBy("key", 1)
+                    incrBy("key", 1)
                     delay(100)
-                    redis.incrBy("key", -1)
-                    values += redis.get("key")
+                    incrBy("key", -1)
+                    values += get("key")
                 }
             }
         }
