@@ -20,6 +20,8 @@ interface RedisCommandReceiver<
         DurationResponseType,
 
         StringToBooleanMapResponseType,
+        StringToStringMapResponseType,
+
         StringCursorResponseType,
 
         NullableSourceAndStringType,
@@ -40,7 +42,6 @@ interface RedisCommandReceiver<
         NullableSourceAndStringType,
         NullableSourceAndStringListType,
 
-
         BooleanResponseType,
         UnitResponseType
         >, SetRedisCommandReceiver<
@@ -60,6 +61,9 @@ interface RedisCommandReceiver<
         exclusiveMode: ExclusiveMode? = null,
         timeToLive: Duration? = null
     ): UnitResponseType
+
+    suspend fun mset(vararg pairs: Pair<String, String>): UnitResponseType
+    suspend fun mget(key: String, vararg rest: String): StringToStringMapResponseType
 
     suspend fun get(key: String): StringResponseType
     suspend fun del(key: String, vararg rest: String): LongResponseType

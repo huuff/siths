@@ -35,6 +35,8 @@ class SithsPipelinedClient(
         QueuedResponse<Duration?>,
 
         QueuedResponse<Map<String, Boolean>>,
+        QueuedResponse<Map<String, String>>,
+
         QueuedResponse<RedisCursor<String>>,
 
         QueuedResponse<SourceAndData<String>?>,
@@ -101,6 +103,12 @@ class SithsPipelinedClient(
 
     override suspend fun getOrNull(key: String): QueuedResponse<String?>
         = addOperation(Operation(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringOrNull)))
+
+    override suspend fun mset(vararg pairs: Pair<String, String>): QueuedResponse<Unit>
+        = addOperation(Operation(commandBuilder.mset(*pairs), QueuedResponse(RespType<*>::toUnit)))
+
+    override suspend fun mget(key: String, vararg rest: String): QueuedResponse<Map<String, String>>
+        = addOperation(Operation(commandBuilder.mget(key, *rest), QueuedResponse({ it.associateArrayToArguments(key, *rest) })))
 
     override suspend fun del(key: String, vararg rest: String): QueuedResponse<Long> =
         addOperation(Operation(commandBuilder.del(key, *rest), QueuedResponse(RespType<*>::toLong)))

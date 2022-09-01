@@ -6,7 +6,6 @@
 
 ## Siths
 * Implement `EXPIREAT` and `EXPIRETIME`
-* Implement `MSET` and `MGET`
 * Implement `ZSET` operations! I had forgotten
 * Implement a distributed counter!
 * Implement `MutableMap`.

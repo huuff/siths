@@ -27,6 +27,12 @@ class ManagedSithsClient(
     override suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode?, timeToLive: Duration?)
         = pool.get().use { it.set(key, value, exclusiveMode, timeToLive) }
 
+    override suspend fun mset(vararg pairs: Pair<String, String>)
+        = pool.get().use { it.mset(*pairs) }
+
+    override suspend fun mget(key: String, vararg rest: String): Map<String, String>
+        = pool.get().use { it.mget(key, *rest) }
+
     override suspend fun del(key: String, vararg rest: String): Long
         = pool.get().use { it.del(key, *rest) }
 

@@ -23,6 +23,8 @@ interface SithsImmediateClient : SithsClient<
         Duration,
 
         Map<String, Boolean>,
+        Map<String, String>,
+
         RedisCursor<String>,
 
         SourceAndData<String>?,

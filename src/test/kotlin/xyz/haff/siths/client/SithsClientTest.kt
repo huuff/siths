@@ -238,4 +238,17 @@ class SithsClientTest : FunSpec({
         wasPersisted shouldBe true
         siths.ttl(key) shouldBe null
     }
+
+    test("mset and mget") {
+        // ARRANGE
+        val key1 = randomUUID()
+        val key2 = randomUUID()
+        siths.mset(key1 to "value1", key2 to "value2")
+
+        // ACT & ASSERT
+        siths.mget(key1, key2, "nonexistent") shouldBe mapOf(
+            key1 to "value1",
+            key2 to "value2",
+        )
+    }
 })

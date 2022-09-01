@@ -24,6 +24,8 @@ interface SithsClient<
         DurationResponseType,
 
         StringToBooleanMapResponseType,
+        StringToStringMapResponseType,
+
         StringCursorResponseType,
 
         NullableSourceAndStringType,
@@ -48,6 +50,8 @@ interface SithsClient<
         DurationResponseType,
 
         StringToBooleanMapResponseType,
+        StringToStringMapResponseType,
+
         StringCursorResponseType,
 
         NullableSourceAndStringType,

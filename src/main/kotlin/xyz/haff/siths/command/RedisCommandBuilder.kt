@@ -29,9 +29,16 @@ class RedisCommandBuilder : RedisCommandReceiver<
         RedisCommand,
         RedisCommand,
         RedisCommand,
+        RedisCommand,
         > {
 
     override suspend fun get(key: String) = RedisCommand("GET", key)
+
+    override suspend fun mset(vararg pairs: Pair<String, String>): RedisCommand
+        = RedisCommand("MSET", *pairs.flatMap { listOf(it.first, it.second) }.toTypedArray())
+
+    override suspend fun mget(key: String, vararg rest: String): RedisCommand
+        = RedisCommand("MGET", key, *rest)
 
     override suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode?, timeToLive: Duration?): RedisCommand {
         val mainCommand = RedisCommand("SET", key, value, exclusiveMode?.toString())

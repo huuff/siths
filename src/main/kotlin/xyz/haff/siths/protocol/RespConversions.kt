@@ -190,6 +190,19 @@ fun RespType<*>.toSourceAndStringOrNull(): SourceAndData<String>? = when (this) 
     else -> handleAsUnexpected()
 }
 
+fun RespType<*>.associateArrayToArguments(vararg arguments: String): Map<String, String> = when (this) {
+    is RespArray -> {
+        value.mapIndexedNotNull { i, value ->
+            when (value) {
+                is RespBulkString -> Pair(arguments[i], value.value)
+                is RespNullResponse -> null
+                else -> handleAsUnexpected()
+            }
+        }.associate { it }
+    }
+    else -> handleAsUnexpected()
+}
+
 fun RespType<*>.assertOk() {
     isOk()
 }
