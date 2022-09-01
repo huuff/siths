@@ -7,13 +7,16 @@ import kotlin.time.Duration.Companion.seconds
 
 interface ListRedisCommandReceiver<
         LongResponseType,
+        NullableLongResponseType,
+        LongListResponseType,
+
         StringResponseType,
         NullableStringResponseType,
-        NullableLongResponseType,
         StringListResponseType,
-        NullableSourceAndStringListType,
+
         NullableSourceAndStringType,
-        LongListResponseType,
+        NullableSourceAndStringListType,
+
         BooleanResponseType,
         UnitResponseType
         > {

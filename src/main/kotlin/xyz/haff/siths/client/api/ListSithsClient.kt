@@ -4,13 +4,16 @@ import xyz.haff.siths.protocol.SourceAndData
 
 interface ListSithsClient: ListRedisCommandReceiver<
         Long,
+        Long?,
+        List<Long>,
+
         String,
         String?,
-        Long?,
         List<String>,
-        SourceAndData<List<String>>?,
+
         SourceAndData<String>?,
-        List<Long>,
+        SourceAndData<List<String>>?,
+
         Boolean,
         Unit
         > {

@@ -2,11 +2,13 @@ package xyz.haff.siths.client.api
 
 interface SetRedisCommandReceiver<
         LongResponseType,
-        StringSetResponseType,
-        BooleanResponseType,
-        StringToBooleanMapResponseType,
         NullableStringResponseType,
-        StringCursorResponseType
+
+        StringSetResponseType,
+        StringToBooleanMapResponseType,
+        StringCursorResponseType,
+
+        BooleanResponseType,
         > {
 
     suspend fun sadd(key: String, value: String, vararg rest: String): LongResponseType

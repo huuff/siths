@@ -24,22 +24,28 @@ interface RedisCommandReceiver<
         NullableSourceAndStringType,
         > : ListRedisCommandReceiver<
         LongResponseType,
+        NullableLongResponseType,
+        LongListResponseType,
+
         StringResponseType,
         NullableStringResponseType,
-        NullableLongResponseType,
         StringListResponseType,
-        NullableSourceAndStringListType,
+
         NullableSourceAndStringType,
-        LongListResponseType,
+        NullableSourceAndStringListType,
+
+
         BooleanResponseType,
         UnitResponseType
         >, SetRedisCommandReceiver<
         LongResponseType,
-        StringSetResponseType,
-        BooleanResponseType,
-        StringToBooleanMapResponseType,
         NullableStringResponseType,
+
+        StringSetResponseType,
+        StringToBooleanMapResponseType,
         StringCursorResponseType,
+
+        BooleanResponseType,
         > {
     suspend fun set(
         key: String,
