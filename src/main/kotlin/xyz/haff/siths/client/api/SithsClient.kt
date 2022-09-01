@@ -1,42 +1,62 @@
 package xyz.haff.siths.client.api
 
-import xyz.haff.siths.protocol.RedisClient
-import xyz.haff.siths.protocol.RedisCursor
-import xyz.haff.siths.protocol.RespType
-import xyz.haff.siths.protocol.SourceAndData
-import kotlin.time.Duration
 /**
  * A thin wrapper over a plain redis connection. Things it does:
  *  * Provide a discoverable entrypoint for available functions
  *  * Escape the commands that are sent to Redis
  *  * Convert the responses to the appropriate Kotlin types
  */
-interface SithsClient : RedisCommandReceiver<
-        Long,
-        Long?,
-        List<Long>,
 
-        Double,
+// XXX: Heaps upon heaps of copy-pasted lists of generic parameters... all to marginally refine each interface
+interface SithsClient<
+        LongResponseType,
+        NullableLongResponseType,
+        LongListResponseType,
 
-        String,
-        String?,
-        List<String>,
-        Set<String>,
+        DoubleResponseType,
 
-        List<RedisClient>,
-        Duration,
+        StringResponseType,
+        NullableStringResponseType,
+        StringListResponseType,
+        StringSetResponseType,
 
-        Map<String, Boolean>,
-        RedisCursor<String>,
+        ClientListResponseType,
+        DurationResponseType,
 
-        SourceAndData<String>?,
-        SourceAndData<List<String>>?,
+        StringToBooleanMapResponseType,
+        StringCursorResponseType,
 
-        Boolean,
-        Unit,
-        RespType<*>,
-        >, ListSithsClient {
+        NullableSourceAndStringType,
+        NullableSourceAndStringListType,
 
-    suspend fun getOrNull(key: String): String?
+        BooleanResponseType,
+        UnitResponseType,
+        RespResponseType,
+>: RedisCommandReceiver<
+        LongResponseType,
+        NullableLongResponseType,
+        LongListResponseType,
+
+        DoubleResponseType,
+
+        StringResponseType,
+        NullableStringResponseType,
+        StringListResponseType,
+        StringSetResponseType,
+
+        ClientListResponseType,
+        DurationResponseType,
+
+        StringToBooleanMapResponseType,
+        StringCursorResponseType,
+
+        NullableSourceAndStringType,
+        NullableSourceAndStringListType,
+
+        BooleanResponseType,
+        UnitResponseType,
+        RespResponseType,
+        > {
+
+    suspend fun getOrNull(key: String): NullableStringResponseType
 }
-

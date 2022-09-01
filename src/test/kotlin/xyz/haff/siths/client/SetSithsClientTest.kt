@@ -7,7 +7,7 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import xyz.haff.siths.client.api.SithsClient
+import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeSithsClient
@@ -16,7 +16,7 @@ class SetSithsClientTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
         withExposedPorts(6379)
     }
-    lateinit var siths: SithsClient
+    lateinit var siths: SithsImmediateClient
 
     beforeAny {
         siths = makeSithsClient(container)

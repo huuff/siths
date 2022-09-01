@@ -2,6 +2,7 @@ package xyz.haff.siths.pipelining
 
 import xyz.haff.siths.protocol.RedisClient
 import xyz.haff.siths.client.api.RedisCommandReceiver
+import xyz.haff.siths.client.api.SithsClient
 import xyz.haff.siths.protocol.SourceAndData
 import xyz.haff.siths.command.RedisCommand
 import xyz.haff.siths.command.RedisCommandBuilder
@@ -20,7 +21,7 @@ class RedisPipelineBuilder(
     // connection without actually using it
     private val connection: SithsConnection,
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder(),
-) : RedisCommandReceiver<
+) : SithsClient<
         QueuedResponse<Long>,
         QueuedResponse<Long?>,
         QueuedResponse<List<Long>>,
@@ -97,9 +98,11 @@ class RedisPipelineBuilder(
         )
     )
 
-    override suspend fun get(key: String): QueuedResponse<String> {
-        return addOperation(Operation(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringNonNull)))
-    }
+    override suspend fun get(key: String): QueuedResponse<String>
+        = addOperation(Operation(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringNonNull)))
+
+    override suspend fun getOrNull(key: String): QueuedResponse<String?>
+        = addOperation(Operation(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringOrNull)))
 
     override suspend fun del(key: String, vararg rest: String): QueuedResponse<Long> =
         addOperation(Operation(commandBuilder.del(key, *rest), QueuedResponse(RespType<*>::toLong)))

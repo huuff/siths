@@ -5,7 +5,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.shouldBe
-import xyz.haff.siths.client.api.SithsClient
+import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeSithsClient
 
@@ -13,7 +13,7 @@ class RedisScriptsTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
         withExposedPorts(6379)
     }
-    lateinit var siths: SithsClient
+    lateinit var siths: SithsImmediateClient
 
     beforeAny {
         siths = makeSithsClient(container)

@@ -1,6 +1,6 @@
 package xyz.haff.siths.client.pooled
 
-import xyz.haff.siths.client.api.SithsClient
+import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.option.ExclusiveMode
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.option.ListEnd
@@ -13,7 +13,7 @@ import kotlin.time.Duration.Companion.seconds
 // in the future
 class ManagedSithsClient(
     private val pool: SithsClientPool,
-) : SithsClient {
+) : SithsImmediateClient {
     constructor(
         redisConnection: RedisConnection,
         maxConnections: Int = 10,

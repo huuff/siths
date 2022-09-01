@@ -2,7 +2,7 @@ package xyz.haff.siths.client
 
 import xyz.haff.siths.client.api.ListSithsClient
 import xyz.haff.siths.client.api.SetSithsClient
-import xyz.haff.siths.client.api.SithsClient
+import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.option.ExclusiveMode
 import xyz.haff.siths.option.ExpirationCondition
@@ -13,7 +13,7 @@ class StandaloneSithsClient(
     private val connection: SithsConnection,
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder()
 )   :
-    SithsClient,
+    SithsImmediateClient,
     ListSithsClient by StandaloneListSithsClient(connection, commandBuilder),
     SetSithsClient by StandaloneSetSithsClient(connection, commandBuilder)
     {

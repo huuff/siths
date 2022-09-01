@@ -12,7 +12,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import xyz.haff.koy.timed
-import xyz.haff.siths.client.api.SithsClient
+import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeSithsClient
 import xyz.haff.siths.option.ListEnd
@@ -22,7 +22,7 @@ class ListSithsClientTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
         withExposedPorts(6379)
     }
-    lateinit var siths: SithsClient
+    lateinit var siths: SithsImmediateClient
 
     beforeAny {
         siths = makeSithsClient(container)

@@ -1,6 +1,6 @@
 package xyz.haff.siths.client.pooled
 
-import xyz.haff.siths.client.api.SithsClient
+import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.client.StandaloneSithsClient
 import xyz.haff.siths.pooling.Pool
 import xyz.haff.siths.pooling.PoolStatus
@@ -8,7 +8,7 @@ import xyz.haff.siths.protocol.SithsConnectionPool
 
 class SithsClientPool(
     private val connectionPool: SithsConnectionPool,
-) : Pool<SithsClient, PooledSithsClient> {
+) : Pool<SithsImmediateClient, PooledSithsClient> {
     private val identifiersToClients = mutableMapOf<String, PooledSithsClient>()
 
     override val currentResources: Int get() = identifiersToClients.size
