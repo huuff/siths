@@ -5,7 +5,7 @@ import xyz.haff.siths.client.pooled.ManagedSithsClient
 import xyz.haff.siths.client.pooled.SithsClientPool
 import xyz.haff.siths.common.*
 import xyz.haff.siths.common.buildLockKey
-import xyz.haff.siths.pipelining.RedisPipelineBuilder
+import xyz.haff.siths.pipelining.SithsPipelinedClient
 import xyz.haff.siths.protocol.RespType
 import xyz.haff.siths.protocol.SithsConnectionPool
 import xyz.haff.siths.scripts.RedisScript
@@ -38,16 +38,16 @@ class SithsDSL(val pool: SithsConnectionPool) {
     }
 
     // TODO: hmm this api seems unfriendly... the return type is too low-level
-    suspend inline fun pipelined(f: RedisPipelineBuilder.() -> Unit): List<RespType<*>> {
+    suspend inline fun pipelined(f: SithsPipelinedClient.() -> Unit): List<RespType<*>> {
         return pool.get().use { connection ->
-            val pipelineBuilder = RedisPipelineBuilder(connection)
+            val pipelineBuilder = SithsPipelinedClient(connection)
             pipelineBuilder.f()
             pipelineBuilder.exec()
         }
     }
-    suspend inline fun transactional(f: RedisPipelineBuilder.() -> Unit): List<RespType<*>> {
+    suspend inline fun transactional(f: SithsPipelinedClient.() -> Unit): List<RespType<*>> {
         return pool.get().use { connection ->
-            val pipelineBuilder = RedisPipelineBuilder(connection)
+            val pipelineBuilder = SithsPipelinedClient(connection)
             pipelineBuilder.f()
             pipelineBuilder.exec(inTransaction = true)
         }

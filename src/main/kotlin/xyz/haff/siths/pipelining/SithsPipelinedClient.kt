@@ -1,7 +1,6 @@
 package xyz.haff.siths.pipelining
 
 import xyz.haff.siths.protocol.RedisClient
-import xyz.haff.siths.client.api.RedisCommandReceiver
 import xyz.haff.siths.client.api.SithsClient
 import xyz.haff.siths.protocol.SourceAndData
 import xyz.haff.siths.command.RedisCommand
@@ -15,8 +14,7 @@ import kotlin.time.Duration
 
 private data class Operation<T>(val command: RedisCommand, val response: QueuedResponse<T>)
 
-// TODO: Is PipelineBuilder the correct name? It's not simply a builder since it also executes it
-class RedisPipelineBuilder(
+class SithsPipelinedClient(
     // TODO: Surely we shouldn't take the connection at the constructor, but only at execution! otherwise we'd be locking a
     // connection without actually using it
     private val connection: SithsConnection,

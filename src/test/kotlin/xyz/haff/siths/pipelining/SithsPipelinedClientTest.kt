@@ -9,10 +9,9 @@ import io.kotest.matchers.comparables.shouldBeLessThanOrEqualTo
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeSithsPool
-import xyz.haff.siths.pipelining.RedisPipelineBuilder
 import kotlin.time.Duration.Companion.seconds
 
-class RedisPipelineBuilderTest : FunSpec({
+class SithsPipelinedClientTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
         withExposedPorts(6379)
     }
@@ -20,7 +19,7 @@ class RedisPipelineBuilderTest : FunSpec({
     test("can set and get") {
         // ARRANGE
         val connection = makeSithsPool(container).get()
-        val pipeline = RedisPipelineBuilder(connection)
+        val pipeline = SithsPipelinedClient(connection)
         val key = randomUUID()
 
         // ACT
@@ -39,7 +38,7 @@ class RedisPipelineBuilderTest : FunSpec({
     test("all kinds of operations") {
         // ARRANGE
         val connection = makeSithsPool(container).get()
-        val pipeline = RedisPipelineBuilder(connection)
+        val pipeline = SithsPipelinedClient(connection)
         val key = randomUUID()
 
         // ACT

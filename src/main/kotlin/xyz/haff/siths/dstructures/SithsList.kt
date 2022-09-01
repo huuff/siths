@@ -2,7 +2,7 @@ package xyz.haff.siths.dstructures
 
 import kotlinx.coroutines.runBlocking
 import xyz.haff.siths.client.pooled.ManagedSithsClient
-import xyz.haff.siths.pipelining.RedisPipelineBuilder
+import xyz.haff.siths.pipelining.SithsPipelinedClient
 import xyz.haff.siths.client.withRedis
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
@@ -43,7 +43,7 @@ class SithsList<T : Any>(
     override fun containsAll(elements: Collection<T>): Boolean
         = runBlocking {
             connectionPool.get().use { conn ->
-                val pipeline = RedisPipelineBuilder(conn)
+                val pipeline = SithsPipelinedClient(conn)
                 val responses = elements.map { elem -> pipeline.lpos(name, serialize(elem)) }
                 pipeline.exec(inTransaction = true)
                 return@use responses.map { it.get() }.all { it != null }
@@ -63,7 +63,7 @@ class SithsList<T : Any>(
 
     override fun iterator(): MutableIterator<T> = runBlocking {
         connectionPool.get().use { conn ->
-            val pipeline = RedisPipelineBuilder(conn)
+            val pipeline = SithsPipelinedClient(conn)
             val cursorContents = pipeline.lrange(name, 0, maxCursorSize - 1)
             val size = pipeline.llen(name)
             pipeline.exec(inTransaction = true)
@@ -80,7 +80,7 @@ class SithsList<T : Any>(
     override fun add(element: T): Boolean {
         return runBlocking {
             connectionPool.get().use { conn ->
-                val pipeline = RedisPipelineBuilder(conn)
+                val pipeline = SithsPipelinedClient(conn)
                 val sizePriorToUpdate = pipeline.llen(name)
                 val sizeAfterUpdate = pipeline.rpush(name, serialize(element))
                 pipeline.exec(inTransaction = true)
@@ -114,7 +114,7 @@ class SithsList<T : Any>(
 
         return runBlocking {
             connectionPool.get().use { conn ->
-                val pipeline = RedisPipelineBuilder(conn)
+                val pipeline = SithsPipelinedClient(conn)
                 val sizePriorToUpdate = pipeline.llen(name)
                 val sizeAfterUpdate = pipeline.rpush(name, head, *tail)
                 pipeline.exec(inTransaction = true)
@@ -135,7 +135,7 @@ class SithsList<T : Any>(
         val cursorStart = index - floor(min(elementsBeforeIndex.toDouble(), maxCursorSize.toDouble()/2)).toInt()
 
         return@runBlocking connectionPool.get().use { conn ->
-            val pipeline = RedisPipelineBuilder(conn)
+            val pipeline = SithsPipelinedClient(conn)
             val size = pipeline.llen(name)
             val cursorContents = pipeline.lrange(name, cursorStart, cursorStart + maxCursorSize)
             pipeline.exec(inTransaction = true)
@@ -154,7 +154,7 @@ class SithsList<T : Any>(
 
     override fun removeAll(elements: Collection<T>): Boolean = runBlocking {
             connectionPool.get().use { conn ->
-                val pipeline = RedisPipelineBuilder(conn)
+                val pipeline = SithsPipelinedClient(conn)
                 val responses = elements.map {
                     pipeline.lrem(name, serialize(it), count = 0)
                 }
@@ -165,7 +165,7 @@ class SithsList<T : Any>(
 
     override fun removeAt(index: Int): T = runBlocking {
         connectionPool.get().use { conn ->
-            val pipeline = RedisPipelineBuilder(conn)
+            val pipeline = SithsPipelinedClient(conn)
             val removedElement = pipeline.lindex(name, index)
             val removeMarker = randomUUID()
             pipeline.lset(name, index, removeMarker)
@@ -191,7 +191,7 @@ class SithsList<T : Any>(
 
     override fun set(index: Int, element: T): T = runBlocking {
         connectionPool.get().use { conn ->
-            val pipeline = RedisPipelineBuilder(conn)
+            val pipeline = SithsPipelinedClient(conn)
             val previousElement = pipeline.lindex(name, index)
             pipeline.lset(name, index, serialize(element))
             pipeline.exec(inTransaction = true)
