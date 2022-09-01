@@ -177,12 +177,6 @@ class RedisCommandBuilder : RedisCommandReceiver<
     override suspend fun lmpop(key: String, end: ListEnd, count: Int?): RedisCommand
         = lmpop(listOf(key), end, count)
 
-    override suspend fun blmpop(keys: List<String>, end: ListEnd, count: Int?): RedisCommand
-        = RedisCommand("BLMPOP", keys.size, *keys.toTypedArray(), end) + countSubCommand(count)
-
-    override suspend fun blmpop(key: String, end: ListEnd, count: Int?): RedisCommand
-        = RedisCommand("BLMPOP", 1, key, end) + countSubCommand(count)
-
     override suspend fun rpop(key: String, count: Int?): RedisCommand
         = RedisCommand("RPOP", key, count)
 
@@ -232,15 +226,18 @@ class RedisCommandBuilder : RedisCommandReceiver<
     ): RedisCommand
         = RedisCommand("LMOVE", source, destination, sourceEnd, destinationEnd)
 
-    override suspend fun brpop(keys: List<String>, timeout: Duration?): RedisCommand
-        = RedisCommand("BRPOP", *keys.toTypedArray(), durationToFloatSeconds(timeout))
+    override suspend fun blmpop(
+        timeout: Duration,
+        key: String,
+        vararg otherKeys: String,
+        end: ListEnd,
+        count: Int?
+    ): RedisCommand
+        = RedisCommand("BLMPOP", durationToFloatSeconds(timeout), 1 + otherKeys.size, end) + countSubCommand(count)
 
-    override suspend fun brpop(key: String, timeout: Duration?): RedisCommand
-        = RedisCommand("BRPOP", key, durationToFloatSeconds(timeout))
+    override suspend fun brpop(key: String, vararg otherKeys: String, timeout: Duration?): RedisCommand
+        = RedisCommand("BRPOP", key, *otherKeys, durationToFloatSeconds(timeout))
 
-    override suspend fun blpop(keys: List<String>, timeout: Duration?): RedisCommand
-        = RedisCommand("BLPOP", *keys.toTypedArray(), durationToFloatSeconds(timeout))
-
-    override suspend fun blpop(key: String, timeout: Duration?): RedisCommand
-        = RedisCommand("BLPOP", key, durationToFloatSeconds(timeout))
+    override suspend fun blpop(key: String, vararg otherKeys: String, timeout: Duration?): RedisCommand
+        = RedisCommand("BLPOP", key, *otherKeys, durationToFloatSeconds(timeout))
 }

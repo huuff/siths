@@ -347,24 +347,6 @@ class RedisPipelineBuilder(
         )
     )
 
-    override suspend fun blmpop(
-        keys: List<String>,
-        end: ListEnd,
-        count: Int?
-    ): QueuedResponse<SourceAndData<List<String>>?> = addOperation(
-        Operation(
-            command = commandBuilder.blmpop(keys, end, count),
-            response = QueuedResponse(RespType<*>::toSourceAndStringListOrNull)
-        )
-    )
-
-    override suspend fun blmpop(key: String, end: ListEnd, count: Int?): QueuedResponse<List<String>> = addOperation(
-        Operation(
-            command = commandBuilder.blmpop(key, end, count),
-            response = QueuedResponse({ it.toSourceAndStringListOrNull()?.data ?: listOf() })
-        )
-    )
-
     override suspend fun lmpop(key: String, end: ListEnd, count: Int?): QueuedResponse<List<String>> = addOperation(
         Operation(
             command = commandBuilder.lmpop(key, end, count),
@@ -443,36 +425,6 @@ class RedisPipelineBuilder(
         )
     )
 
-    override suspend fun brpop(keys: List<String>, timeout: Duration?): QueuedResponse<SourceAndData<String>?> =
-        addOperation(
-            Operation(
-                command = commandBuilder.brpop(keys, timeout),
-                response = QueuedResponse(RespType<*>::toSourceAndStringOrNull)
-            )
-        )
-
-    override suspend fun brpop(key: String, timeout: Duration?): QueuedResponse<String?> = addOperation(
-        Operation(
-            command = commandBuilder.brpop(key, timeout),
-            response = QueuedResponse({ it.toSourceAndStringOrNull()?.data })
-        )
-    )
-
-    override suspend fun blpop(keys: List<String>, timeout: Duration?): QueuedResponse<SourceAndData<String>?> =
-        addOperation(
-            Operation(
-                command = commandBuilder.blpop(keys, timeout),
-                response = QueuedResponse(RespType<*>::toSourceAndStringOrNull)
-            )
-        )
-
-    override suspend fun blpop(key: String, timeout: Duration?): QueuedResponse<String?> = addOperation(
-        Operation(
-            command = commandBuilder.blpop(key, timeout),
-            response = QueuedResponse({ it.toSourceAndStringOrNull()?.data })
-        )
-    )
-
     override suspend fun lmove(
         source: String,
         destination: String,
@@ -482,6 +434,41 @@ class RedisPipelineBuilder(
         Operation(
             command = commandBuilder.lmove(source, destination, sourceEnd, destinationEnd),
             response = QueuedResponse(RespType<*>::toStringNonNull)
+        )
+    )
+
+    override suspend fun blmpop(
+        timeout: Duration,
+        key: String,
+        vararg otherKeys: String,
+        end: ListEnd,
+        count: Int?
+    ): QueuedResponse<SourceAndData<List<String>>?> = addOperation(
+        Operation(
+            command = commandBuilder.blmpop(timeout, key, otherKeys = otherKeys, end = end, count),
+            response = QueuedResponse(RespType<*>::toSourceAndStringListOrNull)
+        )
+    )
+
+    override suspend fun brpop(
+        key: String,
+        vararg otherKeys: String,
+        timeout: Duration?
+    ): QueuedResponse<SourceAndData<String>?> = addOperation(
+        Operation(
+            command = commandBuilder.brpop(key, otherKeys = otherKeys, timeout),
+            response = QueuedResponse(RespType<*>::toSourceAndStringOrNull)
+        )
+    )
+
+    override suspend fun blpop(
+        key: String,
+        vararg otherKeys: String,
+        timeout: Duration?
+    ): QueuedResponse<SourceAndData<String>?> = addOperation(
+        Operation(
+            command = commandBuilder.blpop(key, otherKeys = otherKeys, timeout),
+            response = QueuedResponse(RespType<*>::toSourceAndStringOrNull)
         )
     )
 }

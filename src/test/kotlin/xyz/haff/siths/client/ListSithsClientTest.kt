@@ -191,7 +191,7 @@ class ListSithsClientTest : FunSpec({
             val key = randomUUID()
 
             // ACT
-            val popped = siths.brpop(key, 20.milliseconds)
+            val popped = siths.brpop(key, timeout = 20.milliseconds)
 
             // ASSERT
             popped shouldBe null
@@ -210,7 +210,7 @@ class ListSithsClientTest : FunSpec({
 
             // ASSERT
             val (result, time) = popped.await()
-            result shouldBe "value"
+            result?.data shouldBe "value"
             time shouldBeGreaterThanOrEqualTo 10
         }
     }

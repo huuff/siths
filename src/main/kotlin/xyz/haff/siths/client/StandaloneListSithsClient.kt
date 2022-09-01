@@ -29,11 +29,20 @@ class StandaloneListSithsClient(
     override suspend fun lmpop(keys: List<String>, end: ListEnd, count: Int?): SourceAndData<List<String>>?
             = connection.runCommand(commandBuilder.lmpop(keys, end, count)).toSourceAndStringListOrNull()
 
-    override suspend fun blmpop(keys: List<String>, end: ListEnd, count: Int?): SourceAndData<List<String>>?
-            = connection.runCommand(commandBuilder.blmpop(keys, end, count)).toSourceAndStringListOrNull()
+    override suspend fun blmpop(
+        timeout: Duration,
+        key: String,
+        vararg otherKeys: String,
+        end: ListEnd,
+        count: Int?
+    ): SourceAndData<List<String>>?
+        = connection.runCommand(commandBuilder.blmpop(timeout, key, otherKeys = otherKeys, end = end, count = count)).toSourceAndStringListOrNull()
 
-    override suspend fun blmpop(key: String, end: ListEnd, count: Int?): List<String>
-            = connection.runCommand(commandBuilder.blmpop(key, end, count)).toSourceAndStringListOrNull()?.data ?: listOf()
+    override suspend fun brpop(key: String, vararg otherKeys: String, timeout: Duration?): SourceAndData<String>?
+        = connection.runCommand(commandBuilder.brpop(key, otherKeys = otherKeys, timeout = timeout)).toSourceAndStringOrNull()
+
+    override suspend fun blpop(key: String, vararg otherKeys: String, timeout: Duration?): SourceAndData<String>?
+        = connection.runCommand(commandBuilder.blpop(key, otherKeys = otherKeys, timeout = timeout)).toSourceAndStringOrNull()
 
     override suspend fun lmpop(key: String, end: ListEnd, count: Int?): List<String>
             = lmpop(listOf(key), end, count)?.data ?: listOf()
@@ -81,16 +90,4 @@ class StandaloneListSithsClient(
         destinationEnd: ListEnd
     ): String
             = connection.runCommand(commandBuilder.lmove(source, destination, sourceEnd, destinationEnd)).toStringNonNull()
-
-    override suspend fun brpop(keys: List<String>, timeout: Duration?): SourceAndData<String>?
-            = connection.runCommand(commandBuilder.brpop(keys, timeout)).toSourceAndStringOrNull()
-
-    override suspend fun brpop(key: String, timeout: Duration?): String?
-            = connection.runCommand(commandBuilder.brpop(key, timeout)).toSourceAndStringOrNull()?.data
-
-    override suspend fun blpop(keys: List<String>, timeout: Duration?): SourceAndData<String>?
-            = connection.runCommand(commandBuilder.blpop(keys, timeout)).toSourceAndStringOrNull()
-
-    override suspend fun blpop(key: String, timeout: Duration?): String?
-            = connection.runCommand(commandBuilder.blpop(key, timeout)).toSourceAndStringOrNull()?.data
 }

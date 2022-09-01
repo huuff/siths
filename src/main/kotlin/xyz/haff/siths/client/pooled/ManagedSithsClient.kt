@@ -151,11 +151,20 @@ class ManagedSithsClient(
     ): SourceAndData<List<String>>?
             = pool.get().use { it.lmpop(keys, end, count) }
 
-    override suspend fun blmpop(keys: List<String>, end: ListEnd, count: Int?): SourceAndData<List<String>>?
-            = pool.get().use { it.blmpop(keys, end, count) }
+    override suspend fun blmpop(
+        timeout: Duration,
+        key: String,
+        vararg otherKeys: String,
+        end: ListEnd,
+        count: Int?
+    ): SourceAndData<List<String>>?
+        = pool.get().use { it.blmpop(timeout, key, otherKeys = otherKeys, end, count)}
 
-    override suspend fun blmpop(key: String, end: ListEnd, count: Int?): List<String>
-            = pool.get().use { it.blmpop(key, end, count) }
+    override suspend fun brpop(key: String, vararg otherKeys: String, timeout: Duration?): SourceAndData<String>?
+        = pool.get().use { it.brpop(key, otherKeys = otherKeys, timeout) }
+
+    override suspend fun blpop(key: String, vararg otherKeys: String, timeout: Duration?): SourceAndData<String>?
+        = pool.get().use { it.blpop(key, otherKeys = otherKeys, timeout) }
 
     override suspend fun lmpop(key: String, end: ListEnd, count: Int?): List<String>
             = pool.get().use { it.lmpop(key, end, count)}
@@ -202,16 +211,4 @@ class ManagedSithsClient(
         sourceEnd: ListEnd,
         destinationEnd: ListEnd
     ): String = pool.get().use { it.lmove(source, destination, sourceEnd, destinationEnd) }
-
-    override suspend fun brpop(keys: List<String>, timeout: Duration?): SourceAndData<String>?
-            = pool.get().use { it.brpop(keys, timeout) }
-
-    override suspend fun brpop(key: String, timeout: Duration?): String?
-            = pool.get().use { it.brpop(key, timeout)}
-
-    override suspend fun blpop(keys: List<String>, timeout: Duration?): SourceAndData<String>?
-            = pool.get().use { it.blpop(keys, timeout) }
-
-    override suspend fun blpop(key: String, timeout: Duration?): String?
-            = pool.get().use { it.blpop(key, timeout) }
 }
