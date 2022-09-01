@@ -90,4 +90,13 @@ class StandaloneListSithsClient(
         destinationEnd: ListEnd
     ): String
             = connection.runCommand(commandBuilder.lmove(source, destination, sourceEnd, destinationEnd)).toStringNonNull()
+
+    override suspend fun blmove(
+        source: String,
+        destination: String,
+        sourceEnd: ListEnd,
+        destinationEnd: ListEnd,
+        timeout: Duration?
+    ): String?
+        = connection.runCommand(commandBuilder.blmove(source, destination, sourceEnd, destinationEnd, timeout)).toStringOrNull()
 }

@@ -211,4 +211,12 @@ class ManagedSithsClient(
         sourceEnd: ListEnd,
         destinationEnd: ListEnd
     ): String = pool.get().use { it.lmove(source, destination, sourceEnd, destinationEnd) }
+
+    override suspend fun blmove(
+        source: String,
+        destination: String,
+        sourceEnd: ListEnd,
+        destinationEnd: ListEnd,
+        timeout: Duration?
+    ): String? = pool.get().use { it.blmove(source, destination, sourceEnd, destinationEnd) }
 }

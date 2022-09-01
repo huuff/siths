@@ -471,4 +471,17 @@ class RedisPipelineBuilder(
             response = QueuedResponse(RespType<*>::toSourceAndStringOrNull)
         )
     )
+
+    override suspend fun blmove(
+        source: String,
+        destination: String,
+        sourceEnd: ListEnd,
+        destinationEnd: ListEnd,
+        timeout: Duration?
+    ): QueuedResponse<String?> = addOperation(
+        Operation(
+            command = commandBuilder.blmove(source, destination, sourceEnd, destinationEnd, timeout),
+            response = QueuedResponse(RespType<*>::toStringOrNull)
+        )
+    )
 }

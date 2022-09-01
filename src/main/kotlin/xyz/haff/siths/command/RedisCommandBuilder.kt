@@ -240,4 +240,13 @@ class RedisCommandBuilder : RedisCommandReceiver<
 
     override suspend fun blpop(key: String, vararg otherKeys: String, timeout: Duration?): RedisCommand
         = RedisCommand("BLPOP", key, *otherKeys, durationToFloatSeconds(timeout))
+
+    override suspend fun blmove(
+        source: String,
+        destination: String,
+        sourceEnd: ListEnd,
+        destinationEnd: ListEnd,
+        timeout: Duration?
+    ): RedisCommand
+        = RedisCommand("BLMOVE", source, destination, sourceEnd, destinationEnd, durationToFloatSeconds(timeout))
 }

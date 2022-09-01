@@ -35,11 +35,6 @@ interface ListRedisCommandReceiver<
     suspend fun rpop(key: String, count: Int? = null): StringListResponseType
     suspend fun rpop(key: String): NullableStringResponseType
 
-    // BLOCKING
-    suspend fun blmpop(timeout: Duration = 0.seconds, key: String, vararg otherKeys: String, end: ListEnd, count: Int? = null): NullableSourceAndStringListType
-    suspend fun brpop(key: String, vararg otherKeys: String, timeout: Duration? = 0.seconds): NullableSourceAndStringType
-    suspend fun blpop(key: String, vararg otherKeys: String, timeout: Duration? = 0.seconds): NullableSourceAndStringType
-
     // LPOS
     suspend fun lpos(key: String, element: String, rank: Int? = null, maxlen: Int? = null): NullableLongResponseType
     suspend fun lpos(key: String, element: String, rank: Int? = null, count: Int, maxlen: Int? = null): LongListResponseType
@@ -49,4 +44,10 @@ interface ListRedisCommandReceiver<
     suspend fun lpushx(key: String, element: String, vararg rest: String): LongResponseType
     suspend fun rpush(key: String, element: String, vararg rest: String): LongResponseType
     suspend fun rpushx(key: String, element: String, vararg rest: String): LongResponseType
+
+    // BLOCKING
+    suspend fun blmpop(timeout: Duration = 0.seconds, key: String, vararg otherKeys: String, end: ListEnd, count: Int? = null): NullableSourceAndStringListType
+    suspend fun brpop(key: String, vararg otherKeys: String, timeout: Duration? = 0.seconds): NullableSourceAndStringType
+    suspend fun blpop(key: String, vararg otherKeys: String, timeout: Duration? = 0.seconds): NullableSourceAndStringType
+    suspend fun blmove(source: String, destination: String, sourceEnd: ListEnd, destinationEnd: ListEnd, timeout: Duration? = 0.seconds): NullableStringResponseType
 }
