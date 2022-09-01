@@ -5,23 +5,29 @@ import xyz.haff.siths.option.ExpirationCondition
 import kotlin.time.Duration
 
 interface RedisCommandReceiver<
-        UnitResponseType,
-        StringResponseType,
-        NullableStringResponseType,
-        RespResponseType,
         LongResponseType,
-        DoubleResponseType,
         NullableLongResponseType,
         LongListResponseType,
+
+        DoubleResponseType,
+
+        StringResponseType,
+        NullableStringResponseType,
+        StringListResponseType,
+        StringSetResponseType,
+
         ClientListResponseType,
         DurationResponseType,
-        StringSetResponseType,
-        StringCursorResponseType,
-        BooleanResponseType,
+
         StringToBooleanMapResponseType,
-        StringListResponseType,
-        NullableSourceAndStringListType,
+        StringCursorResponseType,
+
         NullableSourceAndStringType,
+        NullableSourceAndStringListType,
+
+        BooleanResponseType,
+        UnitResponseType,
+        RespResponseType,
         > : ListRedisCommandReceiver<
         LongResponseType,
         NullableLongResponseType,
@@ -39,9 +45,10 @@ interface RedisCommandReceiver<
         UnitResponseType
         >, SetRedisCommandReceiver<
         LongResponseType,
-        NullableStringResponseType,
 
+        NullableStringResponseType,
         StringSetResponseType,
+
         StringToBooleanMapResponseType,
         StringCursorResponseType,
 

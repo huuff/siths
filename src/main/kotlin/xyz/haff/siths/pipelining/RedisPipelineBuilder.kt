@@ -21,23 +21,29 @@ class RedisPipelineBuilder(
     private val connection: SithsConnection,
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder(),
 ) : RedisCommandReceiver<
-        QueuedResponse<Unit>,
-        QueuedResponse<String>,
-        QueuedResponse<String?>,
-        QueuedResponse<RespType<*>>,
         QueuedResponse<Long>,
-        QueuedResponse<Double>,
         QueuedResponse<Long?>,
         QueuedResponse<List<Long>>,
+
+        QueuedResponse<Double>,
+
+        QueuedResponse<String>,
+        QueuedResponse<String?>,
+        QueuedResponse<List<String>>,
+        QueuedResponse<Set<String>>,
+
         QueuedResponse<List<RedisClient>>,
         QueuedResponse<Duration?>,
-        QueuedResponse<Set<String>>,
-        QueuedResponse<RedisCursor<String>>,
-        QueuedResponse<Boolean>,
+
         QueuedResponse<Map<String, Boolean>>,
-        QueuedResponse<List<String>>,
-        QueuedResponse<SourceAndData<List<String>>?>,
+        QueuedResponse<RedisCursor<String>>,
+
         QueuedResponse<SourceAndData<String>?>,
+        QueuedResponse<SourceAndData<List<String>>?>,
+
+        QueuedResponse<Boolean>,
+        QueuedResponse<Unit>,
+        QueuedResponse<RespType<*>>,
         > {
     private val operations = mutableListOf<Operation<*>>()
     val length get() = operations.size

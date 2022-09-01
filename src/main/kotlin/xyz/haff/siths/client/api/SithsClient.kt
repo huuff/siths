@@ -5,7 +5,6 @@ import xyz.haff.siths.protocol.RedisCursor
 import xyz.haff.siths.protocol.RespType
 import xyz.haff.siths.protocol.SourceAndData
 import kotlin.time.Duration
-
 /**
  * A thin wrapper over a plain redis connection. Things it does:
  *  * Provide a discoverable entrypoint for available functions
@@ -13,24 +12,31 @@ import kotlin.time.Duration
  *  * Convert the responses to the appropriate Kotlin types
  */
 interface SithsClient : RedisCommandReceiver<
-        Unit,
-        String,
-        String?,
-        RespType<*>,
         Long,
-        Double,
         Long?,
         List<Long>,
+
+        Double,
+
+        String,
+        String?,
+        List<String>,
+        Set<String>,
+
         List<RedisClient>,
         Duration,
-        Set<String>,
-        RedisCursor<String>,
-        Boolean,
+
         Map<String, Boolean>,
-        List<String>,
-        SourceAndData<List<String>>?,
+        RedisCursor<String>,
+
         SourceAndData<String>?,
+        SourceAndData<List<String>>?,
+
+        Boolean,
+        Unit,
+        RespType<*>,
         >, ListSithsClient {
 
     suspend fun getOrNull(key: String): String?
 }
+
