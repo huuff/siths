@@ -265,5 +265,5 @@ class RedisCommandBuilder : RedisCommandReceiver<
         key: String,
         pair: Pair<String, String>,
         vararg rest: Pair<String, String>
-    ): RedisCommand = RedisCommand("HSET", pair.first, pair.second, *pairsToStringArray(*rest))
+    ): RedisCommand = RedisCommand("HSET", key, pair.first, pair.second, *pairsToStringArray(*rest))
 }
