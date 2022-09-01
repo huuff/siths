@@ -2,7 +2,8 @@ package xyz.haff.siths.client.api
 
 import xyz.haff.siths.protocol.SourceAndData
 
-// XXX: Note that there is one level of abstraction more for a SithsClient than for a ListSithsClient
+// XXX: Note that there is one level of abstraction more for a HashSithsClient than for a ListSithsClient or SetSithsClient,
+// that's because I haven't introduced higher-level abstraction methods for lists yet
 interface ListSithsClient: ListRedisCommandReceiver<
         Long,
         Long?,

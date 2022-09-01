@@ -1,8 +1,6 @@
 package xyz.haff.siths.client
 
-import xyz.haff.siths.client.api.ListSithsClient
-import xyz.haff.siths.client.api.SetSithsClient
-import xyz.haff.siths.client.api.SithsImmediateClient
+import xyz.haff.siths.client.api.*
 import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.option.ExclusiveMode
 import xyz.haff.siths.option.ExpirationCondition
@@ -15,7 +13,9 @@ class StandaloneSithsClient(
 ) :
     SithsImmediateClient,
     ListSithsClient by StandaloneListSithsClient(connection, commandBuilder),
-    SetSithsClient by StandaloneSetSithsClient(connection, commandBuilder) {
+    SetSithsClient by StandaloneSetSithsClient(connection, commandBuilder),
+    HashSithsImmediateClient by StandaloneHashSithsClient(connection, commandBuilder)
+{
 
     override suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode?, timeToLive: Duration?): Unit =
         connection.runCommand(commandBuilder.set(key, value, exclusiveMode, timeToLive)).toUnit()

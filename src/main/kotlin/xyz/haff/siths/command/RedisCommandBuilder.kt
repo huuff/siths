@@ -10,6 +10,7 @@ import kotlin.time.DurationUnit
 
 private fun countSubCommand(count: Int?) = count?.let { RedisCommand("COUNT", it ) }
 private fun durationToFloatSeconds(duration: Duration?) = duration?.toDouble(DurationUnit.SECONDS) ?: 0.0
+private fun pairsToStringArray(vararg pairs: Pair<String, String>) = pairs.flatMap { listOf(it.first, it.second) }.toTypedArray()
 
 class RedisCommandBuilder : RedisCommandReceiver<
         RedisCommand,
@@ -35,7 +36,7 @@ class RedisCommandBuilder : RedisCommandReceiver<
     override suspend fun get(key: String) = RedisCommand("GET", key)
 
     override suspend fun mset(vararg pairs: Pair<String, String>): RedisCommand
-        = RedisCommand("MSET", *pairs.flatMap { listOf(it.first, it.second) }.toTypedArray())
+        = RedisCommand("MSET", *pairsToStringArray(*pairs))
 
     override suspend fun mget(key: String, vararg rest: String): RedisCommand
         = RedisCommand("MGET", key, *rest)
@@ -256,4 +257,13 @@ class RedisCommandBuilder : RedisCommandReceiver<
         timeout: Duration?
     ): RedisCommand
         = RedisCommand("BLMOVE", source, destination, sourceEnd, destinationEnd, durationToFloatSeconds(timeout))
+
+    // HASH OPERATIONS
+    override suspend fun hget(key: String, field: String): RedisCommand = RedisCommand("HGET", key, field)
+
+    override suspend fun hset(
+        key: String,
+        pair: Pair<String, String>,
+        vararg rest: Pair<String, String>
+    ): RedisCommand = RedisCommand("HSET", pair.first, pair.second, *pairsToStringArray(*rest))
 }

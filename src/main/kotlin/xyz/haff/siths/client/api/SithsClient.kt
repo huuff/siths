@@ -60,6 +60,11 @@ interface SithsClient<
         BooleanResponseType,
         UnitResponseType,
         RespResponseType,
+        >, HashSithsClient<
+        LongResponseType,
+
+        StringResponseType,
+        NullableStringResponseType
         > {
 
     suspend fun getOrNull(key: String): NullableStringResponseType

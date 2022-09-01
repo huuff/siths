@@ -33,7 +33,7 @@ interface SithsImmediateClient : SithsClient<
         Boolean,
         Unit,
         RespType<*>,
-        >, ListSithsClient {
+        >, ListSithsClient, HashSithsImmediateClient {
 
 }
 

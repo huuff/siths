@@ -225,4 +225,14 @@ class ManagedSithsClient(
         destinationEnd: ListEnd,
         timeout: Duration?
     ): String? = pool.get().use { it.blmove(source, destination, sourceEnd, destinationEnd) }
+
+    // HASH OPERATIONS
+    override suspend fun hget(key: String, field: String): String
+        = pool.get().use { it.hget(key, field) }
+
+    override suspend fun hset(key: String, pair: Pair<String, String>, vararg rest: Pair<String, String>): Long
+        = pool.get().use { it.hset(key, pair, *rest) }
+
+    override suspend fun hgetOrNull(key: String, field: String): String?
+        = pool.get().use { it.hgetOrNull(key, field) }
 }

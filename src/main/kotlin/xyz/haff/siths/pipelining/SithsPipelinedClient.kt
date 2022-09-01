@@ -14,6 +14,7 @@ import kotlin.time.Duration
 
 private data class Operation<T>(val command: RedisCommand, val response: QueuedResponse<T>)
 
+// TODO: Considering I did split the standalone clients, this one must be split too, since it has an awful lot of boilerplate
 class SithsPipelinedClient(
     // TODO: Surely we shouldn't take the connection at the constructor, but only at execution! otherwise we'd be locking a
     // connection without actually using it
@@ -98,17 +99,21 @@ class SithsPipelinedClient(
         )
     )
 
-    override suspend fun get(key: String): QueuedResponse<String>
-        = addOperation(Operation(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringNonNull)))
+    override suspend fun get(key: String): QueuedResponse<String> =
+        addOperation(Operation(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringNonNull)))
 
-    override suspend fun getOrNull(key: String): QueuedResponse<String?>
-        = addOperation(Operation(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringOrNull)))
+    override suspend fun getOrNull(key: String): QueuedResponse<String?> =
+        addOperation(Operation(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringOrNull)))
 
-    override suspend fun mset(vararg pairs: Pair<String, String>): QueuedResponse<Unit>
-        = addOperation(Operation(commandBuilder.mset(*pairs), QueuedResponse(RespType<*>::toUnit)))
+    override suspend fun mset(vararg pairs: Pair<String, String>): QueuedResponse<Unit> =
+        addOperation(Operation(commandBuilder.mset(*pairs), QueuedResponse(RespType<*>::toUnit)))
 
-    override suspend fun mget(key: String, vararg rest: String): QueuedResponse<Map<String, String>>
-        = addOperation(Operation(commandBuilder.mget(key, *rest), QueuedResponse({ it.associateArrayToArguments(key, *rest) })))
+    override suspend fun mget(key: String, vararg rest: String): QueuedResponse<Map<String, String>> = addOperation(
+        Operation(
+            commandBuilder.mget(key, *rest),
+            QueuedResponse({ it.associateArrayToArguments(key, *rest) })
+        )
+    )
 
     override suspend fun del(key: String, vararg rest: String): QueuedResponse<Long> =
         addOperation(Operation(commandBuilder.del(key, *rest), QueuedResponse(RespType<*>::toLong)))
@@ -496,6 +501,32 @@ class SithsPipelinedClient(
     ): QueuedResponse<String?> = addOperation(
         Operation(
             command = commandBuilder.blmove(source, destination, sourceEnd, destinationEnd, timeout),
+            response = QueuedResponse(RespType<*>::toStringOrNull)
+        )
+    )
+
+    // SET OPERATIONS
+    override suspend fun hget(key: String, field: String): QueuedResponse<String> = addOperation(
+        Operation(
+            command = commandBuilder.hget(key, field),
+            response = QueuedResponse(RespType<*>::toStringNonNull)
+        )
+    )
+
+    override suspend fun hset(
+        key: String,
+        pair: Pair<String, String>,
+        vararg rest: Pair<String, String>
+    ): QueuedResponse<Long> = addOperation(
+        Operation(
+            command = commandBuilder.hset(key, pair, *rest),
+            response = QueuedResponse(RespType<*>::toLong)
+        )
+    )
+
+    override suspend fun hgetOrNull(key: String, field: String): QueuedResponse<String?> = addOperation(
+        Operation(
+            command = commandBuilder.hget(key, field),
             response = QueuedResponse(RespType<*>::toStringOrNull)
         )
     )

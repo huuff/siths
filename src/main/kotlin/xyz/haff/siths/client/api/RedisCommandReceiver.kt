@@ -54,7 +54,10 @@ interface RedisCommandReceiver<
         StringCursorResponseType,
 
         BooleanResponseType,
-        > {
+        >, HashRedisCommandReceiver <
+        LongResponseType,
+        StringResponseType,
+        >{
     suspend fun set(
         key: String,
         value: String,
