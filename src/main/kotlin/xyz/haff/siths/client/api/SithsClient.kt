@@ -64,7 +64,9 @@ interface SithsClient<
         LongResponseType,
 
         StringResponseType,
-        NullableStringResponseType
+        NullableStringResponseType,
+
+        StringToStringMapResponseType,
         > {
 
     suspend fun getOrNull(key: String): NullableStringResponseType

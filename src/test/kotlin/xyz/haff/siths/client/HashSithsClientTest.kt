@@ -29,6 +29,18 @@ class HashSithsClientTest : FunSpec({
 
         // ASSERT
         retrieved shouldBe "value"
+    }
 
+    test("hgetall") {
+        // ARRANGE
+        val key = randomUUID()
+        siths.hset(key, "f1" to "v1", "f2" to "v2", "f3" to "v3")
+
+        // ACT & ASSERT
+        siths.hgetall(key) shouldBe mapOf(
+            "f1" to "v1",
+            "f2" to "v2",
+            "f3" to "v3"
+        )
     }
 })

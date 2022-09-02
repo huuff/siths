@@ -505,7 +505,7 @@ class SithsPipelinedClient(
         )
     )
 
-    // SET OPERATIONS
+    // HASH OPERATIONS
     override suspend fun hget(key: String, field: String): QueuedResponse<String> = addOperation(
         Operation(
             command = commandBuilder.hget(key, field),
@@ -528,6 +528,13 @@ class SithsPipelinedClient(
         Operation(
             command = commandBuilder.hget(key, field),
             response = QueuedResponse(RespType<*>::toStringOrNull)
+        )
+    )
+
+    override suspend fun hgetall(key: String): QueuedResponse<Map<String, String>> = addOperation(
+        Operation(
+            command = commandBuilder.hgetall(key),
+            response = QueuedResponse(RespType<*>::toStringMap)
         )
     )
 }

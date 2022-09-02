@@ -235,4 +235,7 @@ class ManagedSithsClient(
 
     override suspend fun hgetOrNull(key: String, field: String): String?
         = pool.get().use { it.hgetOrNull(key, field) }
+
+    override suspend fun hgetall(key: String): Map<String, String>
+        = pool.get().use { it.hgetall(key) }
 }

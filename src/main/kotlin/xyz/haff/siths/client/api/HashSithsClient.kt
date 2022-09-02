@@ -5,8 +5,10 @@ interface HashSithsClient<
 
         StringResponseType,
         NullableStringResponseType,
+
+        StringToStringMapResponseType,
         >
-    : HashRedisCommandReceiver<LongResponseType, StringResponseType> {
+    : HashRedisCommandReceiver<LongResponseType, StringResponseType, StringToStringMapResponseType> {
 
     suspend fun hgetOrNull(key: String, field: String): NullableStringResponseType
 }

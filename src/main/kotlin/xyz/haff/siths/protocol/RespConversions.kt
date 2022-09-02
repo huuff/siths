@@ -206,3 +206,13 @@ fun RespType<*>.associateArrayToArguments(vararg arguments: String): Map<String,
 fun RespType<*>.assertOk() {
     isOk()
 }
+
+fun RespType<*>.toStringMap(): Map<String, String> = when (this) {
+    is RespArray -> {
+        val contents = contentsOfType<RespBulkString>().map { it.value }
+
+        // Make a list of even entries and another of odd ones, then zip and associate
+        ((contents.filterIndexed { i, _ -> i % 2 == 0}) zip (contents.filterIndexed { i, _ -> i % 2 != 0 })).associate { it }
+    }
+    else -> handleAsUnexpected()
+}

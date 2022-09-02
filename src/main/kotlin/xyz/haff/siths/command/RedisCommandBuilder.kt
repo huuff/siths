@@ -266,4 +266,6 @@ class RedisCommandBuilder : RedisCommandReceiver<
         pair: Pair<String, String>,
         vararg rest: Pair<String, String>
     ): RedisCommand = RedisCommand("HSET", key, pair.first, pair.second, *pairsToStringArray(*rest))
+
+    override suspend fun hgetall(key: String): RedisCommand = RedisCommand("HGETALL", key)
 }
