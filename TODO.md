@@ -6,7 +6,6 @@
 
 ## Siths
 * Implement `EXPIREAT` and `EXPIRETIME`
-* Implement `ZSET` operations! I had forgotten
 * Implement a distributed counter!
 * Implement `MutableMap`.
 * What if I simplify complex operations such as those of `SithsSet` or `SithsList` by making them lua scripts?
