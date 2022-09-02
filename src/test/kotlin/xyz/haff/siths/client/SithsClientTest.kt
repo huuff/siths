@@ -9,6 +9,8 @@ import io.kotest.matchers.comparables.shouldBeGreaterThanOrEqualTo
 import io.kotest.matchers.comparables.shouldBeLessThanOrEqualTo
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import xyz.haff.koy.javatime.asDate
+import xyz.haff.koy.javatime.asTime
 import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.option.ExclusiveMode.NX
 import xyz.haff.siths.option.ExclusiveMode.XX
@@ -19,6 +21,8 @@ import xyz.haff.siths.makeSithsClient
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.protocol.StandaloneSithsConnection
 import xyz.haff.siths.scripts.RedisScript
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import kotlin.time.Duration.Companion.seconds
 
 class SithsClientTest : FunSpec({
@@ -250,5 +254,19 @@ class SithsClientTest : FunSpec({
             key1 to "value1",
             key2 to "value2",
         )
+    }
+
+    test("expireAt and expireTime") {
+        // ARRANGE
+        val key = randomUUID()
+        siths.set(key, "value")
+
+        // ACT
+        val expirationSet = siths.expireAt(key, ZonedDateTime.of("2050-10-01".asDate, "10:00:00".asTime, ZoneId.systemDefault()))
+        val expirationReceived = siths.expireTime(key)
+
+        // ASSERT
+        expirationSet shouldBe true
+        expirationReceived?.toLocalDate() shouldBe "2050-10-01".asDate
     }
 })

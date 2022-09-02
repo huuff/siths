@@ -2,6 +2,7 @@ package xyz.haff.siths.client.api
 
 import xyz.haff.siths.option.ExclusiveMode
 import xyz.haff.siths.option.ExpirationCondition
+import java.time.ZonedDateTime
 import kotlin.time.Duration
 
 interface RedisCommandReceiver<
@@ -17,7 +18,9 @@ interface RedisCommandReceiver<
         StringSetResponseType,
 
         ClientListResponseType,
+
         DurationResponseType,
+        NullableZonedDateTimeResponseType,
 
         StringToBooleanMapResponseType,
         StringToStringMapResponseType,
@@ -97,6 +100,9 @@ interface RedisCommandReceiver<
     ): BooleanResponseType
 
     suspend fun persist(key: String): BooleanResponseType
+
+    suspend fun expireAt(key: String, time: ZonedDateTime, expirationCondition: ExpirationCondition? = null): BooleanResponseType
+    suspend fun expireTime(key: String): NullableZonedDateTimeResponseType
 
     suspend fun clientList(): ClientListResponseType
     suspend fun ping(): BooleanResponseType

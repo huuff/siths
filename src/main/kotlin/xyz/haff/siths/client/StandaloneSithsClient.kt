@@ -5,6 +5,7 @@ import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.option.ExclusiveMode
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.protocol.*
+import java.time.ZonedDateTime
 import kotlin.time.Duration
 
 class StandaloneSithsClient(
@@ -66,4 +67,13 @@ class StandaloneSithsClient(
 
     override suspend fun persist(key: String): Boolean =
         connection.runCommand(commandBuilder.persist(key)).integerToBoolean()
+
+    override suspend fun expireAt(
+        key: String,
+        time: ZonedDateTime,
+        expirationCondition: ExpirationCondition?
+    ): Boolean = connection.runCommand(commandBuilder.expireAt(key, time, expirationCondition)).integerToBoolean()
+
+    override suspend fun expireTime(key: String): ZonedDateTime?
+        = connection.runCommand(commandBuilder.expireTime(key)).toNullableZonedDateTime()
 }

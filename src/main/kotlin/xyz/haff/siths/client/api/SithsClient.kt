@@ -21,7 +21,9 @@ interface SithsClient<
         StringSetResponseType,
 
         ClientListResponseType,
+
         DurationResponseType,
+        NullableZonedDateTimeResponseType,
 
         StringToBooleanMapResponseType,
         StringToStringMapResponseType,
@@ -48,7 +50,9 @@ interface SithsClient<
         StringSetResponseType,
 
         ClientListResponseType,
+
         DurationResponseType,
+        NullableZonedDateTimeResponseType,
 
         StringToBooleanMapResponseType,
         StringToStringMapResponseType,

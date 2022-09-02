@@ -6,6 +6,7 @@ import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.option.ListEnd
 import xyz.haff.siths.option.RelativePosition
 import xyz.haff.siths.protocol.*
+import java.time.ZonedDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -76,6 +77,15 @@ class ManagedSithsClient(
 
     override suspend fun persist(key: String): Boolean
             = pool.get().use { it.persist(key) }
+
+    override suspend fun expireAt(
+        key: String,
+        time: ZonedDateTime,
+        expirationCondition: ExpirationCondition?
+    ): Boolean = pool.get().use { it.expireAt(key, time, expirationCondition) }
+
+    override suspend fun expireTime(key: String): ZonedDateTime?
+        = pool.get().use { it.expireTime(key) }
 
     // SET OPERATIONS
 

@@ -5,6 +5,7 @@ import xyz.haff.siths.option.ExclusiveMode
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.option.ListEnd
 import xyz.haff.siths.option.RelativePosition
+import java.time.ZonedDateTime
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -14,6 +15,8 @@ private fun pairsToStringArray(vararg pairs: Pair<String, String>) =
     pairs.flatMap { listOf(it.first, it.second) }.toTypedArray()
 
 class RedisCommandBuilder : RedisCommandReceiver<
+        // lol
+        RedisCommand,
         RedisCommand,
         RedisCommand,
         RedisCommand,
@@ -97,6 +100,14 @@ class RedisCommandBuilder : RedisCommandReceiver<
     override suspend fun ping(): RedisCommand = RedisCommand("PING")
 
     override suspend fun persist(key: String): RedisCommand = RedisCommand("PERSIST", key)
+
+    override suspend fun expireAt(
+        key: String,
+        time: ZonedDateTime,
+        expirationCondition: ExpirationCondition?
+    ): RedisCommand = RedisCommand("EXPIREAT", key, time.toEpochSecond(), expirationCondition)
+
+    override suspend fun expireTime(key: String): RedisCommand = RedisCommand("EXPIRETIME", key)
 
     // SET OPERATIONS
 

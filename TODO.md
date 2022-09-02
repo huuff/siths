@@ -5,4 +5,3 @@
 * Set `codecov.io`
 
 ## Siths
-* Implement `EXPIREAT` and `EXPIRETIME`

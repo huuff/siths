@@ -2,6 +2,9 @@ package xyz.haff.siths.protocol
 
 import xyz.haff.siths.common.RedisUnexpectedRespResponseException
 import xyz.haff.siths.common.zipEvensWithOdds
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -227,6 +230,14 @@ fun RespType<*>.toStringPairCursor(): RedisCursor<Pair<String, String>> = when (
         }
 
         RedisCursor(nextCursor, contents = contents.zipEvensWithOdds())
+    }
+    else -> handleAsUnexpected()
+}
+
+fun RespType<*>.toNullableZonedDateTime(): ZonedDateTime? = when (this) {
+    is RespInteger -> when (value) {
+        -1L, -2L -> null
+        else -> ZonedDateTime.ofInstant(Instant.ofEpochSecond(value), ZoneId.systemDefault())
     }
     else -> handleAsUnexpected()
 }
