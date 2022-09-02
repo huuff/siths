@@ -49,11 +49,12 @@ class SithsDSL(val pool: SithsConnectionPool) :
         return result.get()
     }
 
-    // TODO: Do as above
-    suspend inline fun transactional(f: PipelinedSithsClient.() -> Unit): List<RespType<*>> {
+    suspend inline fun <T> transactional(f: PipelinedSithsClient.() -> QueuedResponse<T>): T {
         val pipelineBuilder = PipelinedSithsClient()
-        pipelineBuilder.f()
-        return pool.get().use { conn -> pipelineBuilder.exec(conn, inTransaction = true) }
+        val result = pipelineBuilder.f()
+        pool.get().use { conn -> pipelineBuilder.exec(conn, inTransaction = true) }
+
+        return result.get()
     }
 
     // TODO: Maybe the following two should be offloaded to some RedisLock class?
