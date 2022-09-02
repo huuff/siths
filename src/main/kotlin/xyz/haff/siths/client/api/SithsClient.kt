@@ -27,6 +27,7 @@ interface SithsClient<
         StringToStringMapResponseType,
 
         StringCursorResponseType,
+        StringPairCursorResponseType,
 
         NullableSourceAndStringType,
         NullableSourceAndStringListType,
@@ -53,6 +54,7 @@ interface SithsClient<
         StringToStringMapResponseType,
 
         StringCursorResponseType,
+        StringPairCursorResponseType,
 
         NullableSourceAndStringType,
         NullableSourceAndStringListType,
@@ -70,6 +72,8 @@ interface SithsClient<
         StringListResponseType,
 
         StringToStringMapResponseType,
+
+        StringPairCursorResponseType,
 
         BooleanResponseType
         > {

@@ -11,6 +11,8 @@ interface HashSithsClient<
 
         StringToStringMapResponseType,
 
+        StringPairCursorResponseType,
+
         BooleanResponseType,
         >
     : HashRedisCommandReceiver<
@@ -23,6 +25,8 @@ interface HashSithsClient<
         StringListResponseType,
 
         StringToStringMapResponseType,
+
+        StringPairCursorResponseType,
 
         BooleanResponseType,
         > {

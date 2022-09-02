@@ -52,6 +52,15 @@ class StandaloneHashSithsClient(
     override suspend fun hsetnx(key: String, field: String, value: String): Boolean
         = connection.runCommand(commandBuilder.hsetnx(key, field, value)).integerToBoolean()
 
+    override suspend fun hscan(
+        key: String,
+        cursor: Long,
+        match: String?,
+        count: Int?
+    ): RedisCursor<Pair<String, String>>
+        = connection.runCommand(commandBuilder.hscan(key, cursor, match, count)).toStringPairCursor()
+
+    // HRANDFIELD
     override suspend fun hrandfield(key: String): String?
         = connection.runCommand(commandBuilder.hrandfield(key)).toStringOrNull()
 
@@ -60,4 +69,5 @@ class StandaloneHashSithsClient(
 
     override suspend fun hrandfieldWithValues(key: String, count: Int): Map<String, String>
         = connection.runCommand(commandBuilder.hrandfieldWithValues(key, count)).toStringMap()
+
 }

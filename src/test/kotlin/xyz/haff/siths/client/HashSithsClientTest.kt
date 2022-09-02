@@ -9,6 +9,7 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.client.api.SithsImmediateClient
+import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeSithsClient
 
@@ -206,5 +207,24 @@ class HashSithsClientTest : FunSpec({
                 "f3" to "v3"
             )
         }
+    }
+
+    test("hscan") {
+        // ARRANGE
+        val key = randomUUID()
+        val pairs = (1..30).map { "f$it" to "v$it" }
+        val (head, tail) = pairs.toTypedArray().headAndTail()
+        siths.hset(key, head, *tail)
+        val scannedPairs = mutableListOf<Pair<String, String>>()
+
+        // ACT
+        var cursor = siths.hscan(key, cursor = 0, match = "f*", count = 5)
+        do {
+            scannedPairs.addAll(cursor.contents)
+            cursor = siths.hscan(key, cursor = cursor.next, match = "f*", count = 5)
+        } while (cursor.next != 0L)
+
+        // ASSERT
+        scannedPairs shouldContainExactlyInAnyOrder pairs
     }
 })

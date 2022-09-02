@@ -11,6 +11,8 @@ interface HashRedisCommandReceiver<
 
             StringToStringMapResponseType,
 
+            StringPairCursorResponseType,
+
             BooleanResponseType,
         > {
     suspend fun hget(key: String, field: String): StringResponseType
@@ -26,6 +28,7 @@ interface HashRedisCommandReceiver<
     suspend fun hdel(key: String, field: String, vararg rest: String): LongResponseType
     suspend fun hstrlen(key: String, field: String): LongResponseType
     suspend fun hsetnx(key: String, field: String, value: String): BooleanResponseType
+    suspend fun hscan(key: String, cursor: Long = 0, match: String? = null, count: Int? = null): StringPairCursorResponseType
 
     // HRANDFIELD
     suspend fun hrandfield(key: String): NullableStringResponseType

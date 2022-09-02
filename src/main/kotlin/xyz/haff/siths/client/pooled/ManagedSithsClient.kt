@@ -271,6 +271,15 @@ class ManagedSithsClient(
     override suspend fun hsetnx(key: String, field: String, value: String): Boolean
         = pool.get().use { it.hsetnx(key, field, value) }
 
+    override suspend fun hscan(
+        key: String,
+        cursor: Long,
+        match: String?,
+        count: Int?
+    ): RedisCursor<Pair<String, String>>
+        = pool.get().use { it.hscan(key, cursor, match, count) }
+
+    // HRANDFIELD
     override suspend fun hrandfield(key: String): String?
         = pool.get().use { it.hrandfield(key) }
 

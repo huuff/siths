@@ -23,6 +23,7 @@ interface RedisCommandReceiver<
         StringToStringMapResponseType,
 
         StringCursorResponseType,
+        StringPairCursorResponseType,
 
         NullableSourceAndStringType,
         NullableSourceAndStringListType,
@@ -51,6 +52,7 @@ interface RedisCommandReceiver<
         StringSetResponseType,
 
         StringToBooleanMapResponseType,
+
         StringCursorResponseType,
 
         BooleanResponseType,
@@ -64,6 +66,8 @@ interface RedisCommandReceiver<
         StringListResponseType,
 
         StringToStringMapResponseType,
+
+        StringPairCursorResponseType,
 
         BooleanResponseType,
         >{

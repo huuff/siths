@@ -26,6 +26,7 @@ interface SithsImmediateClient : SithsClient<
         Map<String, String>,
 
         RedisCursor<String>,
+        RedisCursor<Pair<String, String>>,
 
         SourceAndData<String>?,
         SourceAndData<List<String>>?,

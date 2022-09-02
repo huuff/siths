@@ -40,6 +40,7 @@ class SithsPipelinedClient(
         QueuedResponse<Map<String, String>>,
 
         QueuedResponse<RedisCursor<String>>,
+        QueuedResponse<RedisCursor<Pair<String, String>>>,
 
         QueuedResponse<SourceAndData<String>?>,
         QueuedResponse<SourceAndData<List<String>>?>,
@@ -626,6 +627,19 @@ class SithsPipelinedClient(
         )
     )
 
+    override suspend fun hscan(
+        key: String,
+        cursor: Long,
+        match: String?,
+        count: Int?
+    ): QueuedResponse<RedisCursor<Pair<String, String>>> = addOperation(
+        Operation(
+            command = commandBuilder.hscan(key, cursor, match, count),
+            response = QueuedResponse(RespType<*>::toStringPairCursor)
+        )
+    )
+
+    // HRANDFIELD
     override suspend fun hrandfield(key: String): QueuedResponse<String?> = addOperation(
         Operation(
             command = commandBuilder.hrandfield(key),

@@ -22,4 +22,7 @@ fun <T> Iterable<T>.headAndTail(): Pair<T, Array<T>> {
 }
 
 // TODO: Also in koy
-fun <A, B, C> Pair<A, B>.mapSecond(f: (B) -> C): Pair<A, C> = Pair(first, f(second))
+fun <A, B, C> Pair<A, B>.mapSecond(f: (B) -> C): Pair<A, C> = first to f(second)
+
+// TODO: In koy
+fun <T> Iterable<T>.zipEvensWithOdds() = (filterIndexed { i, _ -> i % 2 == 0}) zip (filterIndexed { i, _ -> i % 2 != 0 })

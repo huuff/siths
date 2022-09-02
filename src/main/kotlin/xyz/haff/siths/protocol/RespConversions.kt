@@ -1,6 +1,7 @@
 package xyz.haff.siths.protocol
 
 import xyz.haff.siths.common.RedisUnexpectedRespResponseException
+import xyz.haff.siths.common.zipEvensWithOdds
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -211,8 +212,21 @@ fun RespType<*>.toStringMap(): Map<String, String> = when (this) {
     is RespArray -> {
         val contents = contentsOfType<RespBulkString>().map { it.value }
 
-        // Make a list of even entries and another of odd ones, then zip and associate
-        ((contents.filterIndexed { i, _ -> i % 2 == 0}) zip (contents.filterIndexed { i, _ -> i % 2 != 0 })).associate { it }
+        contents.zipEvensWithOdds().associate { it }
+    }
+    else -> handleAsUnexpected()
+}
+
+fun RespType<*>.toStringPairCursor(): RedisCursor<Pair<String, String>> = when (this) {
+    is RespArray -> {
+        val nextCursor = if (value[0] is RespBulkString) { (value[0] as RespBulkString).value.toLong() } else { handleAsUnexpected() }
+        val contents = if (value[1] is RespArray) {
+            (value[1] as RespArray).contentsOfType<RespBulkString>().map { it.value }
+        } else {
+            handleAsUnexpected()
+        }
+
+        RedisCursor(nextCursor, contents = contents.zipEvensWithOdds())
     }
     else -> handleAsUnexpected()
 }
