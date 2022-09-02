@@ -169,6 +169,9 @@ class SithsList<T : Any>(
     override fun removeAt(index: Int): T = runBlocking {
             val removedElement = client.transactional {
                 val result = lindex(name, index)
+
+                // XXX: Since redis has no operation to remove by index, we insert a random element into the list, and then
+                // remove it
                 val removeMarker = randomUUID()
                 lset(name, index, removeMarker)
                 lrem(name, removeMarker, count = 1)

@@ -1,6 +1,7 @@
 package xyz.haff.siths.dstructures
 
 import kotlinx.coroutines.runBlocking
+import xyz.haff.siths.client.SithsDSL
 import xyz.haff.siths.client.pooled.ManagedSithsClient
 import xyz.haff.siths.pipelining.PipelinedSithsClient
 import xyz.haff.siths.client.pooled.SithsClientPool
@@ -16,7 +17,7 @@ class SithsSet<T : Any>(
     private val serialize: (T) -> String,
     private val deserialize: (String) -> T
 ) : MutableSet<T> {
-    private val client = ManagedSithsClient(pool = SithsClientPool(connectionPool))
+    private val client = SithsDSL(connectionPool)
 
     companion object {
         @JvmStatic
@@ -80,21 +81,25 @@ class SithsSet<T : Any>(
 
     override fun contains(element: T): Boolean = runBlocking { client.sisMember(name, serialize(element)) }
 
+    // Put the other set into Redis, calculate the cardinality of the intersection and return true if it's the same as the
+    // other set's size
     override fun containsAll(elements: Collection<T>): Boolean {
         val otherSet = elements.map(serialize).toTypedArray()
         val (otherSetHead, otherSetTail) = otherSet.headAndTail()
-        return runBlocking {
-                val pipeline = PipelinedSithsClient()
-                val temporalSetKey = randomUUID()
-                pipeline.sadd(temporalSetKey, otherSetHead, *otherSetTail)
-                val intersectionCardinality =
-                    pipeline.sinterCard(this@SithsSet.name, temporalSetKey, limit = otherSet.size)
-                pipeline.del(temporalSetKey)
-                connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true) }
 
-                return@runBlocking intersectionCardinality.get().toInt() == otherSet.size
+        val elementsInCommon = runBlocking {
+            client.transactional {
+                val temporalSetKey = randomUUID()
+                sadd(temporalSetKey, otherSetHead, *otherSetTail)
+                val intersectionCardinality = sinterCard(this@SithsSet.name, temporalSetKey, limit = otherSet.size)
+                del(temporalSetKey)
+
+                intersectionCardinality
             }
         }
+
+        return elementsInCommon.toInt() == otherSet.size
+    }
 
     override fun isEmpty(): Boolean = size == 0
 
