@@ -21,7 +21,6 @@ class SithsDSL(val pool: SithsConnectionPool): SithsImmediateClient by ManagedSi
     /**
      * Tries to run script, and, if not loaded, loads it, then runs it again
      */
-    // TODO: Likely I'll need some way to run this in a pipeline with more commands! For example, see my SithsList.retainAll implementation
     suspend fun runScript(script: RedisScript, keys: List<String> = listOf(), args: List<String> = listOf()): RespType<*> {
         return pool.get().use { conn ->
             with (StandaloneSithsClient(conn)) {
