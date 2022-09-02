@@ -286,4 +286,7 @@ class RedisCommandBuilder : RedisCommandReceiver<
         = RedisCommand("HMGET", key, field, *rest)
 
     override suspend fun hlen(key: String): RedisCommand = RedisCommand("HLEN", key)
+
+    override suspend fun hdel(key: String, field: String, vararg rest: String): RedisCommand
+        = RedisCommand("HDEL", key, field, *rest)
 }

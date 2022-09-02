@@ -604,4 +604,11 @@ class SithsPipelinedClient(
             response = QueuedResponse(RespType<*>::toLong)
         )
     )
+
+    override suspend fun hdel(key: String, field: String, vararg rest: String): QueuedResponse<Long> = addOperation(
+        Operation(
+            command = commandBuilder.hdel(key, field, *rest),
+            response = QueuedResponse(RespType<*>::toLong)
+        )
+    )
 }

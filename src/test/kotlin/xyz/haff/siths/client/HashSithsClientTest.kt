@@ -118,4 +118,20 @@ class HashSithsClientTest : FunSpec({
         // ACT & ASSERT
         siths.hlen(key) shouldBe 3
     }
+
+    test("hdel") {
+        // ARRANGE
+        val key = randomUUID()
+        siths.hset(key, "f1" to "v1", "f2" to "v2", "f3" to "v3")
+
+        // SANITY CHECK
+        siths.hexists(key, "f2") shouldBe true
+
+        // ACT
+        val deletedAmount = siths.hdel(key, "f2")
+
+        // ASSERT
+        deletedAmount shouldBe 1
+        siths.hexists(key, "f2") shouldBe false
+    }
 })

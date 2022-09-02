@@ -42,4 +42,7 @@ class StandaloneHashSithsClient(
         = connection.runCommand(commandBuilder.hmget(key, field, *rest)).associateArrayToArguments(field, *rest)
 
     override suspend fun hlen(key: String): Long = connection.runCommand(commandBuilder.hlen(key)).toLong()
+
+    override suspend fun hdel(key: String, field: String, vararg rest: String): Long
+        = connection.runCommand(commandBuilder.hdel(key, field, *rest)).toLong()
 }
