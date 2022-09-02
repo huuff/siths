@@ -6,6 +6,7 @@ import xyz.haff.siths.pipelining.PipelinedSithsClient
 import xyz.haff.siths.client.withRedis
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
+import xyz.haff.siths.pipelining.RedisPipeline
 import xyz.haff.siths.protocol.SithsConnectionPool
 import xyz.haff.siths.protocol.luaBooleanToBoolean
 import xyz.haff.siths.scripts.RedisScripts
@@ -177,18 +178,19 @@ class SithsList<T : Any>(
             return@runBlocking deserialize(removedElement.get() ?: throw IndexOutOfBoundsException(index))
     }
 
-    // TODO: Three round-trips to the server because I can't run runScript in a single pipeline...
     override fun retainAll(elements: Collection<T>): Boolean = runBlocking {
         val temporaryOtherList = randomUUID()
         val (otherHead, otherTail) = elements.map(serialize).toTypedArray().headAndTail()
-        client.rpush(temporaryOtherList, otherHead, *otherTail)
 
-        val response = withRedis(connectionPool) {
-            runScript(RedisScripts.LIST_RETAIN_ALL, keys = listOf(this@SithsList.name, temporaryOtherList))
-        }.luaBooleanToBoolean()
-        client.del(temporaryOtherList)
+        val pipeline = PipelinedSithsClient()
+        pipeline.rpush(temporaryOtherList, otherHead, *otherTail)
+        // XXX: We can't take advantage of the optimistic checking whether the script if loaded because we want to pipeline it...
+        // we can't just run all operations and wait until running the script
+        val result = pipeline.eval(RedisScripts.LIST_RETAIN_ALL.code, keys = listOf(this@SithsList.name, temporaryOtherList))
+        pipeline.del(temporaryOtherList)
+        connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true)}
 
-        return@runBlocking response
+        return@runBlocking result.get().luaBooleanToBoolean()
     }
 
     override fun set(index: Int, element: T): T = runBlocking {
