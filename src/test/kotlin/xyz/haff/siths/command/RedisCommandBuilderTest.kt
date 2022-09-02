@@ -3,8 +3,6 @@ package xyz.haff.siths.command
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.option.ExclusiveMode
-import xyz.haff.siths.command.RedisCommand
-import xyz.haff.siths.command.RedisCommandBuilder
 import kotlin.time.Duration.Companion.seconds
 
 class RedisCommandBuilderTest : FunSpec({
@@ -17,7 +15,7 @@ class RedisCommandBuilderTest : FunSpec({
     }
 
     test("sintercard") {
-        val command = commandBuilder.sintercard("key1", "key2", "key3", limit = 10)
+        val command = commandBuilder.sinterCard("key1", "key2", "key3", limit = 10)
 
         command shouldBe RedisCommand("SINTERCARD", "3", "key1", "key2", "key3", "LIMIT", 10)
     }

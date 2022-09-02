@@ -86,11 +86,11 @@ class ManagedSithsClient(
     override suspend fun smembers(key: String): Set<String>
         = pool.get().use { it.smembers(key) }
 
-    override suspend fun sismember(key: String, member: String): Boolean
-        = pool.get().use { it.sismember(key, member) }
+    override suspend fun sisMember(key: String, member: String): Boolean
+        = pool.get().use { it.sisMember(key, member) }
 
-    override suspend fun smismember(key: String, member: String, vararg rest: String): Map<String, Boolean>
-        = pool.get().use { it.smismember(key, member, *rest) }
+    override suspend fun smisMember(key: String, member: String, vararg rest: String): Map<String, Boolean>
+        = pool.get().use { it.smisMember(key, member, *rest) }
 
     override suspend fun scard(key: String): Long
         = pool.get().use { it.scard(key) }
@@ -98,11 +98,11 @@ class ManagedSithsClient(
     override suspend fun srem(key: String, member: String, vararg rest: String): Long
         = pool.get().use { it.srem(key, member, *rest) }
 
-    override suspend fun sintercard(key: String, vararg rest: String, limit: Int?): Long
-        = pool.get().use { it.sintercard(key, rest = rest, limit = limit) }
+    override suspend fun sinterCard(key: String, vararg rest: String, limit: Int?): Long
+        = pool.get().use { it.sinterCard(key, rest = rest, limit = limit) }
 
-    override suspend fun sdiffstore(destination: String, key: String, vararg rest: String): Long
-        = pool.get().use { it.sdiffstore(destination, key, *rest) }
+    override suspend fun sdiffStore(destination: String, key: String, vararg rest: String): Long
+        = pool.get().use { it.sdiffStore(destination, key, *rest) }
 
     override suspend fun sdiff(key: String, vararg rest: String): Set<String>
         = pool.get().use { it.sdiff(key, *rest) }
@@ -119,20 +119,20 @@ class ManagedSithsClient(
     override suspend fun spop(key: String, count: Int?): Set<String>
         = pool.get().use { it.spop(key, count) }
 
-    override suspend fun srandmember(key: String, count: Int?): Set<String>
-        = pool.get().use { it.srandmember(key, count) }
+    override suspend fun srandMember(key: String, count: Int?): Set<String>
+        = pool.get().use { it.srandMember(key, count) }
 
-    override suspend fun srandmember(key: String): String?
-        = pool.get().use { it.srandmember(key) }
+    override suspend fun srandMember(key: String): String?
+        = pool.get().use { it.srandMember(key) }
 
     override suspend fun sunion(key: String, vararg rest: String): Set<String>
         = pool.get().use { it.sunion(key, *rest) }
 
-    override suspend fun sunionstore(destination: String, key: String, vararg rest: String): Long
-        = pool.get().use { it.sunionstore(destination, key, *rest) }
+    override suspend fun sunionStore(destination: String, key: String, vararg rest: String): Long
+        = pool.get().use { it.sunionStore(destination, key, *rest) }
 
-    override suspend fun sinterstore(destination: String, key: String, vararg rest: String): Long
-        = pool.get().use { it.sinterstore(destination, key, *rest) }
+    override suspend fun sinterStore(destination: String, key: String, vararg rest: String): Long
+        = pool.get().use { it.sinterStore(destination, key, *rest) }
 
     override suspend fun sscan(key: String, cursor: Long, match: String?, count: Int?): RedisCursor<String>
         = pool.get().use { it.sscan(key, cursor, match, count) }
@@ -248,8 +248,8 @@ class ManagedSithsClient(
     override suspend fun hgetOrNull(key: String, field: String): String?
         = pool.get().use { it.hgetOrNull(key, field) }
 
-    override suspend fun hgetall(key: String): Map<String, String>
-        = pool.get().use { it.hgetall(key) }
+    override suspend fun hgetAll(key: String): Map<String, String>
+        = pool.get().use { it.hgetAll(key) }
 
     override suspend fun hkeys(key: String): List<String>
         = pool.get().use { it.hkeys(key) }
@@ -260,11 +260,11 @@ class ManagedSithsClient(
     override suspend fun hexists(key: String, field: String): Boolean
         = pool.get().use { it.hexists(key, field) }
 
-    override suspend fun hincrby(key: String, field: String, increment: Long): Long
-        = pool.get().use { it.hincrby(key, field, increment) }
+    override suspend fun hincrBy(key: String, field: String, increment: Long): Long
+        = pool.get().use { it.hincrBy(key, field, increment) }
 
-    override suspend fun hincrbyfloat(key: String, field: String, increment: Double): Double
-        = pool.get().use { it.hincrbyfloat(key, field, increment) }
+    override suspend fun hincrByFloat(key: String, field: String, increment: Double): Double
+        = pool.get().use { it.hincrByFloat(key, field, increment) }
 
     override suspend fun hmget(key: String, field: String, vararg rest: String): Map<String, String>
         = pool.get().use { it.hmget(key, field, *rest) }
@@ -274,8 +274,8 @@ class ManagedSithsClient(
     override suspend fun hdel(key: String, field: String, vararg rest: String): Long
         = pool.get().use { it.hdel(key, field, *rest) }
 
-    override suspend fun hstrlen(key: String, field: String): Long
-        = pool.get().use { it.hstrlen(key, field) }
+    override suspend fun hstrLen(key: String, field: String): Long
+        = pool.get().use { it.hstrLen(key, field) }
 
     override suspend fun hsetnx(key: String, field: String, value: String): Boolean
         = pool.get().use { it.hsetnx(key, field, value) }
@@ -289,12 +289,12 @@ class ManagedSithsClient(
         = pool.get().use { it.hscan(key, cursor, match, count) }
 
     // HRANDFIELD
-    override suspend fun hrandfield(key: String): String?
-        = pool.get().use { it.hrandfield(key) }
+    override suspend fun hrandField(key: String): String?
+        = pool.get().use { it.hrandField(key) }
 
-    override suspend fun hrandfield(key: String, count: Int): List<String>
-        = pool.get().use { it.hrandfield(key, count) }
+    override suspend fun hrandField(key: String, count: Int): List<String>
+        = pool.get().use { it.hrandField(key, count) }
 
-    override suspend fun hrandfieldWithValues(key: String, count: Int): Map<String, String>
-        = pool.get().use { it.hrandfieldWithValues(key, count) }
+    override suspend fun hrandFieldWithValues(key: String, count: Int): Map<String, String>
+        = pool.get().use { it.hrandFieldWithValues(key, count) }
 }

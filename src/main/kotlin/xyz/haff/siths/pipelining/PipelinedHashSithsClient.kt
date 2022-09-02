@@ -3,7 +3,6 @@ package xyz.haff.siths.pipelining
 import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.common.mapSecond
 import xyz.haff.siths.protocol.*
-import kotlin.text.toDouble
 
 class PipelinedHashSithsClient(
     private val executor: RedisPipelineExecutor = RedisPipelineExecutor(),
@@ -51,9 +50,9 @@ class PipelinedHashSithsClient(
         )
     )
 
-    override suspend fun hgetall(key: String): QueuedResponse<Map<String, String>> = executor.addOperation(
+    override suspend fun hgetAll(key: String): QueuedResponse<Map<String, String>> = executor.addOperation(
         DeferredCommand(
-            command = commandBuilder.hgetall(key),
+            command = commandBuilder.hgetAll(key),
             response = QueuedResponse(RespType<*>::toStringMap)
         )
     )
@@ -79,17 +78,17 @@ class PipelinedHashSithsClient(
         )
     )
 
-    override suspend fun hincrby(key: String, field: String, increment: Long): QueuedResponse<Long> = executor.addOperation(
+    override suspend fun hincrBy(key: String, field: String, increment: Long): QueuedResponse<Long> = executor.addOperation(
         DeferredCommand(
-            command = commandBuilder.hincrby(key, field, increment),
+            command = commandBuilder.hincrBy(key, field, increment),
             response = QueuedResponse(RespType<*>::toLong)
         )
     )
 
-    override suspend fun hincrbyfloat(key: String, field: String, increment: Double): QueuedResponse<Double> =
+    override suspend fun hincrByFloat(key: String, field: String, increment: Double): QueuedResponse<Double> =
         executor.addOperation(
             DeferredCommand(
-                command = commandBuilder.hincrbyfloat(key, field, increment),
+                command = commandBuilder.hincrByFloat(key, field, increment),
                 response = QueuedResponse(RespType<*>::toDouble)
             )
         )
@@ -116,9 +115,9 @@ class PipelinedHashSithsClient(
         )
     )
 
-    override suspend fun hstrlen(key: String, field: String): QueuedResponse<Long> = executor.addOperation(
+    override suspend fun hstrLen(key: String, field: String): QueuedResponse<Long> = executor.addOperation(
         DeferredCommand(
-            command = commandBuilder.hstrlen(key, field),
+            command = commandBuilder.hstrLen(key, field),
             response = QueuedResponse(RespType<*>::toLong)
         )
     )
@@ -143,23 +142,23 @@ class PipelinedHashSithsClient(
     )
 
     // HRANDFIELD
-    override suspend fun hrandfield(key: String): QueuedResponse<String?> = executor.addOperation(
+    override suspend fun hrandField(key: String): QueuedResponse<String?> = executor.addOperation(
         DeferredCommand(
-            command = commandBuilder.hrandfield(key),
+            command = commandBuilder.hrandField(key),
             response = QueuedResponse(RespType<*>::toStringOrNull)
         )
     )
 
-    override suspend fun hrandfield(key: String, count: Int): QueuedResponse<List<String>> = executor.addOperation(
+    override suspend fun hrandField(key: String, count: Int): QueuedResponse<List<String>> = executor.addOperation(
         DeferredCommand(
-            command = commandBuilder.hrandfield(key, count),
+            command = commandBuilder.hrandField(key, count),
             response = QueuedResponse(RespType<*>::toStringList)
         )
     )
 
-    override suspend fun hrandfieldWithValues(key: String, count: Int): QueuedResponse<Map<String, String>> = executor.addOperation(
+    override suspend fun hrandFieldWithValues(key: String, count: Int): QueuedResponse<Map<String, String>> = executor.addOperation(
         DeferredCommand(
-            command = commandBuilder.hrandfieldWithValues(key, count),
+            command = commandBuilder.hrandFieldWithValues(key, count),
             response = QueuedResponse(RespType<*>::toStringMap)
         )
     )

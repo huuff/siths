@@ -20,8 +20,8 @@ class StandaloneHashSithsClient(
     override suspend fun hsetAny(key: String, pair: Pair<String, Any>, vararg rest: Pair<String, Any>): Long
         = hset(key, pair.mapSecond(Any::toString), *rest.map { it.mapSecond(Any::toString) }.toTypedArray())
 
-    override suspend fun hgetall(key: String): Map<String, String>
-        = connection.runCommand(commandBuilder.hgetall(key)).toStringMap()
+    override suspend fun hgetAll(key: String): Map<String, String>
+        = connection.runCommand(commandBuilder.hgetAll(key)).toStringMap()
 
     override suspend fun hkeys(key: String): List<String>
         = connection.runCommand(commandBuilder.hkeys(key)).toStringList()
@@ -32,11 +32,11 @@ class StandaloneHashSithsClient(
     override suspend fun hexists(key: String, field: String): Boolean
         = connection.runCommand(commandBuilder.hexists(key, field)).integerToBoolean()
 
-    override suspend fun hincrby(key: String, field: String, increment: Long): Long
-        = connection.runCommand(commandBuilder.hincrby(key, field, increment)).toLong()
+    override suspend fun hincrBy(key: String, field: String, increment: Long): Long
+        = connection.runCommand(commandBuilder.hincrBy(key, field, increment)).toLong()
 
-    override suspend fun hincrbyfloat(key: String, field: String, increment: Double): Double
-        = connection.runCommand(commandBuilder.hincrbyfloat(key, field, increment)).toDouble()
+    override suspend fun hincrByFloat(key: String, field: String, increment: Double): Double
+        = connection.runCommand(commandBuilder.hincrByFloat(key, field, increment)).toDouble()
 
     override suspend fun hmget(key: String, field: String, vararg rest: String): Map<String, String>
         = connection.runCommand(commandBuilder.hmget(key, field, *rest)).associateArrayToArguments(field, *rest)
@@ -46,8 +46,8 @@ class StandaloneHashSithsClient(
     override suspend fun hdel(key: String, field: String, vararg rest: String): Long
         = connection.runCommand(commandBuilder.hdel(key, field, *rest)).toLong()
 
-    override suspend fun hstrlen(key: String, field: String): Long
-        = connection.runCommand(commandBuilder.hstrlen(key, field)).toLong()
+    override suspend fun hstrLen(key: String, field: String): Long
+        = connection.runCommand(commandBuilder.hstrLen(key, field)).toLong()
 
     override suspend fun hsetnx(key: String, field: String, value: String): Boolean
         = connection.runCommand(commandBuilder.hsetnx(key, field, value)).integerToBoolean()
@@ -61,13 +61,13 @@ class StandaloneHashSithsClient(
         = connection.runCommand(commandBuilder.hscan(key, cursor, match, count)).toStringPairCursor()
 
     // HRANDFIELD
-    override suspend fun hrandfield(key: String): String?
-        = connection.runCommand(commandBuilder.hrandfield(key)).toStringOrNull()
+    override suspend fun hrandField(key: String): String?
+        = connection.runCommand(commandBuilder.hrandField(key)).toStringOrNull()
 
-    override suspend fun hrandfield(key: String, count: Int): List<String>
-        = connection.runCommand(commandBuilder.hrandfield(key, count)).toStringList()
+    override suspend fun hrandField(key: String, count: Int): List<String>
+        = connection.runCommand(commandBuilder.hrandField(key, count)).toStringList()
 
-    override suspend fun hrandfieldWithValues(key: String, count: Int): Map<String, String>
-        = connection.runCommand(commandBuilder.hrandfieldWithValues(key, count)).toStringMap()
+    override suspend fun hrandFieldWithValues(key: String, count: Int): Map<String, String>
+        = connection.runCommand(commandBuilder.hrandFieldWithValues(key, count)).toStringMap()
 
 }

@@ -31,8 +31,8 @@ class SetSithsClientTest : FunSpec({
 
         // ASSERT
         added shouldBe 2
-        siths.sismember(set, "test1") shouldBe true
-        siths.sismember(set, "test2") shouldBe true
+        siths.sisMember(set, "test1") shouldBe true
+        siths.sisMember(set, "test2") shouldBe true
     }
 
     test("we can get all members") {
@@ -50,14 +50,14 @@ class SetSithsClientTest : FunSpec({
         siths.sadd(set, "test1", "test2")
 
         // SANITY CHECK
-        siths.sismember(set, "test1") shouldBe true
+        siths.sisMember(set, "test1") shouldBe true
 
         // ACT
         val removed = siths.srem(set, "test1")
 
         // ASSERT
         removed shouldBe 1L
-        siths.sismember(set, "test1") shouldBe false
+        siths.sisMember(set, "test1") shouldBe false
     }
 
     test("sintercard") {
@@ -68,7 +68,7 @@ class SetSithsClientTest : FunSpec({
         siths.sadd(set2, "key2", "key3")
 
         // ACT & ASSERT
-        siths.sintercard(set1, set2) shouldBe 1L
+        siths.sinterCard(set1, set2) shouldBe 1L
     }
 
     test("sdiffstore") {
@@ -80,7 +80,7 @@ class SetSithsClientTest : FunSpec({
         siths.sadd(operand2, "key1", "key3")
 
         // ACT
-        val elementNumber = siths.sdiffstore(destination, operand1, operand2)
+        val elementNumber = siths.sdiffStore(destination, operand1, operand2)
 
         // ASSERT
         elementNumber shouldBe 1L
@@ -96,7 +96,7 @@ class SetSithsClientTest : FunSpec({
         siths.sadd(operand2, "key1", "key3")
 
         // ACT
-        val elementNumber = siths.sinterstore(destination, operand1, operand2)
+        val elementNumber = siths.sinterStore(destination, operand1, operand2)
 
         // ASSERT
         elementNumber shouldBe 2L
@@ -171,7 +171,7 @@ class SetSithsClientTest : FunSpec({
         poppedElement!!
         poppedElement shouldBeIn members
         siths.scard(set) shouldBe 2
-        siths.sismember(set, poppedElement) shouldBe false
+        siths.sisMember(set, poppedElement) shouldBe false
     }
 
     test("srandmember") {
@@ -180,7 +180,7 @@ class SetSithsClientTest : FunSpec({
         siths.sadd(set, "key1", "key2", "key3")
 
         // ACT
-        val randomMembers = siths.srandmember(set, count = 2)
+        val randomMembers = siths.srandMember(set, count = 2)
 
         // ASSERT
         randomMembers.forEach {
@@ -208,7 +208,7 @@ class SetSithsClientTest : FunSpec({
         val destination = randomUUID()
 
         // ACT
-        val unionCard = siths.sunionstore(destination, set1, set2)
+        val unionCard = siths.sunionStore(destination, set1, set2)
 
         // ASSERT
         unionCard shouldBe 3
@@ -221,7 +221,7 @@ class SetSithsClientTest : FunSpec({
         siths.sadd(set, "key1", "key3", "key5")
 
         // ACT & ASSERT
-        siths.smismember(set, "key1", "key2", "key3", "key4", "key5") shouldBe mapOf(
+        siths.smisMember(set, "key1", "key2", "key3", "key4", "key5") shouldBe mapOf(
             "key1" to true,
             "key2" to false,
             "key3" to true,

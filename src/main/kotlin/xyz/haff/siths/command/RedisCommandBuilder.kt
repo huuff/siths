@@ -109,12 +109,12 @@ class RedisCommandBuilder : RedisCommandReceiver<
 
     override suspend fun smembers(key: String): RedisCommand = RedisCommand("SMEMBERS", key)
 
-    override suspend fun sismember(key: String, member: String) = RedisCommand("SISMEMBER", key, member)
+    override suspend fun sisMember(key: String, member: String) = RedisCommand("SISMEMBER", key, member)
     override suspend fun scard(key: String): RedisCommand = RedisCommand("SCARD", key)
     override suspend fun srem(key: String, member: String, vararg rest: String): RedisCommand =
         RedisCommand("SREM", key, member, *rest)
 
-    override suspend fun sintercard(key: String, vararg rest: String, limit: Int?): RedisCommand {
+    override suspend fun sinterCard(key: String, vararg rest: String, limit: Int?): RedisCommand {
         val mainCommand = RedisCommand("SINTERCARD", 1 + rest.size, key, *rest)
 
         return if (limit == null) {
@@ -124,10 +124,10 @@ class RedisCommandBuilder : RedisCommandReceiver<
         }
     }
 
-    override suspend fun sdiffstore(destination: String, key: String, vararg rest: String): RedisCommand =
+    override suspend fun sdiffStore(destination: String, key: String, vararg rest: String): RedisCommand =
         RedisCommand("SDIFFSTORE", destination, key, *rest)
 
-    override suspend fun sinterstore(destination: String, key: String, vararg rest: String): RedisCommand =
+    override suspend fun sinterStore(destination: String, key: String, vararg rest: String): RedisCommand =
         RedisCommand("SINTERSTORE", destination, key, *rest)
 
     override suspend fun sscan(key: String, cursor: Long, match: String?, count: Int?): RedisCommand =
@@ -146,16 +146,16 @@ class RedisCommandBuilder : RedisCommandReceiver<
 
     override suspend fun spop(key: String, count: Int?): RedisCommand = RedisCommand("SPOP", key, count)
 
-    override suspend fun srandmember(key: String) = RedisCommand("SRANDMEMBER", key)
+    override suspend fun srandMember(key: String) = RedisCommand("SRANDMEMBER", key)
 
-    override suspend fun srandmember(key: String, count: Int?): RedisCommand = RedisCommand("SRANDMEMBER", key, count)
+    override suspend fun srandMember(key: String, count: Int?): RedisCommand = RedisCommand("SRANDMEMBER", key, count)
 
     override suspend fun sunion(key: String, vararg rest: String): RedisCommand = RedisCommand("SUNION", key, *rest)
 
-    override suspend fun sunionstore(destination: String, key: String, vararg rest: String): RedisCommand =
+    override suspend fun sunionStore(destination: String, key: String, vararg rest: String): RedisCommand =
         RedisCommand("SUNIONSTORE", destination, key, *rest)
 
-    override suspend fun smismember(key: String, member: String, vararg rest: String) =
+    override suspend fun smisMember(key: String, member: String, vararg rest: String) =
         RedisCommand("SMISMEMBER", key, member, *rest)
 
     override suspend fun llen(key: String): RedisCommand = RedisCommand("LLEN", key)
@@ -258,7 +258,7 @@ class RedisCommandBuilder : RedisCommandReceiver<
         vararg rest: Pair<String, String>
     ): RedisCommand = RedisCommand("HSET", key, pair.first, pair.second, *pairsToStringArray(*rest))
 
-    override suspend fun hgetall(key: String): RedisCommand = RedisCommand("HGETALL", key)
+    override suspend fun hgetAll(key: String): RedisCommand = RedisCommand("HGETALL", key)
 
     override suspend fun hkeys(key: String): RedisCommand = RedisCommand("HKEYS", key)
 
@@ -266,10 +266,10 @@ class RedisCommandBuilder : RedisCommandReceiver<
 
     override suspend fun hexists(key: String, field: String): RedisCommand = RedisCommand("HEXISTS", key, field)
 
-    override suspend fun hincrby(key: String, field: String, increment: Long): RedisCommand =
+    override suspend fun hincrBy(key: String, field: String, increment: Long): RedisCommand =
         RedisCommand("HINCRBY", key, field, increment)
 
-    override suspend fun hincrbyfloat(key: String, field: String, increment: Double): RedisCommand =
+    override suspend fun hincrByFloat(key: String, field: String, increment: Double): RedisCommand =
         RedisCommand("HINCRBYFLOAT", key, field, increment)
 
     override suspend fun hmget(key: String, field: String, vararg rest: String): RedisCommand =
@@ -280,7 +280,7 @@ class RedisCommandBuilder : RedisCommandReceiver<
     override suspend fun hdel(key: String, field: String, vararg rest: String): RedisCommand =
         RedisCommand("HDEL", key, field, *rest)
 
-    override suspend fun hstrlen(key: String, field: String): RedisCommand = RedisCommand("HSTRLEN", key, field)
+    override suspend fun hstrLen(key: String, field: String): RedisCommand = RedisCommand("HSTRLEN", key, field)
 
     override suspend fun hsetnx(key: String, field: String, value: String): RedisCommand =
         RedisCommand("HSETNX", key, field, value)
@@ -291,11 +291,11 @@ class RedisCommandBuilder : RedisCommandReceiver<
                 + countSubCommand(count))
 
     // HRANDFIELD
-    override suspend fun hrandfield(key: String): RedisCommand = RedisCommand("HRANDFIELD", key)
+    override suspend fun hrandField(key: String): RedisCommand = RedisCommand("HRANDFIELD", key)
 
-    override suspend fun hrandfield(key: String, count: Int): RedisCommand = RedisCommand("HRANDFIELD", key, count)
+    override suspend fun hrandField(key: String, count: Int): RedisCommand = RedisCommand("HRANDFIELD", key, count)
 
-    override suspend fun hrandfieldWithValues(key: String, count: Int): RedisCommand =
+    override suspend fun hrandFieldWithValues(key: String, count: Int): RedisCommand =
         RedisCommand("HRANDFIELD", key, count, "WITHVALUES")
 
 

@@ -6,7 +6,6 @@ import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.common.headAndTail
@@ -41,7 +40,7 @@ class HashSithsClientTest : FunSpec({
         siths.hset(key, "f1" to "v1", "f2" to "v2", "f3" to "v3")
 
         // ACT & ASSERT
-        siths.hgetall(key) shouldBe mapOf(
+        siths.hgetAll(key) shouldBe mapOf(
             "f1" to "v1",
             "f2" to "v2",
             "f3" to "v3"
@@ -82,7 +81,7 @@ class HashSithsClientTest : FunSpec({
         siths.hsetAny(key, "field" to 5)
 
         // ACT
-        val response = siths.hincrby(key, "field", 3)
+        val response = siths.hincrBy(key, "field", 3)
 
         // ASSERT
         response shouldBe 8
@@ -95,7 +94,7 @@ class HashSithsClientTest : FunSpec({
         siths.hsetAny(key, "field" to 2.4)
 
         // ACT
-        val response = siths.hincrbyfloat(key, "field", 1.6)
+        val response = siths.hincrByFloat(key, "field", 1.6)
 
         // ASSERT
         response shouldBe 4
@@ -145,7 +144,7 @@ class HashSithsClientTest : FunSpec({
         siths.hset(key, "field" to "test")
 
         // ACT & ASSERT
-        siths.hstrlen(key, "field") shouldBe 4
+        siths.hstrLen(key, "field") shouldBe 4
     }
 
     context("hsetnx") {
@@ -183,7 +182,7 @@ class HashSithsClientTest : FunSpec({
             siths.hset(key, "f1" to "v1", "f2" to "v2", "f3" to "v3")
 
             // ACT & ASSERT
-            siths.hrandfield(key) shouldBeIn listOf("f1", "f2", "f3")
+            siths.hrandField(key) shouldBeIn listOf("f1", "f2", "f3")
         }
 
         test("several elements") {
@@ -192,7 +191,7 @@ class HashSithsClientTest : FunSpec({
             siths.hset(key, "f1" to "v1", "f2" to "v2", "f3" to "v3")
 
             // ACT & ASSERT
-            siths.hrandfield(key, 3) shouldContainExactlyInAnyOrder listOf("f1", "f2", "f3")
+            siths.hrandField(key, 3) shouldContainExactlyInAnyOrder listOf("f1", "f2", "f3")
         }
 
         test("with values") {
@@ -201,7 +200,7 @@ class HashSithsClientTest : FunSpec({
             siths.hset(key, "f1" to "v1", "f2" to "v2", "f3" to "v3")
 
             // ACT & ASSERT
-            siths.hrandfieldWithValues(key, 3) shouldBe mapOf(
+            siths.hrandFieldWithValues(key, 3) shouldBe mapOf(
                 "f1" to "v1",
                 "f2" to "v2",
                 "f3" to "v3"

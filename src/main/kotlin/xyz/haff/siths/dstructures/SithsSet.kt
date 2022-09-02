@@ -51,7 +51,7 @@ class SithsSet<T : Any>(
                 val pipeline = PipelinedSithsClient(conn)
                 val sizeBeforeChange = pipeline.scard(this@SithsSet.name)
                 pipeline.sadd(otherSetKey, otherSetHead, *otherSetTail)
-                val sizeAfterChange = pipeline.sdiffstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
+                val sizeAfterChange = pipeline.sdiffStore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
                 pipeline.del(otherSetKey)
                 pipeline.exec(inTransaction = true)
 
@@ -68,7 +68,7 @@ class SithsSet<T : Any>(
                 val sizeBeforeChange = pipeline.scard(this@SithsSet.name)
                 val otherSetKey = randomUUID()
                 pipeline.sadd(otherSetKey, otherSetHead, *otherSetTail)
-                val sizeAfterChange = pipeline.sinterstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
+                val sizeAfterChange = pipeline.sinterStore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
                 pipeline.del(otherSetKey)
                 pipeline.exec(inTransaction = true)
 
@@ -80,7 +80,7 @@ class SithsSet<T : Any>(
     override val size: Int
         get() = runBlocking { client.scard(name).toInt() }
 
-    override fun contains(element: T): Boolean = runBlocking { client.sismember(name, serialize(element)) }
+    override fun contains(element: T): Boolean = runBlocking { client.sisMember(name, serialize(element)) }
 
     override fun containsAll(elements: Collection<T>): Boolean {
         val otherSet = elements.map(serialize).toTypedArray()
@@ -91,7 +91,7 @@ class SithsSet<T : Any>(
                 val temporalSetKey = randomUUID()
                 pipeline.sadd(temporalSetKey, otherSetHead, *otherSetTail)
                 val intersectionCardinality =
-                    pipeline.sintercard(this@SithsSet.name, temporalSetKey, limit = otherSet.size)
+                    pipeline.sinterCard(this@SithsSet.name, temporalSetKey, limit = otherSet.size)
                 pipeline.del(temporalSetKey)
                 pipeline.exec(inTransaction = true)
                 return@use intersectionCardinality.get().toInt() == otherSet.size

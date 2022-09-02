@@ -1,6 +1,5 @@
 package xyz.haff.siths.pipelining
 
-import xyz.haff.siths.client.api.SetSithsClient
 import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.protocol.*
 
@@ -22,9 +21,9 @@ class PipelinedSetSithsClient(
     override suspend fun smembers(key: String): QueuedResponse<Set<String>> =
         executor.addOperation(DeferredCommand(commandBuilder.smembers(key), QueuedResponse(RespType<*>::toStringSet)))
 
-    override suspend fun sismember(key: String, member: String): QueuedResponse<Boolean> = executor.addOperation(
+    override suspend fun sisMember(key: String, member: String): QueuedResponse<Boolean> = executor.addOperation(
         DeferredCommand(
-            command = commandBuilder.sismember(key, member),
+            command = commandBuilder.sisMember(key, member),
             response = QueuedResponse(RespType<*>::integerToBoolean)
         )
     )
@@ -39,25 +38,25 @@ class PipelinedSetSithsClient(
         )
     )
 
-    override suspend fun sintercard(key: String, vararg rest: String, limit: Int?): QueuedResponse<Long> = executor.addOperation(
+    override suspend fun sinterCard(key: String, vararg rest: String, limit: Int?): QueuedResponse<Long> = executor.addOperation(
         DeferredCommand(
-            command = commandBuilder.sintercard(key, rest = rest, limit = limit),
+            command = commandBuilder.sinterCard(key, rest = rest, limit = limit),
             response = QueuedResponse(RespType<*>::toLong)
         )
     )
 
-    override suspend fun sdiffstore(destination: String, key: String, vararg rest: String): QueuedResponse<Long> =
+    override suspend fun sdiffStore(destination: String, key: String, vararg rest: String): QueuedResponse<Long> =
         executor.addOperation(
             DeferredCommand(
-                command = commandBuilder.sdiffstore(destination, key, *rest),
+                command = commandBuilder.sdiffStore(destination, key, *rest),
                 response = QueuedResponse(RespType<*>::toLong)
             )
         )
 
-    override suspend fun sinterstore(destination: String, key: String, vararg rest: String): QueuedResponse<Long> =
+    override suspend fun sinterStore(destination: String, key: String, vararg rest: String): QueuedResponse<Long> =
         executor.addOperation(
             DeferredCommand(
-                command = commandBuilder.sinterstore(destination, key, *rest),
+                command = commandBuilder.sinterStore(destination, key, *rest),
                 response = QueuedResponse(RespType<*>::toLong)
             )
         )
@@ -111,17 +110,17 @@ class PipelinedSetSithsClient(
         )
     )
 
-    override suspend fun srandmember(key: String): QueuedResponse<String?> = executor.addOperation(
+    override suspend fun srandMember(key: String): QueuedResponse<String?> = executor.addOperation(
         DeferredCommand(
-            command = commandBuilder.srandmember(key),
+            command = commandBuilder.srandMember(key),
             response = QueuedResponse(RespType<*>::toStringOrNull)
         )
     )
 
-    override suspend fun srandmember(key: String, count: Int?): QueuedResponse<Set<String>> {
+    override suspend fun srandMember(key: String, count: Int?): QueuedResponse<Set<String>> {
         return executor.addOperation(
             DeferredCommand(
-                command = commandBuilder.srandmember(key, count),
+                command = commandBuilder.srandMember(key, count),
                 response = QueuedResponse(RespType<*>::bulkOrArrayToStringSet)
             )
         )
@@ -134,21 +133,21 @@ class PipelinedSetSithsClient(
         )
     )
 
-    override suspend fun sunionstore(destination: String, key: String, vararg rest: String): QueuedResponse<Long> =
+    override suspend fun sunionStore(destination: String, key: String, vararg rest: String): QueuedResponse<Long> =
         executor.addOperation(
             DeferredCommand(
-                commandBuilder.sunionstore(destination, key, *rest),
+                commandBuilder.sunionStore(destination, key, *rest),
                 QueuedResponse(RespType<*>::toLong)
             )
         )
 
-    override suspend fun smismember(
+    override suspend fun smisMember(
         key: String,
         member: String,
         vararg rest: String
     ): QueuedResponse<Map<String, Boolean>> = executor.addOperation(
         DeferredCommand(
-            commandBuilder.smismember(key, member, *rest),
+            commandBuilder.smisMember(key, member, *rest),
             QueuedResponse(converter = { it.toStringToBooleanMap(member, *rest) })
         )
     )
