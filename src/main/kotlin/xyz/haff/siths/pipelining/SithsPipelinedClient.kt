@@ -5,6 +5,7 @@ import xyz.haff.siths.client.api.SithsClient
 import xyz.haff.siths.protocol.SourceAndData
 import xyz.haff.siths.command.RedisCommand
 import xyz.haff.siths.command.RedisCommandBuilder
+import xyz.haff.siths.common.mapSecond
 import xyz.haff.siths.option.ExclusiveMode
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.option.ListEnd
@@ -524,6 +525,17 @@ class SithsPipelinedClient(
         )
     )
 
+    override suspend fun hsetAny(
+        key: String,
+        pair: Pair<String, Any>,
+        vararg rest: Pair<String, Any>
+    ): QueuedResponse<Long> = addOperation(
+        Operation(
+            command = commandBuilder.hset(key, pair.mapSecond(Any::toString), *rest.map { it.mapSecond(Any::toString)}.toTypedArray()),
+            response = QueuedResponse(RespType<*>::toLong)
+        )
+    )
+
     override suspend fun hgetOrNull(key: String, field: String): QueuedResponse<String?> = addOperation(
         Operation(
             command = commandBuilder.hget(key, field),
@@ -558,4 +570,19 @@ class SithsPipelinedClient(
             response = QueuedResponse(RespType<*>::integerToBoolean)
         )
     )
+
+    override suspend fun hincrby(key: String, field: String, increment: Long): QueuedResponse<Long> = addOperation(
+        Operation(
+            command = commandBuilder.hincrby(key, field, increment),
+            response = QueuedResponse(RespType<*>::toLong)
+        )
+    )
+
+    override suspend fun hincrbyfloat(key: String, field: String, increment: Double): QueuedResponse<Double> =
+        addOperation(
+            Operation(
+                command = commandBuilder.hincrbyfloat(key, field, increment),
+                response = QueuedResponse(RespType<*>::toDouble)
+            )
+        )
 }

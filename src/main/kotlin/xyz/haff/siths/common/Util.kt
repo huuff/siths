@@ -20,3 +20,6 @@ fun <T> Iterable<T>.headAndTail(): Pair<T, Array<T>> {
 
     return Pair(head, tail.stream().toArray() as Array<T>)
 }
+
+// TODO: Also in koy
+fun <A, B, C> Pair<A, B>.mapSecond(f: (B) -> C): Pair<A, C> = Pair(first, f(second))

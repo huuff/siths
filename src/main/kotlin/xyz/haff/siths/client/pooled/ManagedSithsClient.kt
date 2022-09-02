@@ -233,6 +233,9 @@ class ManagedSithsClient(
     override suspend fun hset(key: String, pair: Pair<String, String>, vararg rest: Pair<String, String>): Long
         = pool.get().use { it.hset(key, pair, *rest) }
 
+    override suspend fun hsetAny(key: String, pair: Pair<String, Any>, vararg rest: Pair<String, Any>): Long
+        = pool.get().use { it.hsetAny(key, pair, *rest) }
+
     override suspend fun hgetOrNull(key: String, field: String): String?
         = pool.get().use { it.hgetOrNull(key, field) }
 
@@ -247,4 +250,10 @@ class ManagedSithsClient(
 
     override suspend fun hexists(key: String, field: String): Boolean
         = pool.get().use { it.hexists(key, field) }
+
+    override suspend fun hincrby(key: String, field: String, increment: Long): Long
+        = pool.get().use { it.hincrby(key, field, increment) }
+
+    override suspend fun hincrbyfloat(key: String, field: String, increment: Double): Double
+        = pool.get().use { it.hincrbyfloat(key, field, increment) }
 }

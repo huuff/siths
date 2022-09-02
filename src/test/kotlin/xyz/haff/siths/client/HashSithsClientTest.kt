@@ -71,4 +71,30 @@ class HashSithsClientTest : FunSpec({
         siths.hexists(key, "f1") shouldBe true
         siths.hexists(key, "nonexistent") shouldBe false
     }
+
+    test("hincrby") {
+        // ARRANGE
+        val key = randomUUID()
+        siths.hsetAny(key, "field" to 5)
+
+        // ACT
+        val response = siths.hincrby(key, "field", 3)
+
+        // ASSERT
+        response shouldBe 8
+        siths.hget(key, "field") shouldBe "8"
+    }
+
+    test("hincrbyfloat") {
+        // ARRANGE
+        val key = randomUUID()
+        siths.hsetAny(key, "field" to 2.4)
+
+        // ACT
+        val response = siths.hincrbyfloat(key, "field", 1.6)
+
+        // ASSERT
+        response shouldBe 4
+        siths.hget(key, "field") shouldBe "4"
+    }
 })

@@ -63,6 +63,8 @@ interface SithsClient<
         >, HashSithsClient<
         LongResponseType,
 
+        DoubleResponseType,
+
         StringResponseType,
         NullableStringResponseType,
         StringListResponseType,

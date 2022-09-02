@@ -57,6 +57,8 @@ interface RedisCommandReceiver<
         >, HashRedisCommandReceiver <
         LongResponseType,
 
+        DoubleResponseType,
+
         StringResponseType,
         StringListResponseType,
 

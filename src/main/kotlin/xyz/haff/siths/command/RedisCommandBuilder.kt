@@ -275,4 +275,10 @@ class RedisCommandBuilder : RedisCommandReceiver<
 
     override suspend fun hexists(key: String, field: String): RedisCommand
         = RedisCommand("HEXISTS", key, field)
+
+    override suspend fun hincrby(key: String, field: String, increment: Long): RedisCommand
+        = RedisCommand("HINCRBY", key, field, increment)
+
+    override suspend fun hincrbyfloat(key: String, field: String, increment: Double): RedisCommand
+        = RedisCommand("HINCRBYFLOAT", key, field, increment)
 }

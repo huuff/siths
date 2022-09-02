@@ -3,6 +3,8 @@ package xyz.haff.siths.client.api
 interface HashRedisCommandReceiver<
             LongResponseType,
 
+            DoubleResponseType,
+
             StringResponseType,
             StringListResponseType,
 
@@ -16,4 +18,6 @@ interface HashRedisCommandReceiver<
     suspend fun hkeys(key: String): StringListResponseType
     suspend fun hvals(key: String): StringListResponseType
     suspend fun hexists(key: String, field: String): BooleanResponseType
+    suspend fun hincrby(key: String, field: String, increment: Long): LongResponseType
+    suspend fun hincrbyfloat(key: String, field: String, increment: Double): DoubleResponseType
 }
