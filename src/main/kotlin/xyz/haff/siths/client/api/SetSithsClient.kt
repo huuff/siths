@@ -1,7 +1,5 @@
 package xyz.haff.siths.client.api
 
-import xyz.haff.siths.protocol.RedisCursor
-
 interface SetSithsClient<
         LongResponseType,
 
@@ -25,4 +23,7 @@ interface SetSithsClient<
             StringCursorResponseType,
 
             BooleanResponseType,
-            >
+            > {
+
+    suspend fun saddAny(key: String, value: Any, vararg rest: Any): LongResponseType
+}

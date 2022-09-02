@@ -80,6 +80,9 @@ class ManagedSithsClient(
     override suspend fun sadd(key: String, value: String, vararg rest: String): Long
         = pool.get().use { it.sadd(key, value, *rest) }
 
+    override suspend fun saddAny(key: String, value: Any, vararg rest: Any): Long
+        = pool.get().use { it.saddAny(key, value, rest) }
+
     override suspend fun smembers(key: String): Set<String>
         = pool.get().use { it.smembers(key) }
 

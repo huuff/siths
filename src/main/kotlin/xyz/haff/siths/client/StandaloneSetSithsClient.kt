@@ -1,6 +1,6 @@
 package xyz.haff.siths.client
 
-import xyz.haff.siths.client.api.SetSithsClient
+
 import xyz.haff.siths.client.api.SetSithsImmediateClient
 import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.protocol.*
@@ -12,6 +12,9 @@ class StandaloneSetSithsClient(
 
     override suspend fun sadd(key: String, value: String, vararg rest: String): Long
             = connection.runCommand(commandBuilder.sadd(key, value, *rest)).toLong()
+
+    override suspend fun saddAny(key: String, value: Any, vararg rest: Any): Long
+        = sadd(key, value.toString(), *rest.map(Any::toString).toTypedArray())
 
     override suspend fun smembers(key: String): Set<String>
             = connection.runCommand(commandBuilder.smembers(key)).toStringSet()

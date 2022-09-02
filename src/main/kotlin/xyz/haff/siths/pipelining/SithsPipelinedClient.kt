@@ -193,6 +193,9 @@ class SithsPipelinedClient(
         )
     )
 
+    override suspend fun saddAny(key: String, value: Any, vararg rest: Any): QueuedResponse<Long>
+       = sadd(key, value.toString(), *rest.map(Any::toString).toTypedArray())
+
     override suspend fun smembers(key: String): QueuedResponse<Set<String>> =
         addOperation(Operation(commandBuilder.smembers(key), QueuedResponse(RespType<*>::toStringSet)))
 
