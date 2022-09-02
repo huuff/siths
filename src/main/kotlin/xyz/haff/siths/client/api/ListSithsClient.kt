@@ -1,7 +1,5 @@
 package xyz.haff.siths.client.api
 
-import xyz.haff.siths.protocol.SourceAndData
-
 interface ListSithsClient<
         LongResponseType,
         NullableLongResponseType,
@@ -31,4 +29,7 @@ interface ListSithsClient<
         BooleanResponseType,
         UnitResponseType,
         > {
+
+    suspend fun lpushAny(key: String, element: Any, vararg rest: Any): LongResponseType
+    suspend fun rpushAny(key: String, element: Any, vararg rest: Any): LongResponseType
 }

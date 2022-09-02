@@ -100,4 +100,10 @@ class StandaloneListSithsClient(
         timeout: Duration?
     ): String?
         = connection.runCommand(commandBuilder.blmove(source, destination, sourceEnd, destinationEnd, timeout)).toStringOrNull()
+
+    override suspend fun lpushAny(key: String, element: Any, vararg rest: Any): Long
+        = lpush(key, element.toString(), *rest.map(Any::toString).toTypedArray())
+
+    override suspend fun rpushAny(key: String, element: Any, vararg rest: Any): Long
+        = rpush(key, element.toString(), *rest.map(Any::toString).toTypedArray())
 }

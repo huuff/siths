@@ -510,6 +510,12 @@ class SithsPipelinedClient(
         )
     )
 
+    override suspend fun lpushAny(key: String, element: Any, vararg rest: Any): QueuedResponse<Long>
+        = lpush(key, element.toString(), *rest.map(Any::toString).toTypedArray())
+
+    override suspend fun rpushAny(key: String, element: Any, vararg rest: Any): QueuedResponse<Long>
+        = rpush(key, element.toString(), *rest.map(Any::toString).toTypedArray())
+
     // HASH OPERATIONS
     override suspend fun hget(key: String, field: String): QueuedResponse<String> = addOperation(
         Operation(
