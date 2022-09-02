@@ -24,7 +24,7 @@ class RedisClientTest : FunSpec({
             name = null,
             age = 25639.seconds,
             idle = 0.seconds,
-            flags = "N",
+            flags = RedisClient.Flags(),
             db = 0,
             sub = 0,
             psub = 0,

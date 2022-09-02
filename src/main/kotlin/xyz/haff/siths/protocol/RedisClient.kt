@@ -12,7 +12,7 @@ data class RedisClient(
     val fd: Int,
     val age: Duration,
     val idle: Duration,
-    val flags: String, // TODO: Is there a better representation?
+    val flags: Flags,
     val db: Int,
     val sub: Int,
     val psub: Int,
@@ -47,7 +47,7 @@ data class RedisClient(
                     name = map["name"],
                     age = map["age"]!!.toInt().seconds,
                     idle = map["idle"]!!.toInt().seconds,
-                    flags = map["flags"]!!,
+                    flags = Flags.fromString(map["flags"]!!),
                     db = map["db"]!!.toInt(),
                     sub = map["sub"]!!.toInt(),
                     psub = map["psub"]!!.toInt(),
@@ -70,6 +70,46 @@ data class RedisClient(
                     resp = map["resp"]!!.toInt()
                 )
             }
+    }
+
+    data class Flags(
+        val closeAsap: Boolean = false,
+        val blocked: Boolean = false,
+        val closeAfterReply: Boolean = false,
+        val watchedChanged: Boolean = false,
+        val waitingVm: Boolean = false,
+        val master: Boolean = false,
+        val monitor: Boolean = false,
+        val pubsub: Boolean = false,
+        val readonly: Boolean = false,
+        val replica: Boolean = false,
+        val unblocked: Boolean = false,
+        val unixSocket: Boolean = false,
+        val inMulti: Boolean = false,
+        val keysTracking: Boolean = false,
+        val trackingInvalid: Boolean = false,
+        val broadcastTracking: Boolean = false,
+    ) {
+        companion object {
+            fun fromString(flags: String) = Flags(
+                closeAsap = "A" in flags,
+                blocked = "b" in flags,
+                closeAfterReply = "c" in flags,
+                watchedChanged = "d" in flags,
+                waitingVm = "i" in flags,
+                master = "M" in flags,
+                monitor = "O" in flags,
+                pubsub = "P" in flags,
+                readonly = "r" in flags,
+                replica = "S" in flags,
+                unblocked = "u" in flags,
+                unixSocket = "U" in flags,
+                inMulti = "X" in flags,
+                keysTracking = "t" in flags,
+                trackingInvalid = "R" in flags,
+                broadcastTracking = "B" in flags,
+            )
+        }
     }
 }
 
