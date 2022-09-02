@@ -66,9 +66,7 @@ class SithsLockTest : FunSpec({
 
         // ACT & ASSERT
         shouldThrow<RedisLockTimeoutException> {
-            withRedis(fakePool) {
-                acquireLock("lock", acquireTimeout = 10.milliseconds)
-            }
+            SithsLock("lock", fakePool).acquire(acquireTimeout = 10.milliseconds)
         }
     }
 })

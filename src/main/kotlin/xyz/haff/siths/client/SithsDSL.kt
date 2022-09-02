@@ -58,41 +58,14 @@ class SithsDSL(val pool: SithsConnectionPool) :
         return result.get()
     }
 
-    // TODO: Maybe the following two should be offloaded to some RedisLock class?
-    suspend fun acquireLock(
-        lockName: String,
-        acquireTimeout: Duration = 10.seconds,
-        lockTimeout: Duration = 10.seconds,
-    ): String {
-        val identifier = UUID.randomUUID().toString()
-        val endTime = System.currentTimeMillis() + acquireTimeout.inWholeMilliseconds
-
-        // TODO: Function to run some code for some duration, in koy
-        while (System.currentTimeMillis() < endTime) {
-            if (runScript(
-                    RedisScripts.ACQUIRE_LOCK,
-                    listOf(buildLockKey(lockName)),
-                    listOf(lockTimeout.inWholeMilliseconds.toString(), identifier)
-                ).isOk()
-            ) {
-                return identifier
-            }
-            delay(10)
-        }
-
-        throw RedisLockTimeoutException(lockName, acquireTimeout)
-    }
-
-    suspend fun releaseLock(lockName: String, identifier: String): Boolean =
-        runScript(RedisScripts.RELEASE_LOCK, listOf(buildLockKey(lockName)), listOf(identifier)).isOk()
-
     suspend inline fun <T> withLock(lockName: String, timeout: Duration = 10.seconds, f: SithsDSL.() -> T): T {
-        val lockIdentifier = acquireLock(lockName, timeout)
+        val lock = SithsLock(lockName, pool)
+        lock.acquire(acquireTimeout = timeout)
 
         return try {
             f()
         } finally {
-            releaseLock(lockName, lockIdentifier)
+            lock.release()
         }
     }
 }
