@@ -2,21 +2,33 @@ package xyz.haff.siths.client.api
 
 import xyz.haff.siths.protocol.SourceAndData
 
-// XXX: Note that there is one level of abstraction more for a HashSithsClient than for a ListSithsClient or SetSithsClient,
-// that's because I haven't introduced higher-level abstraction methods for lists yet
-interface ListSithsClient: ListRedisCommandReceiver<
-        Long,
-        Long?,
-        List<Long>,
+interface ListSithsClient<
+        LongResponseType,
+        NullableLongResponseType,
+        LongListResponseType,
 
-        String,
-        String?,
-        List<String>,
+        StringResponseType,
+        NullableStringResponseType,
+        StringListResponseType,
 
-        SourceAndData<String>?,
-        SourceAndData<List<String>>?,
+        NullableSourceAndStringType,
+        NullableSourceAndStringListType,
 
-        Boolean,
-        Unit
+        BooleanResponseType,
+        UnitResponseType,
+        >: ListRedisCommandReceiver<
+        LongResponseType,
+        NullableLongResponseType,
+        LongListResponseType,
+
+        StringResponseType,
+        NullableStringResponseType,
+        StringListResponseType,
+
+        NullableSourceAndStringType,
+        NullableSourceAndStringListType,
+
+        BooleanResponseType,
+        UnitResponseType,
         > {
 }

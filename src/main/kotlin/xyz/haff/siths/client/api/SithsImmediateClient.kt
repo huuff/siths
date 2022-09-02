@@ -34,7 +34,7 @@ interface SithsImmediateClient : SithsClient<
         Boolean,
         Unit,
         RespType<*>,
-        >, ListSithsClient, HashSithsImmediateClient, SetSithsClient {
+        >, ListSithsImmediateClient, HashSithsImmediateClient, SetSithsClient {
 
 }
 

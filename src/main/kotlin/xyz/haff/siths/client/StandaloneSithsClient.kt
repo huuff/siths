@@ -12,7 +12,7 @@ class StandaloneSithsClient(
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder()
 ) :
     SithsImmediateClient,
-    ListSithsClient by StandaloneListSithsClient(connection, commandBuilder),
+    ListSithsImmediateClient by StandaloneListSithsClient(connection, commandBuilder),
     SetSithsClient by StandaloneSetSithsClient(connection, commandBuilder),
     HashSithsImmediateClient by StandaloneHashSithsClient(connection, commandBuilder)
 {

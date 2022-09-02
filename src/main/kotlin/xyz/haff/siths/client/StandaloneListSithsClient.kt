@@ -1,6 +1,7 @@
 package xyz.haff.siths.client
 
 import xyz.haff.siths.client.api.ListSithsClient
+import xyz.haff.siths.client.api.ListSithsImmediateClient
 import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.option.ListEnd
 import xyz.haff.siths.option.RelativePosition
@@ -10,7 +11,7 @@ import kotlin.time.Duration
 class StandaloneListSithsClient(
     private val connection: SithsConnection,
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder()
-): ListSithsClient {
+): ListSithsImmediateClient {
     override suspend fun llen(key: String): Long
             = connection.runCommand(commandBuilder.llen(key)).toLong()
 

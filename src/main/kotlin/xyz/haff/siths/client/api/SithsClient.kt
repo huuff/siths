@@ -76,6 +76,20 @@ interface SithsClient<
         StringPairCursorResponseType,
 
         BooleanResponseType
+        >, ListSithsClient<
+        LongResponseType,
+        NullableLongResponseType,
+        LongListResponseType,
+
+        StringResponseType,
+        NullableStringResponseType,
+        StringListResponseType,
+
+        NullableSourceAndStringType,
+        NullableSourceAndStringListType,
+
+        BooleanResponseType,
+        UnitResponseType,
         > {
 
     suspend fun getOrNull(key: String): NullableStringResponseType
