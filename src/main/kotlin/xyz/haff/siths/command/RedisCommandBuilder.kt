@@ -268,4 +268,8 @@ class RedisCommandBuilder : RedisCommandReceiver<
     ): RedisCommand = RedisCommand("HSET", key, pair.first, pair.second, *pairsToStringArray(*rest))
 
     override suspend fun hgetall(key: String): RedisCommand = RedisCommand("HGETALL", key)
+
+    override suspend fun hkeys(key: String): RedisCommand = RedisCommand("HKEYS", key)
+
+    override suspend fun hvals(key: String): RedisCommand = RedisCommand("HVALS", key)
 }

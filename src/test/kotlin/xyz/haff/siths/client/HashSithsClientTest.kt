@@ -43,4 +43,22 @@ class HashSithsClientTest : FunSpec({
             "f3" to "v3"
         )
     }
+
+    test("hkeys") {
+        // ARRANGE
+        val key = randomUUID()
+        siths.hset(key, "f1" to "v1", "f2" to "v2", "f3" to "v3")
+
+        // ACT & ASSERT
+        siths.hkeys(key) shouldBe listOf("f1", "f2", "f3")
+    }
+
+    test("hvals") {
+        // ARRANGE
+        val key = randomUUID()
+        siths.hset(key, "f1" to "v1", "f2" to "v2", "f3" to "v3")
+
+        // ACT & ASSERT
+        siths.hvals(key) shouldBe listOf("v1", "v2", "v3")
+    }
 })

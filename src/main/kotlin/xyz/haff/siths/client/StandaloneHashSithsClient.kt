@@ -2,10 +2,7 @@ package xyz.haff.siths.client
 
 import xyz.haff.siths.client.api.HashSithsImmediateClient
 import xyz.haff.siths.command.RedisCommandBuilder
-import xyz.haff.siths.protocol.SithsConnection
-import xyz.haff.siths.protocol.toLong
-import xyz.haff.siths.protocol.toStringMap
-import xyz.haff.siths.protocol.toStringOrNull
+import xyz.haff.siths.protocol.*
 
 class StandaloneHashSithsClient(
     private val connection: SithsConnection,
@@ -21,4 +18,10 @@ class StandaloneHashSithsClient(
 
     override suspend fun hgetall(key: String): Map<String, String>
         = connection.runCommand(commandBuilder.hgetall(key)).toStringMap()
+
+    override suspend fun hkeys(key: String): List<String>
+        = connection.runCommand(commandBuilder.hkeys(key)).toStringList()
+
+    override suspend fun hvals(key: String): List<String>
+        = connection.runCommand(commandBuilder.hvals(key)).toStringList()
 }

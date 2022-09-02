@@ -537,4 +537,18 @@ class SithsPipelinedClient(
             response = QueuedResponse(RespType<*>::toStringMap)
         )
     )
+
+    override suspend fun hkeys(key: String): QueuedResponse<List<String>> = addOperation(
+        Operation(
+            command = commandBuilder.hkeys(key),
+            response = QueuedResponse(RespType<*>::toStringList)
+        )
+    )
+
+    override suspend fun hvals(key: String): QueuedResponse<List<String>> = addOperation(
+        Operation(
+            command = commandBuilder.hvals(key),
+            response = QueuedResponse(RespType<*>::toStringList)
+        )
+    )
 }

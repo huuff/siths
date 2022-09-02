@@ -58,6 +58,7 @@ interface RedisCommandReceiver<
         LongResponseType,
 
         StringResponseType,
+        StringListResponseType,
 
         StringToStringMapResponseType,
         >{

@@ -65,6 +65,7 @@ interface SithsClient<
 
         StringResponseType,
         NullableStringResponseType,
+        StringListResponseType,
 
         StringToStringMapResponseType,
         > {

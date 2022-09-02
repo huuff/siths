@@ -238,4 +238,10 @@ class ManagedSithsClient(
 
     override suspend fun hgetall(key: String): Map<String, String>
         = pool.get().use { it.hgetall(key) }
+
+    override suspend fun hkeys(key: String): List<String>
+        = pool.get().use { it.hkeys(key) }
+
+    override suspend fun hvals(key: String): List<String>
+        = pool.get().use { it.hvals(key) }
 }
