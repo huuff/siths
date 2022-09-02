@@ -1,7 +1,7 @@
 package xyz.haff.siths.command
 
 import xyz.haff.siths.client.api.RedisCommandReceiver
-import xyz.haff.siths.option.ExclusiveMode
+import xyz.haff.siths.option.ExistenceCondition
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.option.ListEnd
 import xyz.haff.siths.option.RelativePosition
@@ -48,10 +48,10 @@ class RedisCommandBuilder : RedisCommandReceiver<
     override suspend fun set(
         key: String,
         value: String,
-        exclusiveMode: ExclusiveMode?,
+        existenceCondition: ExistenceCondition?,
         timeToLive: Duration?
     ): RedisCommand {
-        val mainCommand = RedisCommand("SET", key, value, exclusiveMode?.toString())
+        val mainCommand = RedisCommand("SET", key, value, existenceCondition?.toString())
 
         return if (timeToLive == null) {
             mainCommand

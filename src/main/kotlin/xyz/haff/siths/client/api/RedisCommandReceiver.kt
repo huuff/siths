@@ -1,6 +1,6 @@
 package xyz.haff.siths.client.api
 
-import xyz.haff.siths.option.ExclusiveMode
+import xyz.haff.siths.option.ExistenceCondition
 import xyz.haff.siths.option.ExpirationCondition
 import java.time.ZonedDateTime
 import kotlin.time.Duration
@@ -77,7 +77,7 @@ interface RedisCommandReceiver<
     suspend fun set(
         key: String,
         value: String,
-        exclusiveMode: ExclusiveMode? = null,
+        existenceCondition: ExistenceCondition? = null,
         timeToLive: Duration? = null
     ): UnitResponseType
 

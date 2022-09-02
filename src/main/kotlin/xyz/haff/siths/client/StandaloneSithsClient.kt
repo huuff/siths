@@ -2,7 +2,7 @@ package xyz.haff.siths.client
 
 import xyz.haff.siths.client.api.*
 import xyz.haff.siths.command.RedisCommandBuilder
-import xyz.haff.siths.option.ExclusiveMode
+import xyz.haff.siths.option.ExistenceCondition
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.protocol.*
 import java.time.ZonedDateTime
@@ -18,8 +18,8 @@ class StandaloneSithsClient(
     HashSithsImmediateClient by StandaloneHashSithsClient(connection, commandBuilder)
 {
 
-    override suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode?, timeToLive: Duration?): Unit =
-        connection.runCommand(commandBuilder.set(key, value, exclusiveMode, timeToLive)).toUnit()
+    override suspend fun set(key: String, value: String, existenceCondition: ExistenceCondition?, timeToLive: Duration?): Unit =
+        connection.runCommand(commandBuilder.set(key, value, existenceCondition, timeToLive)).toUnit()
 
     override suspend fun mset(vararg pairs: Pair<String, String>)
         = connection.runCommand(commandBuilder.mset(*pairs)).toUnit()

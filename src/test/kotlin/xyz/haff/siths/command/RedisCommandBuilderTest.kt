@@ -2,14 +2,14 @@ package xyz.haff.siths.command
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import xyz.haff.siths.option.ExclusiveMode
+import xyz.haff.siths.option.ExistenceCondition
 import kotlin.time.Duration.Companion.seconds
 
 class RedisCommandBuilderTest : FunSpec({
     val commandBuilder = RedisCommandBuilder()
 
     test("set") {
-        val command = commandBuilder.set("key", "value", exclusiveMode = ExclusiveMode.NX, timeToLive = 1.seconds)
+        val command = commandBuilder.set("key", "value", existenceCondition = ExistenceCondition.NX, timeToLive = 1.seconds)
 
         command shouldBe RedisCommand("SET", "key", "value", "NX", "PX", "1000")
     }

@@ -2,7 +2,7 @@ package xyz.haff.siths.pipelining
 
 import xyz.haff.siths.client.api.SithsClient
 import xyz.haff.siths.command.RedisCommandBuilder
-import xyz.haff.siths.option.ExclusiveMode
+import xyz.haff.siths.option.ExistenceCondition
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.protocol.*
 import java.time.ZonedDateTime
@@ -51,11 +51,11 @@ class PipelinedSithsClient(
     override suspend fun set(
         key: String,
         value: String,
-        exclusiveMode: ExclusiveMode?,
+        existenceCondition: ExistenceCondition?,
         timeToLive: Duration?
     ): QueuedResponse<Unit> = executor.addOperation(
         DeferredCommand(
-            command = commandBuilder.set(key, value, exclusiveMode, timeToLive),
+            command = commandBuilder.set(key, value, existenceCondition, timeToLive),
             response = QueuedResponseImpl(RespType<*>::toUnit)
         )
     )

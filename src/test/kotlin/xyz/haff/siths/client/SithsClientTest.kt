@@ -12,8 +12,8 @@ import io.kotest.matchers.shouldNotBe
 import xyz.haff.koy.javatime.asDate
 import xyz.haff.koy.javatime.asTime
 import xyz.haff.siths.client.api.SithsImmediateClient
-import xyz.haff.siths.option.ExclusiveMode.NX
-import xyz.haff.siths.option.ExclusiveMode.XX
+import xyz.haff.siths.option.ExistenceCondition.NX
+import xyz.haff.siths.option.ExistenceCondition.XX
 import xyz.haff.siths.common.RedisScriptNotLoadedException
 import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeRedisConnection
@@ -125,7 +125,7 @@ class SithsClientTest : FunSpec({
                 siths.set(key, "test1")
 
                 // ACT
-                siths.set(key, "test2", exclusiveMode = NX)
+                siths.set(key, "test2", existenceCondition = NX)
 
                 // ASSERT
                 siths.get(key) shouldBe "test1"
@@ -133,7 +133,7 @@ class SithsClientTest : FunSpec({
             test("SET ... XX does not set if the key does not exist") {
                 // ACT
                 val key = randomUUID()
-                siths.set(key, "testvalue", exclusiveMode = XX)
+                siths.set(key, "testvalue", existenceCondition = XX)
 
                 // ASSERT
                 siths.getOrNull(key) shouldBe null

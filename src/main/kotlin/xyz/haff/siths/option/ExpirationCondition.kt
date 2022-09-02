@@ -1,9 +1,26 @@
 package xyz.haff.siths.option
 
-// TODO: Document this so that these comments appear in the javadoc (kdoc?)
+/**
+ * To manage in which cases this expiration should be set
+ */
 enum class ExpirationCondition {
-    NX, // Only if no expiration exists
-    XX, // Only if expiration exists
+    /**
+     * Only if no expiration exists
+     */
+    NX,
+
+    /**
+     * Only if expiration exists
+     */
+    XX,
+
+    /**
+     * Only if the new expiry is after than the current one
+     */
     GT, // Only if the new expiry is greater than the current one
-    LT, // Only if the new expiry is smaller than the current one
+
+    /**
+     * Only if the new expiry is before the current one
+     */
+    LT,
 }

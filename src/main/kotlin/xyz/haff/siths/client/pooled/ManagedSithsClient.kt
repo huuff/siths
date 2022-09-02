@@ -1,7 +1,7 @@
 package xyz.haff.siths.client.pooled
 
 import xyz.haff.siths.client.api.SithsImmediateClient
-import xyz.haff.siths.option.ExclusiveMode
+import xyz.haff.siths.option.ExistenceCondition
 import xyz.haff.siths.option.ExpirationCondition
 import xyz.haff.siths.option.ListEnd
 import xyz.haff.siths.option.RelativePosition
@@ -25,8 +25,8 @@ class ManagedSithsClient(
         connectionPool: SithsConnectionPool
     ): this(SithsClientPool(connectionPool))
 
-    override suspend fun set(key: String, value: String, exclusiveMode: ExclusiveMode?, timeToLive: Duration?)
-        = pool.get().use { it.set(key, value, exclusiveMode, timeToLive) }
+    override suspend fun set(key: String, value: String, existenceCondition: ExistenceCondition?, timeToLive: Duration?)
+        = pool.get().use { it.set(key, value, existenceCondition, timeToLive) }
 
     override suspend fun mset(vararg pairs: Pair<String, String>)
         = pool.get().use { it.mset(*pairs) }
