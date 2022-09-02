@@ -295,4 +295,12 @@ class RedisCommandBuilder : RedisCommandReceiver<
 
     override suspend fun hsetnx(key: String, field: String, value: String): RedisCommand
         = RedisCommand("HSETNX", key, field, value)
+
+    override suspend fun hrandfield(key: String): RedisCommand = RedisCommand("HRANDFIELD", key)
+
+    override suspend fun hrandfield(key: String, count: Int): RedisCommand
+        = RedisCommand("HRANDFIELD", key, count)
+
+    override suspend fun hrandfieldWithValues(key: String, count: Int): RedisCommand
+        = RedisCommand("HRANDFIELD", key, count, "WITHVALUES")
 }

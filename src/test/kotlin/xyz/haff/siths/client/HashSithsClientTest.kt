@@ -4,6 +4,8 @@ import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
+import io.kotest.matchers.collections.shouldBeIn
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.client.api.SithsImmediateClient
@@ -170,6 +172,39 @@ class HashSithsClientTest : FunSpec({
             // ASSERT
             wasChanged shouldBe true
             siths.hget(key, "field") shouldBe "new"
+        }
+    }
+
+    context("hrandfield") {
+        test("single element") {
+            // ARRANGE
+            val key = randomUUID()
+            siths.hset(key, "f1" to "v1", "f2" to "v2", "f3" to "v3")
+
+            // ACT & ASSERT
+            siths.hrandfield(key) shouldBeIn listOf("f1", "f2", "f3")
+        }
+
+        test("several elements") {
+            // ARRANGE
+            val key = randomUUID()
+            siths.hset(key, "f1" to "v1", "f2" to "v2", "f3" to "v3")
+
+            // ACT & ASSERT
+            siths.hrandfield(key, 3) shouldContainExactlyInAnyOrder listOf("f1", "f2", "f3")
+        }
+
+        test("with values") {
+            // ARRANGE
+            val key = randomUUID()
+            siths.hset(key, "f1" to "v1", "f2" to "v2", "f3" to "v3")
+
+            // ACT & ASSERT
+            siths.hrandfieldWithValues(key, 3) shouldBe mapOf(
+                "f1" to "v1",
+                "f2" to "v2",
+                "f3" to "v3"
+            )
         }
     }
 })

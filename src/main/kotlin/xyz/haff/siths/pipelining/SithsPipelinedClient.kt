@@ -625,4 +625,25 @@ class SithsPipelinedClient(
             response = QueuedResponse(RespType<*>::integerToBoolean)
         )
     )
+
+    override suspend fun hrandfield(key: String): QueuedResponse<String?> = addOperation(
+        Operation(
+            command = commandBuilder.hrandfield(key),
+            response = QueuedResponse(RespType<*>::toStringOrNull)
+        )
+    )
+
+    override suspend fun hrandfield(key: String, count: Int): QueuedResponse<List<String>> = addOperation(
+        Operation(
+            command = commandBuilder.hrandfield(key, count),
+            response = QueuedResponse(RespType<*>::toStringList)
+        )
+    )
+
+    override suspend fun hrandfieldWithValues(key: String, count: Int): QueuedResponse<Map<String, String>> = addOperation(
+        Operation(
+            command = commandBuilder.hrandfieldWithValues(key, count),
+            response = QueuedResponse(RespType<*>::toStringMap)
+        )
+    )
 }

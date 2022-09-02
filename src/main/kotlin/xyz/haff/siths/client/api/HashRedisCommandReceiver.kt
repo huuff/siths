@@ -6,6 +6,7 @@ interface HashRedisCommandReceiver<
             DoubleResponseType,
 
             StringResponseType,
+            NullableStringResponseType,
             StringListResponseType,
 
             StringToStringMapResponseType,
@@ -25,4 +26,9 @@ interface HashRedisCommandReceiver<
     suspend fun hdel(key: String, field: String, vararg rest: String): LongResponseType
     suspend fun hstrlen(key: String, field: String): LongResponseType
     suspend fun hsetnx(key: String, field: String, value: String): BooleanResponseType
+
+    // HRANDFIELD
+    suspend fun hrandfield(key: String): NullableStringResponseType
+    suspend fun hrandfield(key: String, count: Int): StringListResponseType
+    suspend fun hrandfieldWithValues(key: String, count: Int): StringToStringMapResponseType
 }

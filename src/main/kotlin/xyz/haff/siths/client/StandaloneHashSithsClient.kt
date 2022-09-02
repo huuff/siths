@@ -51,4 +51,13 @@ class StandaloneHashSithsClient(
 
     override suspend fun hsetnx(key: String, field: String, value: String): Boolean
         = connection.runCommand(commandBuilder.hsetnx(key, field, value)).integerToBoolean()
+
+    override suspend fun hrandfield(key: String): String?
+        = connection.runCommand(commandBuilder.hrandfield(key)).toStringOrNull()
+
+    override suspend fun hrandfield(key: String, count: Int): List<String>
+        = connection.runCommand(commandBuilder.hrandfield(key, count)).toStringList()
+
+    override suspend fun hrandfieldWithValues(key: String, count: Int): Map<String, String>
+        = connection.runCommand(commandBuilder.hrandfieldWithValues(key, count)).toStringMap()
 }

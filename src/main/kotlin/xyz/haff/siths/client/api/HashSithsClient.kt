@@ -19,6 +19,7 @@ interface HashSithsClient<
         DoubleResponseType,
 
         StringResponseType,
+        NullableStringResponseType,
         StringListResponseType,
 
         StringToStringMapResponseType,

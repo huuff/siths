@@ -60,6 +60,7 @@ interface RedisCommandReceiver<
         DoubleResponseType,
 
         StringResponseType,
+        NullableStringResponseType,
         StringListResponseType,
 
         StringToStringMapResponseType,

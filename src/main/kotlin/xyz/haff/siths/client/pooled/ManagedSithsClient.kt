@@ -270,4 +270,13 @@ class ManagedSithsClient(
 
     override suspend fun hsetnx(key: String, field: String, value: String): Boolean
         = pool.get().use { it.hsetnx(key, field, value) }
+
+    override suspend fun hrandfield(key: String): String?
+        = pool.get().use { it.hrandfield(key) }
+
+    override suspend fun hrandfield(key: String, count: Int): List<String>
+        = pool.get().use { it.hrandfield(key, count) }
+
+    override suspend fun hrandfieldWithValues(key: String, count: Int): Map<String, String>
+        = pool.get().use { it.hrandfieldWithValues(key, count) }
 }
