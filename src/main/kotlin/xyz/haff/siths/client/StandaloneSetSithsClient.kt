@@ -1,13 +1,14 @@
 package xyz.haff.siths.client
 
 import xyz.haff.siths.client.api.SetSithsClient
+import xyz.haff.siths.client.api.SetSithsImmediateClient
 import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.protocol.*
 
 class StandaloneSetSithsClient(
     private val connection: SithsConnection,
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder()
-): SetSithsClient {
+): SetSithsImmediateClient {
 
     override suspend fun sadd(key: String, value: String, vararg rest: String): Long
             = connection.runCommand(commandBuilder.sadd(key, value, *rest)).toLong()

@@ -13,7 +13,7 @@ class StandaloneSithsClient(
 ) :
     SithsImmediateClient,
     ListSithsImmediateClient by StandaloneListSithsClient(connection, commandBuilder),
-    SetSithsClient by StandaloneSetSithsClient(connection, commandBuilder),
+    SetSithsImmediateClient by StandaloneSetSithsClient(connection, commandBuilder),
     HashSithsImmediateClient by StandaloneHashSithsClient(connection, commandBuilder)
 {
 
