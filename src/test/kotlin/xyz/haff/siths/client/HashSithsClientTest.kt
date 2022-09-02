@@ -109,4 +109,13 @@ class HashSithsClientTest : FunSpec({
             "f3" to "v3"
         )
     }
+
+    test("hlen") {
+        // ARRANGE
+        val key = randomUUID()
+        siths.hset(key, "f1" to "v1", "f2" to "v2", "f3" to "v3")
+
+        // ACT & ASSERT
+        siths.hlen(key) shouldBe 3
+    }
 })

@@ -40,4 +40,6 @@ class StandaloneHashSithsClient(
 
     override suspend fun hmget(key: String, field: String, vararg rest: String): Map<String, String>
         = connection.runCommand(commandBuilder.hmget(key, field, *rest)).associateArrayToArguments(field, *rest)
+
+    override suspend fun hlen(key: String): Long = connection.runCommand(commandBuilder.hlen(key)).toLong()
 }

@@ -259,4 +259,6 @@ class ManagedSithsClient(
 
     override suspend fun hmget(key: String, field: String, vararg rest: String): Map<String, String>
         = pool.get().use { it.hmget(key, field, *rest) }
+
+    override suspend fun hlen(key: String): Long = pool.get().use { it.hlen(key) }
 }

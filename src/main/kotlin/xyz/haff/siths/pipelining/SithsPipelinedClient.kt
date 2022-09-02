@@ -597,4 +597,11 @@ class SithsPipelinedClient(
                 response = QueuedResponse({ it.associateArrayToArguments(field, *rest) })
             )
         )
+
+    override suspend fun hlen(key: String): QueuedResponse<Long> = addOperation(
+        Operation(
+            command = commandBuilder.hlen(key),
+            response = QueuedResponse(RespType<*>::toLong)
+        )
+    )
 }
