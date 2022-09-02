@@ -15,7 +15,6 @@ import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 
-// TODO: Try to find the redis error for a non-existent index and convert it to IndexOutOfBoundsException?
 class SithsList<T : Any>(
     private val connectionPool: SithsConnectionPool,
     val name: String = "list:${randomUUID()}",
@@ -219,7 +218,6 @@ class SithsList<T : Any>(
         return runBlocking { client.lrange(name, fromIndex, toIndex - 1) }.map(deserialize).toMutableList()
     }
 
-    // TODO: Use locks somehow to prevent concurrent modifications?
     data class Cursor<T>(val contents: MutableList<T>, val start: Int, var stop: Int)
     open inner class Iterator(
         protected var lastCursor: Cursor<T>,
