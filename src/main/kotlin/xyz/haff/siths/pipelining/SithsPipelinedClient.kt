@@ -618,4 +618,11 @@ class SithsPipelinedClient(
             response = QueuedResponse(RespType<*>::toLong)
         )
     )
+
+    override suspend fun hsetnx(key: String, field: String, value: String): QueuedResponse<Boolean> = addOperation(
+        Operation(
+            command = commandBuilder.hsetnx(key, field, value),
+            response = QueuedResponse(RespType<*>::integerToBoolean)
+        )
+    )
 }

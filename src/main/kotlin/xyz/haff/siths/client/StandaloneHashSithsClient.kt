@@ -48,4 +48,7 @@ class StandaloneHashSithsClient(
 
     override suspend fun hstrlen(key: String, field: String): Long
         = connection.runCommand(commandBuilder.hstrlen(key, field)).toLong()
+
+    override suspend fun hsetnx(key: String, field: String, value: String): Boolean
+        = connection.runCommand(commandBuilder.hsetnx(key, field, value)).integerToBoolean()
 }

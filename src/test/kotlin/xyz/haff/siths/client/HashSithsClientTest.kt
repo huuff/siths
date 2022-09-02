@@ -4,6 +4,7 @@ import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.LifecycleMode
 import io.kotest.extensions.testcontainers.TestContainerExtension
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.common.randomUUID
@@ -142,5 +143,33 @@ class HashSithsClientTest : FunSpec({
 
         // ACT & ASSERT
         siths.hstrlen(key, "field") shouldBe 4
+    }
+
+    context("hsetnx") {
+        test("without setting anything") {
+            // ARRANGE
+            val key = randomUUID()
+            siths.hset(key, "field" to "original")
+
+            // ACT
+            val wasChanged = siths.hsetnx(key, "field", "new")
+
+            // ASSERT
+            wasChanged shouldBe false
+            siths.hget(key, "field") shouldBe "original"
+        }
+
+        test("actually setting") {
+            // ARRANGE
+            val key = randomUUID()
+            siths.hset(key, "otherfield" to "value")
+
+            // ACT
+            val wasChanged = siths.hsetnx(key, "field", "new")
+
+            // ASSERT
+            wasChanged shouldBe true
+            siths.hget(key, "field") shouldBe "new"
+        }
     }
 })
