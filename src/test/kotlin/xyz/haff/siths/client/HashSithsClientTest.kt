@@ -61,4 +61,14 @@ class HashSithsClientTest : FunSpec({
         // ACT & ASSERT
         siths.hvals(key) shouldBe listOf("v1", "v2", "v3")
     }
+
+    test("hexists") {
+        // ARRANGE
+        val key = randomUUID()
+        siths.hset(key, "f1" to "v1", "f2" to "v2", "f3" to "v3")
+
+        // ACT & ASSERT
+        siths.hexists(key, "f1") shouldBe true
+        siths.hexists(key, "nonexistent") shouldBe false
+    }
 })

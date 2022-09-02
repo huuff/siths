@@ -244,4 +244,7 @@ class ManagedSithsClient(
 
     override suspend fun hvals(key: String): List<String>
         = pool.get().use { it.hvals(key) }
+
+    override suspend fun hexists(key: String, field: String): Boolean
+        = pool.get().use { it.hexists(key, field) }
 }

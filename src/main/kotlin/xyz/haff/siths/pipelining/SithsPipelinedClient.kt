@@ -551,4 +551,11 @@ class SithsPipelinedClient(
             response = QueuedResponse(RespType<*>::toStringList)
         )
     )
+
+    override suspend fun hexists(key: String, field: String): QueuedResponse<Boolean> = addOperation(
+        Operation(
+            command = commandBuilder.hexists(key, field),
+            response = QueuedResponse(RespType<*>::integerToBoolean)
+        )
+    )
 }

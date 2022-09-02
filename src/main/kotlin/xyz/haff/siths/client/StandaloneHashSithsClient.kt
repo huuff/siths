@@ -24,4 +24,7 @@ class StandaloneHashSithsClient(
 
     override suspend fun hvals(key: String): List<String>
         = connection.runCommand(commandBuilder.hvals(key)).toStringList()
+
+    override suspend fun hexists(key: String, field: String): Boolean
+        = connection.runCommand(commandBuilder.hexists(key, field)).integerToBoolean()
 }

@@ -272,4 +272,7 @@ class RedisCommandBuilder : RedisCommandReceiver<
     override suspend fun hkeys(key: String): RedisCommand = RedisCommand("HKEYS", key)
 
     override suspend fun hvals(key: String): RedisCommand = RedisCommand("HVALS", key)
+
+    override suspend fun hexists(key: String, field: String): RedisCommand
+        = RedisCommand("HEXISTS", key, field)
 }

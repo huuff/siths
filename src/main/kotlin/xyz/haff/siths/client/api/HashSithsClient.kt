@@ -8,6 +8,8 @@ interface HashSithsClient<
         StringListResponseType,
 
         StringToStringMapResponseType,
+
+        BooleanResponseType,
         >
     : HashRedisCommandReceiver<
         LongResponseType,
@@ -15,7 +17,9 @@ interface HashSithsClient<
         StringResponseType,
         StringListResponseType,
 
-        StringToStringMapResponseType
+        StringToStringMapResponseType,
+
+        BooleanResponseType,
         > {
 
     suspend fun hgetOrNull(key: String, field: String): NullableStringResponseType
