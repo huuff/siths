@@ -19,7 +19,7 @@ class SithsPipelinedClientTest : FunSpec({
     test("can set and get") {
         // ARRANGE
         val connection = makeSithsPool(container).get()
-        val pipeline = SithsPipelinedClient(connection)
+        val pipeline = PipelinedSithsClient(connection)
         val key = randomUUID()
 
         // ACT
@@ -38,7 +38,7 @@ class SithsPipelinedClientTest : FunSpec({
     test("all kinds of operations") {
         // ARRANGE
         val connection = makeSithsPool(container).get()
-        val pipeline = SithsPipelinedClient(connection)
+        val pipeline = PipelinedSithsClient(connection)
         val key = randomUUID()
 
         // ACT

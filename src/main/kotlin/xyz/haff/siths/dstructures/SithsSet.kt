@@ -2,7 +2,7 @@ package xyz.haff.siths.dstructures
 
 import kotlinx.coroutines.runBlocking
 import xyz.haff.siths.client.pooled.ManagedSithsClient
-import xyz.haff.siths.pipelining.SithsPipelinedClient
+import xyz.haff.siths.pipelining.PipelinedSithsClient
 import xyz.haff.siths.client.pooled.SithsClientPool
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
@@ -48,7 +48,7 @@ class SithsSet<T : Any>(
         return runBlocking {
             connectionPool.get().use { conn ->
                 val otherSetKey = randomUUID()
-                val pipeline = SithsPipelinedClient(conn)
+                val pipeline = PipelinedSithsClient(conn)
                 val sizeBeforeChange = pipeline.scard(this@SithsSet.name)
                 pipeline.sadd(otherSetKey, otherSetHead, *otherSetTail)
                 val sizeAfterChange = pipeline.sdiffstore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
@@ -64,7 +64,7 @@ class SithsSet<T : Any>(
         val (otherSetHead, otherSetTail) = elements.map(serialize).toTypedArray().headAndTail()
         return runBlocking {
             connectionPool.get().use { conn ->
-                val pipeline = SithsPipelinedClient(conn)
+                val pipeline = PipelinedSithsClient(conn)
                 val sizeBeforeChange = pipeline.scard(this@SithsSet.name)
                 val otherSetKey = randomUUID()
                 pipeline.sadd(otherSetKey, otherSetHead, *otherSetTail)
@@ -87,7 +87,7 @@ class SithsSet<T : Any>(
         val (otherSetHead, otherSetTail) = otherSet.headAndTail()
         return runBlocking {
             connectionPool.get().use { conn ->
-                val pipeline = SithsPipelinedClient(conn)
+                val pipeline = PipelinedSithsClient(conn)
                 val temporalSetKey = randomUUID()
                 pipeline.sadd(temporalSetKey, otherSetHead, *otherSetTail)
                 val intersectionCardinality =
