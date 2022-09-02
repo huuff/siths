@@ -7,6 +7,7 @@ import xyz.haff.siths.client.pooled.SithsClientPool
 import xyz.haff.siths.common.*
 import xyz.haff.siths.common.buildLockKey
 import xyz.haff.siths.pipelining.PipelinedSithsClient
+import xyz.haff.siths.pipelining.QueuedResponse
 import xyz.haff.siths.protocol.RespType
 import xyz.haff.siths.protocol.SithsConnectionPool
 import xyz.haff.siths.scripts.RedisScript
@@ -34,19 +35,21 @@ class SithsDSL(val pool: SithsConnectionPool) :
                     pipelined {
                         scriptLoad(script.code)
                         evalSha(script.sha, keys, args)
-                    }[1]
+                    }
                 }
             }
         }
     }
 
-    // TODO: hmm this api seems unfriendly... the return type is too low-level
-    suspend inline fun pipelined(f: PipelinedSithsClient.() -> Unit): List<RespType<*>> {
+    suspend inline fun <T> pipelined(f: PipelinedSithsClient.() -> QueuedResponse<T>): T {
         val pipelineBuilder = PipelinedSithsClient()
-        pipelineBuilder.f()
-        return pool.get().use { conn -> pipelineBuilder.exec(conn) }
+        val result = pipelineBuilder.f()
+        pool.get().use { conn -> pipelineBuilder.exec(conn) }
+
+        return result.get()
     }
 
+    // TODO: Do as above
     suspend inline fun transactional(f: PipelinedSithsClient.() -> Unit): List<RespType<*>> {
         val pipelineBuilder = PipelinedSithsClient()
         pipelineBuilder.f()

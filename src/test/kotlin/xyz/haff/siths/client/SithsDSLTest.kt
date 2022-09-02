@@ -40,19 +40,14 @@ class SithsDSLTest : FunSpec({
         val pipelineResult = withRedis(pool) {
             pipelined {
                 set(key, "0")
-                get(key)
+                incrBy(key, 1)
                 incrBy(key, 1)
                 get(key)
             }
         }
 
         // ASSERT
-        pipelineResult shouldBe listOf(
-            RespSimpleString("OK"),
-            RespBulkString("0"),
-            RespInteger(1),
-            RespBulkString("1")
-        )
+        pipelineResult shouldBe "2" // TODO: Use getLong to get an actual number
     }
 
     test("correctly makes transaction") {
