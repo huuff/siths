@@ -104,4 +104,5 @@ interface SithsClient<
         > {
 
     suspend fun getOrNull(key: String): NullableStringResponseType
+    suspend fun getLong(key: String): LongResponseType
 }

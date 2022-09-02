@@ -54,36 +54,38 @@ class PipelinedSithsClient(
     ): QueuedResponse<Unit> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.set(key, value, exclusiveMode, timeToLive),
-            response = QueuedResponse(RespType<*>::toUnit)
+            response = QueuedResponseImpl(RespType<*>::toUnit)
         )
     )
 
     override suspend fun get(key: String): QueuedResponse<String> =
-        executor.addOperation(DeferredCommand(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringNonNull)))
+        executor.addOperation(DeferredCommand(commandBuilder.get(key), QueuedResponseImpl(RespType<*>::toStringNonNull)))
+
+    override suspend fun getLong(key: String): QueuedResponse<Long> = get(key).map(String::toLong)
 
     override suspend fun getOrNull(key: String): QueuedResponse<String?> =
-        executor.addOperation(DeferredCommand(commandBuilder.get(key), QueuedResponse(RespType<*>::toStringOrNull)))
+        executor.addOperation(DeferredCommand(commandBuilder.get(key), QueuedResponseImpl(RespType<*>::toStringOrNull)))
 
     override suspend fun mset(vararg pairs: Pair<String, String>): QueuedResponse<Unit> =
-        executor.addOperation(DeferredCommand(commandBuilder.mset(*pairs), QueuedResponse(RespType<*>::toUnit)))
+        executor.addOperation(DeferredCommand(commandBuilder.mset(*pairs), QueuedResponseImpl(RespType<*>::toUnit)))
 
     override suspend fun mget(key: String, vararg rest: String): QueuedResponse<Map<String, String>> = executor.addOperation(
         DeferredCommand(
             commandBuilder.mget(key, *rest),
-            QueuedResponse({ it.associateArrayToArguments(key, *rest) })
+            QueuedResponseImpl({ it.associateArrayToArguments(key, *rest) })
         )
     )
 
     override suspend fun del(key: String, vararg rest: String): QueuedResponse<Long> =
-        executor.addOperation(DeferredCommand(commandBuilder.del(key, *rest), QueuedResponse(RespType<*>::toLong)))
+        executor.addOperation(DeferredCommand(commandBuilder.del(key, *rest), QueuedResponseImpl(RespType<*>::toLong)))
 
     override suspend fun ttl(key: String): QueuedResponse<Duration?> =
-        executor.addOperation(DeferredCommand(commandBuilder.ttl(key), QueuedResponse(RespType<*>::toDurationOrNull)))
+        executor.addOperation(DeferredCommand(commandBuilder.ttl(key), QueuedResponseImpl(RespType<*>::toDurationOrNull)))
 
     override suspend fun scriptLoad(script: String): QueuedResponse<String> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.scriptLoad(script),
-            response = QueuedResponse(RespType<*>::toStringNonNull)
+            response = QueuedResponseImpl(RespType<*>::toStringNonNull)
         )
     )
 
@@ -91,7 +93,7 @@ class PipelinedSithsClient(
         executor.addOperation(
             DeferredCommand(
                 command = commandBuilder.evalSha(sha, keys, args),
-                response = QueuedResponse(RespType<*>::throwOnError)
+                response = QueuedResponseImpl(RespType<*>::throwOnError)
             )
         )
 
@@ -99,21 +101,21 @@ class PipelinedSithsClient(
         executor.addOperation(
             DeferredCommand(
                 command = commandBuilder.eval(script, keys, args),
-                response = QueuedResponse(RespType<*>::throwOnError)
+                response = QueuedResponseImpl(RespType<*>::throwOnError)
             )
         )
 
     override suspend fun incrBy(key: String, value: Long): QueuedResponse<Long> =
-        executor.addOperation(DeferredCommand(commandBuilder.incrBy(key, value), QueuedResponse(RespType<*>::toLong)))
+        executor.addOperation(DeferredCommand(commandBuilder.incrBy(key, value), QueuedResponseImpl(RespType<*>::toLong)))
 
     override suspend fun incrByFloat(key: String, value: Double): QueuedResponse<Double> =
-        executor.addOperation(DeferredCommand(commandBuilder.incrByFloat(key, value), QueuedResponse(RespType<*>::toDouble)))
+        executor.addOperation(DeferredCommand(commandBuilder.incrByFloat(key, value), QueuedResponseImpl(RespType<*>::toDouble)))
 
     override suspend fun exists(key: String, vararg rest: String): QueuedResponse<Boolean> {
         return executor.addOperation(
             DeferredCommand(
                 command = commandBuilder.exists(key, *rest),
-                response = QueuedResponse(converter = { it.existenceToBoolean(setOf(key, *rest).size.toLong()) })
+                response = QueuedResponseImpl(converter = { it.existenceToBoolean(setOf(key, *rest).size.toLong()) })
             )
         )
     }
@@ -125,21 +127,21 @@ class PipelinedSithsClient(
     ): QueuedResponse<Boolean> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.expire(key, duration, expirationCondition),
-            response = QueuedResponse(RespType<*>::integerToBoolean)
+            response = QueuedResponseImpl(RespType<*>::integerToBoolean)
         )
     )
 
     override suspend fun persist(key: String): QueuedResponse<Boolean> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.persist(key),
-            response = QueuedResponse(RespType<*>::integerToBoolean)
+            response = QueuedResponseImpl(RespType<*>::integerToBoolean)
         )
     )
 
     override suspend fun clientList(): QueuedResponse<List<RedisClient>> =
-        executor.addOperation(DeferredCommand(commandBuilder.clientList(), QueuedResponse(RespType<*>::toClientList)))
+        executor.addOperation(DeferredCommand(commandBuilder.clientList(), QueuedResponseImpl(RespType<*>::toClientList)))
 
     override suspend fun ping(): QueuedResponse<Boolean> =
-        executor.addOperation(DeferredCommand(commandBuilder.ping(), QueuedResponse(RespType<*>::pongToBoolean)))
+        executor.addOperation(DeferredCommand(commandBuilder.ping(), QueuedResponseImpl(RespType<*>::pongToBoolean)))
 
 }

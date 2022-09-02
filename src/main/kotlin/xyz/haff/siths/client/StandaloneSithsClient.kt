@@ -39,6 +39,8 @@ class StandaloneSithsClient(
 
     override suspend fun get(key: String): String = getOrNull(key) ?: throw RuntimeException("Key $key does not exist!")
 
+    override suspend fun getLong(key: String): Long = get(key).toLong()
+
     override suspend fun scriptLoad(script: String): String =
         connection.runCommand(commandBuilder.scriptLoad(script)).toStringNonNull()
 

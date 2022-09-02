@@ -4,7 +4,8 @@ import kotlinx.coroutines.delay
 import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.client.pooled.ManagedSithsClient
 import xyz.haff.siths.client.pooled.SithsClientPool
-import xyz.haff.siths.common.*
+import xyz.haff.siths.common.RedisLockTimeoutException
+import xyz.haff.siths.common.RedisScriptNotLoadedException
 import xyz.haff.siths.common.buildLockKey
 import xyz.haff.siths.pipelining.PipelinedSithsClient
 import xyz.haff.siths.pipelining.QueuedResponse
@@ -12,9 +13,9 @@ import xyz.haff.siths.protocol.RespType
 import xyz.haff.siths.protocol.SithsConnectionPool
 import xyz.haff.siths.scripts.RedisScript
 import xyz.haff.siths.scripts.RedisScripts
+import java.util.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import java.util.*
 
 class SithsDSL(val pool: SithsConnectionPool) :
     SithsImmediateClient by ManagedSithsClient(pool = SithsClientPool(pool)) {

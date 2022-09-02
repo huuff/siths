@@ -15,7 +15,7 @@ class RedisPipelineExecutor(
 
     val length get() = operations.size
 
-    fun <T> addOperation(operation: DeferredCommand<T>): QueuedResponse<T> {
+    fun <T> addOperation(operation: DeferredCommand<T>): QueuedResponseImpl<T> {
         operations += operation
         return operation.response
     }

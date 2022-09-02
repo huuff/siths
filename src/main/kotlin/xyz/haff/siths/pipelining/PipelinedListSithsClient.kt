@@ -4,7 +4,6 @@ import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.option.ListEnd
 import xyz.haff.siths.option.RelativePosition
 import xyz.haff.siths.protocol.*
-import kotlin.text.toLongOrNull
 import kotlin.time.Duration
 
 class PipelinedListSithsClient(
@@ -12,94 +11,94 @@ class PipelinedListSithsClient(
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder(),
 ): IPipelinedListSithsClient {
 
-    override suspend fun llen(key: String): QueuedResponse<Long> =
-        executor.addOperation(DeferredCommand(commandBuilder.llen(key), QueuedResponse(RespType<*>::toLong)))
+    override suspend fun llen(key: String): QueuedResponseImpl<Long> =
+        executor.addOperation(DeferredCommand(commandBuilder.llen(key), QueuedResponseImpl(RespType<*>::toLong)))
 
-    override suspend fun lindex(key: String, index: Int): QueuedResponse<String?> =
-        executor.addOperation(DeferredCommand(commandBuilder.lindex(key, index), QueuedResponse(RespType<*>::toStringOrNull)))
+    override suspend fun lindex(key: String, index: Int): QueuedResponseImpl<String?> =
+        executor.addOperation(DeferredCommand(commandBuilder.lindex(key, index), QueuedResponseImpl(RespType<*>::toStringOrNull)))
 
     override suspend fun linsert(
         key: String,
         relativePosition: RelativePosition,
         pivot: String,
         element: String
-    ): QueuedResponse<Long?> =
+    ): QueuedResponseImpl<Long?> =
         executor.addOperation(
             DeferredCommand(
                 command = commandBuilder.linsert(key, relativePosition, pivot, element),
-                response = QueuedResponse(RespType<*>::toPositiveLongOrNull)
+                response = QueuedResponseImpl(RespType<*>::toPositiveLongOrNull)
             )
         )
 
-    override suspend fun lpop(key: String, count: Int?): QueuedResponse<List<String>> = executor.addOperation(
+    override suspend fun lpop(key: String, count: Int?): QueuedResponseImpl<List<String>> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.lpop(key, count),
-            response = QueuedResponse(RespType<*>::bulkOrArrayToStringList)
+            response = QueuedResponseImpl(RespType<*>::bulkOrArrayToStringList)
         )
     )
 
-    override suspend fun lpop(key: String): QueuedResponse<String?> =
-        executor.addOperation(DeferredCommand(commandBuilder.lpop(key), QueuedResponse(RespType<*>::toStringOrNull)))
+    override suspend fun lpop(key: String): QueuedResponseImpl<String?> =
+        executor.addOperation(DeferredCommand(commandBuilder.lpop(key), QueuedResponseImpl(RespType<*>::toStringOrNull)))
 
     override suspend fun lmpop(
         keys: List<String>,
         end: ListEnd,
         count: Int?
-    ): QueuedResponse<SourceAndData<List<String>>?> = executor.addOperation(
+    ): QueuedResponseImpl<SourceAndData<List<String>>?> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.lmpop(keys, end, count),
-            response = QueuedResponse(RespType<*>::toSourceAndStringListOrNull)
+            response = QueuedResponseImpl(RespType<*>::toSourceAndStringListOrNull)
         )
     )
 
-    override suspend fun lmpop(key: String, end: ListEnd, count: Int?): QueuedResponse<List<String>> = executor.addOperation(
+    override suspend fun lmpop(key: String, end: ListEnd, count: Int?): QueuedResponseImpl<List<String>> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.lmpop(key, end, count),
-            response = QueuedResponse({ it.toSourceAndStringListOrNull()?.data ?: listOf() })
+            response = QueuedResponseImpl({ it.toSourceAndStringListOrNull()?.data ?: listOf() })
         )
     )
 
-    override suspend fun rpop(key: String, count: Int?): QueuedResponse<List<String>> = executor.addOperation(
+    override suspend fun rpop(key: String, count: Int?): QueuedResponseImpl<List<String>> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.rpop(key, count),
-            response = QueuedResponse(RespType<*>::bulkOrArrayToStringList)
+            response = QueuedResponseImpl(RespType<*>::bulkOrArrayToStringList)
         )
     )
 
-    override suspend fun rpop(key: String): QueuedResponse<String?> = executor.addOperation(
+    override suspend fun rpop(key: String): QueuedResponseImpl<String?> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.rpop(key),
-            response = QueuedResponse(RespType<*>::toStringOrNull)
+            response = QueuedResponseImpl(RespType<*>::toStringOrNull)
         )
     )
 
-    override suspend fun lpush(key: String, element: String, vararg rest: String): QueuedResponse<Long> =
-        executor.addOperation(DeferredCommand(commandBuilder.lpush(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
+    override suspend fun lpush(key: String, element: String, vararg rest: String): QueuedResponseImpl<Long> =
+        executor.addOperation(DeferredCommand(commandBuilder.lpush(key, element, *rest), QueuedResponseImpl(RespType<*>::toLong)))
 
-    override suspend fun lpushx(key: String, element: String, vararg rest: String): QueuedResponse<Long> =
-        executor.addOperation(DeferredCommand(commandBuilder.lpushx(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
+    override suspend fun lpushx(key: String, element: String, vararg rest: String): QueuedResponseImpl<Long> =
+        executor.addOperation(DeferredCommand(commandBuilder.lpushx(key, element, *rest), QueuedResponseImpl(RespType<*>::toLong)))
 
-    override suspend fun rpush(key: String, element: String, vararg rest: String): QueuedResponse<Long> =
-        executor.addOperation(DeferredCommand(commandBuilder.rpush(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
+    override suspend fun rpush(key: String, element: String, vararg rest: String): QueuedResponseImpl<Long> =
+        executor.addOperation(DeferredCommand(commandBuilder.rpush(key, element, *rest), QueuedResponseImpl(RespType<*>::toLong)))
 
-    override suspend fun rpushx(key: String, element: String, vararg rest: String): QueuedResponse<Long> =
-        executor.addOperation(DeferredCommand(commandBuilder.rpushx(key, element, *rest), QueuedResponse(RespType<*>::toLong)))
+    override suspend fun rpushx(key: String, element: String, vararg rest: String): QueuedResponseImpl<Long> =
+        executor.addOperation(DeferredCommand(commandBuilder.rpushx(key, element, *rest), QueuedResponseImpl(RespType<*>::toLong)))
 
-    override suspend fun lrem(key: String, element: String, count: Int): QueuedResponse<Long> =
-        executor.addOperation(DeferredCommand(commandBuilder.lrem(key, element, count), QueuedResponse(RespType<*>::toLong)))
+    override suspend fun lrem(key: String, element: String, count: Int): QueuedResponseImpl<Long> =
+        executor.addOperation(DeferredCommand(commandBuilder.lrem(key, element, count), QueuedResponseImpl(RespType<*>::toLong)))
 
-    override suspend fun lrange(key: String, start: Int, stop: Int): QueuedResponse<List<String>> = executor.addOperation(
+    override suspend fun lrange(key: String, start: Int, stop: Int): QueuedResponseImpl<List<String>> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.lrange(key, start, stop),
-            response = QueuedResponse(RespType<*>::toStringList)
+            response = QueuedResponseImpl(RespType<*>::toStringList)
         )
     )
 
-    override suspend fun lpos(key: String, element: String, rank: Int?, maxlen: Int?): QueuedResponse<Long?> =
+    override suspend fun lpos(key: String, element: String, rank: Int?, maxlen: Int?): QueuedResponseImpl<Long?> =
         executor.addOperation(
             DeferredCommand(
                 command = commandBuilder.lpos(key, element, rank, maxlen),
-                response = QueuedResponse(RespType<*>::toLongOrNull)
+                response = QueuedResponseImpl(RespType<*>::toLongOrNull)
             )
         )
 
@@ -109,24 +108,24 @@ class PipelinedListSithsClient(
         rank: Int?,
         count: Int,
         maxlen: Int?
-    ): QueuedResponse<List<Long>> = executor.addOperation(
+    ): QueuedResponseImpl<List<Long>> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.lpos(key, element, rank, count, maxlen),
-            response = QueuedResponse(RespType<*>::toLongList)
+            response = QueuedResponseImpl(RespType<*>::toLongList)
         )
     )
 
-    override suspend fun lset(key: String, index: Int, element: String): QueuedResponse<Boolean> = executor.addOperation(
+    override suspend fun lset(key: String, index: Int, element: String): QueuedResponseImpl<Boolean> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.lset(key, index, element),
-            response = QueuedResponse(RespType<*>::isOk)
+            response = QueuedResponseImpl(RespType<*>::isOk)
         )
     )
 
-    override suspend fun ltrim(key: String, start: Int, stop: Int): QueuedResponse<Unit> = executor.addOperation(
+    override suspend fun ltrim(key: String, start: Int, stop: Int): QueuedResponseImpl<Unit> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.ltrim(key, start, stop),
-            response = QueuedResponse(RespType<*>::assertOk)
+            response = QueuedResponseImpl(RespType<*>::assertOk)
         )
     )
 
@@ -135,10 +134,10 @@ class PipelinedListSithsClient(
         destination: String,
         sourceEnd: ListEnd,
         destinationEnd: ListEnd
-    ): QueuedResponse<String> = executor.addOperation(
+    ): QueuedResponseImpl<String> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.lmove(source, destination, sourceEnd, destinationEnd),
-            response = QueuedResponse(RespType<*>::toStringNonNull)
+            response = QueuedResponseImpl(RespType<*>::toStringNonNull)
         )
     )
 
@@ -148,10 +147,10 @@ class PipelinedListSithsClient(
         vararg otherKeys: String,
         end: ListEnd,
         count: Int?
-    ): QueuedResponse<SourceAndData<List<String>>?> = executor.addOperation(
+    ): QueuedResponseImpl<SourceAndData<List<String>>?> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.blmpop(timeout, key, otherKeys = otherKeys, end = end, count),
-            response = QueuedResponse(RespType<*>::toSourceAndStringListOrNull)
+            response = QueuedResponseImpl(RespType<*>::toSourceAndStringListOrNull)
         )
     )
 
@@ -159,10 +158,10 @@ class PipelinedListSithsClient(
         key: String,
         vararg otherKeys: String,
         timeout: Duration?
-    ): QueuedResponse<SourceAndData<String>?> = executor.addOperation(
+    ): QueuedResponseImpl<SourceAndData<String>?> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.brpop(key, otherKeys = otherKeys, timeout),
-            response = QueuedResponse(RespType<*>::toSourceAndStringOrNull)
+            response = QueuedResponseImpl(RespType<*>::toSourceAndStringOrNull)
         )
     )
 
@@ -170,10 +169,10 @@ class PipelinedListSithsClient(
         key: String,
         vararg otherKeys: String,
         timeout: Duration?
-    ): QueuedResponse<SourceAndData<String>?> = executor.addOperation(
+    ): QueuedResponseImpl<SourceAndData<String>?> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.blpop(key, otherKeys = otherKeys, timeout),
-            response = QueuedResponse(RespType<*>::toSourceAndStringOrNull)
+            response = QueuedResponseImpl(RespType<*>::toSourceAndStringOrNull)
         )
     )
 
@@ -183,16 +182,16 @@ class PipelinedListSithsClient(
         sourceEnd: ListEnd,
         destinationEnd: ListEnd,
         timeout: Duration?
-    ): QueuedResponse<String?> = executor.addOperation(
+    ): QueuedResponseImpl<String?> = executor.addOperation(
         DeferredCommand(
             command = commandBuilder.blmove(source, destination, sourceEnd, destinationEnd, timeout),
-            response = QueuedResponse(RespType<*>::toStringOrNull)
+            response = QueuedResponseImpl(RespType<*>::toStringOrNull)
         )
     )
 
-    override suspend fun lpushAny(key: String, element: Any, vararg rest: Any): QueuedResponse<Long>
+    override suspend fun lpushAny(key: String, element: Any, vararg rest: Any): QueuedResponseImpl<Long>
             = lpush(key, element.toString(), *rest.map(Any::toString).toTypedArray())
 
-    override suspend fun rpushAny(key: String, element: Any, vararg rest: Any): QueuedResponse<Long>
+    override suspend fun rpushAny(key: String, element: Any, vararg rest: Any): QueuedResponseImpl<Long>
             = rpush(key, element.toString(), *rest.map(Any::toString).toTypedArray())
 }

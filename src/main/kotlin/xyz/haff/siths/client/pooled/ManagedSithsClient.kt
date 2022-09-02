@@ -45,6 +45,8 @@ class ManagedSithsClient(
     override suspend fun get(key: String): String
         = pool.get().use { it.get(key) }
 
+    override suspend fun getLong(key: String): Long = pool.get().use { it.get(key).toLong() }
+
     override suspend fun scriptLoad(script: String): String
         = pool.get().use { it.scriptLoad(script) }
 

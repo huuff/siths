@@ -1,22 +1,10 @@
 package xyz.haff.siths.pipelining
 
-import xyz.haff.siths.common.UnexecutedRedisPipelineException
 import xyz.haff.siths.protocol.RespType
 
-class QueuedResponse<T>(
-    private val converter: (RespType<*>) -> T,
-    private var contents: RespType<*>? = null,
-) {
+interface QueuedResponse<T> {
 
-    fun get(): T {
-        if (contents == null) {
-            throw UnexecutedRedisPipelineException()
-        } else {
-            return converter(contents!!)
-        }
-    }
-
-    internal fun set(response: RespType<*>) {
-        contents = response
-    }
+    fun get(): T
+    fun set(response: RespType<*>)
+    fun <R> map(f: (T) -> R): QueuedResponse<R> = QueuedResponseDecorator<T, R>(decorated = this, transform = f)
 }

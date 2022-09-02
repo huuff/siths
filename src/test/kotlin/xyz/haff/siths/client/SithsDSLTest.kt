@@ -42,12 +42,12 @@ class SithsDSLTest : FunSpec({
                 set(key, "0")
                 incrBy(key, 1)
                 incrBy(key, 1)
-                get(key)
+                getLong(key)
             }
         }
 
         // ASSERT
-        pipelineResult shouldBe "2" // TODO: Use getLong to get an actual number
+        pipelineResult shouldBe 2
     }
 
     test("correctly makes transaction") {
@@ -61,11 +61,11 @@ class SithsDSLTest : FunSpec({
                 set(key, "0")
                 incrBy(key, 1)
                 incrBy(key, 1)
-                get(key)
+                getLong(key)
             }
         }
 
         // ASSERT
-        pipelineResult shouldBe "2" // TODO: use getLong
+        pipelineResult shouldBe 2
     }
 })

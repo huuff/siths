@@ -1,7 +1,6 @@
 package xyz.haff.siths.pipelining
 
 import xyz.haff.siths.client.api.ListSithsClient
-import xyz.haff.siths.client.api.SithsClient
 import xyz.haff.siths.protocol.SourceAndData
 
 interface IPipelinedListSithsClient : ListSithsClient<
