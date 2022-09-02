@@ -289,4 +289,7 @@ class RedisCommandBuilder : RedisCommandReceiver<
 
     override suspend fun hdel(key: String, field: String, vararg rest: String): RedisCommand
         = RedisCommand("HDEL", key, field, *rest)
+
+    override suspend fun hstrlen(key: String, field: String): RedisCommand
+        = RedisCommand("HSTRLEN", key, field)
 }

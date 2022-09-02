@@ -45,4 +45,7 @@ class StandaloneHashSithsClient(
 
     override suspend fun hdel(key: String, field: String, vararg rest: String): Long
         = connection.runCommand(commandBuilder.hdel(key, field, *rest)).toLong()
+
+    override suspend fun hstrlen(key: String, field: String): Long
+        = connection.runCommand(commandBuilder.hstrlen(key, field)).toLong()
 }

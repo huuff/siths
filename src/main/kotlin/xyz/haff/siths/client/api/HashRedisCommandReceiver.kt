@@ -23,4 +23,5 @@ interface HashRedisCommandReceiver<
     suspend fun hmget(key: String, field: String, vararg rest: String): StringToStringMapResponseType
     suspend fun hlen(key: String): LongResponseType
     suspend fun hdel(key: String, field: String, vararg rest: String): LongResponseType
+    suspend fun hstrlen(key: String, field: String): LongResponseType
 }

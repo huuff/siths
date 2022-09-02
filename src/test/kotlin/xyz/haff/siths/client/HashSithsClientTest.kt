@@ -134,4 +134,13 @@ class HashSithsClientTest : FunSpec({
         deletedAmount shouldBe 1
         siths.hexists(key, "f2") shouldBe false
     }
+
+    test("hstrlen") {
+        // ARRANGE
+        val key = randomUUID()
+        siths.hset(key, "field" to "test")
+
+        // ACT & ASSERT
+        siths.hstrlen(key, "field") shouldBe 4
+    }
 })

@@ -264,4 +264,7 @@ class ManagedSithsClient(
 
     override suspend fun hdel(key: String, field: String, vararg rest: String): Long
         = pool.get().use { it.hdel(key, field, *rest) }
+
+    override suspend fun hstrlen(key: String, field: String): Long
+        = pool.get().use { it.hstrlen(key, field) }
 }

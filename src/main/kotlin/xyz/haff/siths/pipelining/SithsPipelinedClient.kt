@@ -611,4 +611,11 @@ class SithsPipelinedClient(
             response = QueuedResponse(RespType<*>::toLong)
         )
     )
+
+    override suspend fun hstrlen(key: String, field: String): QueuedResponse<Long> = addOperation(
+        Operation(
+            command = commandBuilder.hstrlen(key, field),
+            response = QueuedResponse(RespType<*>::toLong)
+        )
+    )
 }
