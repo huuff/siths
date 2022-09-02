@@ -270,11 +270,7 @@ class SithsList<T : Any>(
             }
         } else {
             val elementsBeforeCurrentCursor = lastCursor.start
-            val cursorSize = if (elementsBeforeCurrentCursor < maxCursorSize) { // TODO: Math.min?
-                elementsBeforeCurrentCursor
-            } else {
-                maxCursorSize
-            }
+            val cursorSize = min(elementsBeforeCurrentCursor, maxCursorSize)
             val newStart = lastCursor.start - cursorSize
             val newStop = lastCursor.start - 1
             lastCursor = Cursor(
