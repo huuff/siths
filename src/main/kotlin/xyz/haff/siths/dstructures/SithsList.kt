@@ -22,7 +22,7 @@ class SithsList<T : Any>(
     private val deserialize: (String) -> T,
     private val maxCursorSize: Int = 10,
 ) : MutableList<T> {
-    private val client = ManagedSithsClient(connectionPool)
+    private val client = ManagedSithsClient(connectionPool) // TODO: Use a SithsDSL instead?
 
     companion object {
         @JvmStatic
