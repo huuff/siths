@@ -97,4 +97,16 @@ class HashSithsClientTest : FunSpec({
         response shouldBe 4
         siths.hget(key, "field") shouldBe "4"
     }
+
+    test("hmget") {
+        // ARRANGE
+        val key = randomUUID()
+        siths.hset(key, "f1" to "v1", "f2" to "v2", "f3" to "v3")
+
+        // ACT & ASSERT
+        siths.hmget(key, "f1", "f3", "nonexistent") shouldBe mapOf(
+            "f1" to "v1",
+            "f3" to "v3"
+        )
+    }
 })

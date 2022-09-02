@@ -37,4 +37,7 @@ class StandaloneHashSithsClient(
 
     override suspend fun hincrbyfloat(key: String, field: String, increment: Double): Double
         = connection.runCommand(commandBuilder.hincrbyfloat(key, field, increment)).toDouble()
+
+    override suspend fun hmget(key: String, field: String, vararg rest: String): Map<String, String>
+        = connection.runCommand(commandBuilder.hmget(key, field, *rest)).associateArrayToArguments(field, *rest)
 }

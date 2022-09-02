@@ -531,7 +531,11 @@ class SithsPipelinedClient(
         vararg rest: Pair<String, Any>
     ): QueuedResponse<Long> = addOperation(
         Operation(
-            command = commandBuilder.hset(key, pair.mapSecond(Any::toString), *rest.map { it.mapSecond(Any::toString)}.toTypedArray()),
+            command = commandBuilder.hset(
+                key,
+                pair.mapSecond(Any::toString),
+                *rest.map { it.mapSecond(Any::toString) }.toTypedArray()
+            ),
             response = QueuedResponse(RespType<*>::toLong)
         )
     )
@@ -583,6 +587,14 @@ class SithsPipelinedClient(
             Operation(
                 command = commandBuilder.hincrbyfloat(key, field, increment),
                 response = QueuedResponse(RespType<*>::toDouble)
+            )
+        )
+
+    override suspend fun hmget(key: String, field: String, vararg rest: String): QueuedResponse<Map<String, String>> =
+        addOperation(
+            Operation(
+                command = commandBuilder.hmget(key, field, *rest),
+                response = QueuedResponse({ it.associateArrayToArguments(field, *rest) })
             )
         )
 }

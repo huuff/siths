@@ -20,4 +20,5 @@ interface HashRedisCommandReceiver<
     suspend fun hexists(key: String, field: String): BooleanResponseType
     suspend fun hincrby(key: String, field: String, increment: Long): LongResponseType
     suspend fun hincrbyfloat(key: String, field: String, increment: Double): DoubleResponseType
+    suspend fun hmget(key: String, field: String, vararg rest: String): StringToStringMapResponseType
 }

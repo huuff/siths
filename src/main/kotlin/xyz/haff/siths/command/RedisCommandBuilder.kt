@@ -281,4 +281,7 @@ class RedisCommandBuilder : RedisCommandReceiver<
 
     override suspend fun hincrbyfloat(key: String, field: String, increment: Double): RedisCommand
         = RedisCommand("HINCRBYFLOAT", key, field, increment)
+
+    override suspend fun hmget(key: String, field: String, vararg rest: String): RedisCommand
+        = RedisCommand("HMGET", key, field, *rest)
 }

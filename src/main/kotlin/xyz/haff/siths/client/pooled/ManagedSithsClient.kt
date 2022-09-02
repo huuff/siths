@@ -256,4 +256,7 @@ class ManagedSithsClient(
 
     override suspend fun hincrbyfloat(key: String, field: String, increment: Double): Double
         = pool.get().use { it.hincrbyfloat(key, field, increment) }
+
+    override suspend fun hmget(key: String, field: String, vararg rest: String): Map<String, String>
+        = pool.get().use { it.hmget(key, field, *rest) }
 }
