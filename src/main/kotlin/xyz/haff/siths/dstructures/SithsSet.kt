@@ -43,38 +43,36 @@ class SithsSet<T : Any>(
 
     override fun remove(element: T): Boolean = runBlocking { client.srem(name, serialize(element)) != 0L }
 
+    // Store all elements in another set and calculate the difference of both
     override fun removeAll(elements: Collection<T>): Boolean {
         val (otherSetHead, otherSetTail) = elements.map(serialize).toTypedArray().headAndTail()
         return runBlocking {
-            connectionPool.get().use { conn ->
                 val otherSetKey = randomUUID()
-                val pipeline = PipelinedSithsClient(conn)
+                val pipeline = PipelinedSithsClient()
                 val sizeBeforeChange = pipeline.scard(this@SithsSet.name)
                 pipeline.sadd(otherSetKey, otherSetHead, *otherSetTail)
                 val sizeAfterChange = pipeline.sdiffStore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
                 pipeline.del(otherSetKey)
-                pipeline.exec(inTransaction = true)
+                connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true) }
 
-                return@use sizeBeforeChange.get() != sizeAfterChange.get()
+                return@runBlocking sizeBeforeChange.get() != sizeAfterChange.get()
             }
-        }
     }
 
+    // Store all elements in another set and calculate the intersection of both
     override fun retainAll(elements: Collection<T>): Boolean {
         val (otherSetHead, otherSetTail) = elements.map(serialize).toTypedArray().headAndTail()
         return runBlocking {
-            connectionPool.get().use { conn ->
-                val pipeline = PipelinedSithsClient(conn)
+                val pipeline = PipelinedSithsClient()
                 val sizeBeforeChange = pipeline.scard(this@SithsSet.name)
                 val otherSetKey = randomUUID()
                 pipeline.sadd(otherSetKey, otherSetHead, *otherSetTail)
                 val sizeAfterChange = pipeline.sinterStore(this@SithsSet.name, this@SithsSet.name, otherSetKey)
                 pipeline.del(otherSetKey)
-                pipeline.exec(inTransaction = true)
+                connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true) }
 
-                return@use sizeBeforeChange.get() != sizeAfterChange.get()
+                return@runBlocking sizeBeforeChange.get() != sizeAfterChange.get()
             }
-        }
     }
 
     override val size: Int
@@ -86,18 +84,17 @@ class SithsSet<T : Any>(
         val otherSet = elements.map(serialize).toTypedArray()
         val (otherSetHead, otherSetTail) = otherSet.headAndTail()
         return runBlocking {
-            connectionPool.get().use { conn ->
-                val pipeline = PipelinedSithsClient(conn)
+                val pipeline = PipelinedSithsClient()
                 val temporalSetKey = randomUUID()
                 pipeline.sadd(temporalSetKey, otherSetHead, *otherSetTail)
                 val intersectionCardinality =
                     pipeline.sinterCard(this@SithsSet.name, temporalSetKey, limit = otherSet.size)
                 pipeline.del(temporalSetKey)
-                pipeline.exec(inTransaction = true)
-                return@use intersectionCardinality.get().toInt() == otherSet.size
+                connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true) }
+
+                return@runBlocking intersectionCardinality.get().toInt() == otherSet.size
             }
         }
-    }
 
     override fun isEmpty(): Boolean = size == 0
 

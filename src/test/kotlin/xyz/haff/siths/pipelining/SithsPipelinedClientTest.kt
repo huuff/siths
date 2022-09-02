@@ -19,13 +19,13 @@ class SithsPipelinedClientTest : FunSpec({
     test("can set and get") {
         // ARRANGE
         val connection = makeSithsPool(container).get()
-        val pipeline = PipelinedSithsClient(connection)
+        val pipeline = PipelinedSithsClient()
         val key = randomUUID()
 
         // ACT
         val set = pipeline.set(key, "value")
         val get = pipeline.get(key)
-        pipeline.exec()
+        pipeline.exec(connection)
 
         // ASSERT
         set.get() shouldBe Unit
@@ -38,7 +38,7 @@ class SithsPipelinedClientTest : FunSpec({
     test("all kinds of operations") {
         // ARRANGE
         val connection = makeSithsPool(container).get()
-        val pipeline = PipelinedSithsClient(connection)
+        val pipeline = PipelinedSithsClient()
         val key = randomUUID()
 
         // ACT
@@ -49,7 +49,7 @@ class SithsPipelinedClientTest : FunSpec({
         val ttl = pipeline.ttl(key)
         val del = pipeline.del(key)
         val exists = pipeline.exists(key)
-        pipeline.exec()
+        pipeline.exec(connection)
 
         // ASSERT
         set.get() shouldBe Unit

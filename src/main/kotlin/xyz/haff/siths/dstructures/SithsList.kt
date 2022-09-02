@@ -25,7 +25,11 @@ class SithsList<T : Any>(
 
     companion object {
         @JvmStatic
-        fun ofStrings(connectionPool: SithsConnectionPool, name: String = "list:${randomUUID()}", maxCursorSize: Int = 10) = SithsList(
+        fun ofStrings(
+            connectionPool: SithsConnectionPool,
+            name: String = "list:${randomUUID()}",
+            maxCursorSize: Int = 10
+        ) = SithsList(
             connectionPool = connectionPool,
             name = name,
             serialize = { it },
@@ -37,17 +41,14 @@ class SithsList<T : Any>(
     override val size: Int
         get() = runBlocking { client.llen(name) }.toInt()
 
-    override fun contains(element: T): Boolean
-        = runBlocking { client.lpos(name, serialize(element)) != null }
+    override fun contains(element: T): Boolean = runBlocking { client.lpos(name, serialize(element)) != null }
 
-    override fun containsAll(elements: Collection<T>): Boolean
-        = runBlocking {
-            connectionPool.get().use { conn ->
-                val pipeline = PipelinedSithsClient(conn)
-                val responses = elements.map { elem -> pipeline.lpos(name, serialize(elem)) }
-                pipeline.exec(inTransaction = true)
-                return@use responses.map { it.get() }.all { it != null }
-            }
+    override fun containsAll(elements: Collection<T>): Boolean = runBlocking {
+        val pipeline = PipelinedSithsClient()
+        val responses = elements.map { elem -> pipeline.lpos(name, serialize(elem)) }
+        connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true) }
+
+        return@runBlocking responses.map { it.get() }.all { it != null }
     }
 
     override fun get(index: Int): T = runBlocking {
@@ -56,43 +57,44 @@ class SithsList<T : Any>(
             ?: throw IndexOutOfBoundsException(index)
     }
 
-    override fun indexOf(element: T): Int
-        = runBlocking { client.lpos(name, serialize(element))?.toInt() ?: -1 }
+    override fun indexOf(element: T): Int = runBlocking { client.lpos(name, serialize(element))?.toInt() ?: -1 }
 
     override fun isEmpty(): Boolean = this.size == 0
 
     override fun iterator(): MutableIterator<T> = runBlocking {
-        connectionPool.get().use { conn ->
-            val pipeline = PipelinedSithsClient(conn)
-            val cursorContents = pipeline.lrange(name, 0, maxCursorSize - 1)
-            val size = pipeline.llen(name)
-            pipeline.exec(inTransaction = true)
-            return@use Iterator(
-                lastCursor = Cursor(cursorContents.get().map(deserialize).toMutableList(), 0, cursorContents.get().size - 1),
-                size = size.get().toInt()
-            )
-        }
+        val pipeline = PipelinedSithsClient()
+        val cursorContents = pipeline.lrange(name, 0, maxCursorSize - 1)
+        val size = pipeline.llen(name)
+        connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true) }
+        return@runBlocking Iterator(
+            lastCursor = Cursor(
+                cursorContents.get().map(deserialize).toMutableList(),
+                0,
+                cursorContents.get().size - 1
+            ),
+            size = size.get().toInt()
+        )
     }
 
-    override fun lastIndexOf(element: T): Int
-        = runBlocking { client.lpos(name, serialize(element), rank = -1)?.toInt() ?: -1 }
+    override fun lastIndexOf(element: T): Int =
+        runBlocking { client.lpos(name, serialize(element), rank = -1)?.toInt() ?: -1 }
 
-    override fun add(element: T): Boolean {
-        return runBlocking {
-            connectionPool.get().use { conn ->
-                val pipeline = PipelinedSithsClient(conn)
-                val sizePriorToUpdate = pipeline.llen(name)
-                val sizeAfterUpdate = pipeline.rpush(name, serialize(element))
-                pipeline.exec(inTransaction = true)
-                sizePriorToUpdate.get() != sizeAfterUpdate.get()
-            }
-        }
+    override fun add(element: T): Boolean = runBlocking {
+        val pipeline = PipelinedSithsClient()
+        val sizePriorToUpdate = pipeline.llen(name)
+        val sizeAfterUpdate = pipeline.rpush(name, serialize(element))
+        connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true) }
+        sizePriorToUpdate.get() != sizeAfterUpdate.get()
     }
 
     override fun add(index: Int, element: T) {
         runBlocking {
             withRedis(connectionPool) {
-                runScript(RedisScripts.LIST_INSERT_AT, keys = listOf(name), args = listOf(index.toString(), serialize(element)))
+                runScript(
+                    RedisScripts.LIST_INSERT_AT,
+                    keys = listOf(name),
+                    args = listOf(index.toString(), serialize(element))
+                )
             }
         }
     }
@@ -100,7 +102,11 @@ class SithsList<T : Any>(
     override fun addAll(index: Int, elements: Collection<T>): Boolean {
         runBlocking {
             withRedis(connectionPool) {
-                runScript(RedisScripts.LIST_INSERT_AT, keys = listOf(name), args = listOf(index.toString()) + elements.toList().map(serialize))
+                runScript(
+                    RedisScripts.LIST_INSERT_AT,
+                    keys = listOf(name),
+                    args = listOf(index.toString()) + elements.toList().map(serialize)
+                )
             }
         }
 
@@ -113,13 +119,11 @@ class SithsList<T : Any>(
         val (head, tail) = elements.map(serialize).toTypedArray().headAndTail()
 
         return runBlocking {
-            connectionPool.get().use { conn ->
-                val pipeline = PipelinedSithsClient(conn)
-                val sizePriorToUpdate = pipeline.llen(name)
-                val sizeAfterUpdate = pipeline.rpush(name, head, *tail)
-                pipeline.exec(inTransaction = true)
-                sizePriorToUpdate.get() != sizeAfterUpdate.get()
-            }
+            val pipeline = PipelinedSithsClient()
+            val sizePriorToUpdate = pipeline.llen(name)
+            val sizeAfterUpdate = pipeline.rpush(name, head, *tail)
+            connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true) }
+            sizePriorToUpdate.get() != sizeAfterUpdate.get()
         }
     }
 
@@ -132,47 +136,45 @@ class SithsList<T : Any>(
     override fun listIterator(index: Int): MutableListIterator<T> = runBlocking {
         val elementsBeforeIndex = max(index - 1, 0)
         // The start of the list, or the requested index minus half the cursor length
-        val cursorStart = index - floor(min(elementsBeforeIndex.toDouble(), maxCursorSize.toDouble()/2)).toInt()
+        val cursorStart = index - floor(min(elementsBeforeIndex.toDouble(), maxCursorSize.toDouble() / 2)).toInt()
 
-        return@runBlocking connectionPool.get().use { conn ->
-            val pipeline = PipelinedSithsClient(conn)
-            val size = pipeline.llen(name)
-            val cursorContents = pipeline.lrange(name, cursorStart, cursorStart + maxCursorSize)
-            pipeline.exec(inTransaction = true)
-            return@use ListIterator(
-                lastCursor = Cursor(cursorContents.get().map(deserialize).toMutableList(), cursorStart, cursorStart + (cursorContents.get().size - 1)),
-                size = size.get().toInt(),
-                currentIndex = index - 1,
-            )
+        val pipeline = PipelinedSithsClient()
+        val size = pipeline.llen(name)
+        val cursorContents = pipeline.lrange(name, cursorStart, cursorStart + maxCursorSize)
+        connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true) }
+        return@runBlocking ListIterator(
+            lastCursor = Cursor(
+                cursorContents.get().map(deserialize).toMutableList(),
+                cursorStart,
+                cursorStart + (cursorContents.get().size - 1)
+            ),
+            size = size.get().toInt(),
+            currentIndex = index - 1,
+        )
 
-        }
     }
 
     override fun remove(element: T): Boolean {
-        return runBlocking { client.lrem(name, serialize(element), count = 1 ) == 1L}
+        return runBlocking { client.lrem(name, serialize(element), count = 1) == 1L }
     }
 
     override fun removeAll(elements: Collection<T>): Boolean = runBlocking {
-            connectionPool.get().use { conn ->
-                val pipeline = PipelinedSithsClient(conn)
-                val responses = elements.map {
-                    pipeline.lrem(name, serialize(it), count = 0)
-                }
-                pipeline.exec(inTransaction = true)
-                responses.asSequence().map { it.get() }.reduce(Long::plus) != 0L
+            val pipeline = PipelinedSithsClient()
+            val responses = elements.map {
+                pipeline.lrem(name, serialize(it), count = 0)
             }
-        }
+            connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true) }
+            responses.asSequence().map { it.get() }.reduce(Long::plus) != 0L
+    }
 
     override fun removeAt(index: Int): T = runBlocking {
-        connectionPool.get().use { conn ->
-            val pipeline = PipelinedSithsClient(conn)
+            val pipeline = PipelinedSithsClient()
             val removedElement = pipeline.lindex(name, index)
             val removeMarker = randomUUID()
             pipeline.lset(name, index, removeMarker)
             pipeline.lrem(name, removeMarker, count = 1)
-            pipeline.exec(inTransaction = true)
-            return@use deserialize(removedElement.get() ?: throw IndexOutOfBoundsException(index))
-        }
+            connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true) }
+            return@runBlocking deserialize(removedElement.get() ?: throw IndexOutOfBoundsException(index))
     }
 
     // TODO: Three round-trips to the server because I can't run runScript in a single pipeline...
@@ -190,13 +192,11 @@ class SithsList<T : Any>(
     }
 
     override fun set(index: Int, element: T): T = runBlocking {
-        connectionPool.get().use { conn ->
-            val pipeline = PipelinedSithsClient(conn)
+            val pipeline = PipelinedSithsClient()
             val previousElement = pipeline.lindex(name, index)
             pipeline.lset(name, index, serialize(element))
-            pipeline.exec(inTransaction = true)
-            return@use deserialize(previousElement.get() ?: throw IndexOutOfBoundsException(index))
-        }
+            connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true) }
+            return@runBlocking deserialize(previousElement.get() ?: throw IndexOutOfBoundsException(index))
     }
 
     /**
@@ -212,7 +212,7 @@ class SithsList<T : Any>(
         protected var lastCursor: Cursor<T>,
         protected var size: Int,
         protected var currentIndex: Int = lastCursor.start - 1
-    ): MutableIterator<T> {
+    ) : MutableIterator<T> {
         protected val currentIndexInCursor get() = currentIndex - lastCursor.start
 
         override fun hasNext(): Boolean = currentIndex < (size - 1)
@@ -222,10 +222,18 @@ class SithsList<T : Any>(
             lastCursor.contents[currentIndexInCursor]
         } else {
             val remainingElements = size - lastCursor.stop
-            val cursorSize = if (remainingElements < maxCursorSize) { remainingElements } else { maxCursorSize }
+            val cursorSize = if (remainingElements < maxCursorSize) {
+                remainingElements
+            } else {
+                maxCursorSize
+            }
             val newStart = lastCursor.stop + 1
             val newStop = newStart + (cursorSize - 1)
-            lastCursor = Cursor(runBlocking { client.lrange(name, newStart, newStop) }.map(deserialize).toMutableList(), newStart, newStop)
+            lastCursor = Cursor(
+                runBlocking { client.lrange(name, newStart, newStop) }.map(deserialize).toMutableList(),
+                newStart,
+                newStop
+            )
             currentIndex++
             lastCursor.contents[0]
         }
@@ -245,10 +253,14 @@ class SithsList<T : Any>(
         lastCursor: Cursor<T>,
         size: Int,
         currentIndex: Int = lastCursor.start - 1
-    ): MutableListIterator<T>, Iterator(lastCursor, size, currentIndex) {
+    ) : MutableListIterator<T>, Iterator(lastCursor, size, currentIndex) {
         override fun hasPrevious(): Boolean = currentIndex > -1
 
-        override fun nextIndex(): Int = if (hasNext()) { currentIndex + 1 } else { size }
+        override fun nextIndex(): Int = if (hasNext()) {
+            currentIndex + 1
+        } else {
+            size
+        }
 
         override fun previous(): T = if (currentIndex >= lastCursor.start) {
             lastCursor.contents[currentIndexInCursor].also {
@@ -256,10 +268,18 @@ class SithsList<T : Any>(
             }
         } else {
             val elementsBeforeCurrentCursor = lastCursor.start
-            val cursorSize = if (elementsBeforeCurrentCursor < maxCursorSize) { elementsBeforeCurrentCursor } else { maxCursorSize }
+            val cursorSize = if (elementsBeforeCurrentCursor < maxCursorSize) { // TODO: Math.min?
+                elementsBeforeCurrentCursor
+            } else {
+                maxCursorSize
+            }
             val newStart = lastCursor.start - cursorSize
             val newStop = lastCursor.start - 1
-            lastCursor = Cursor(runBlocking { client.lrange(name, newStart, newStop) }.map(deserialize).toMutableList(), newStart, newStop)
+            lastCursor = Cursor(
+                runBlocking { client.lrange(name, newStart, newStop) }.map(deserialize).toMutableList(),
+                newStart,
+                newStop
+            )
             currentIndex--
             lastCursor.contents[lastCursor.contents.size - 1]
         }
@@ -272,13 +292,17 @@ class SithsList<T : Any>(
             val positionToInsert = when {
                 currentIndexInCursor < 0 -> 0
                 currentIndexInCursor >= lastCursor.contents.size -> lastCursor.contents.size
-                else -> currentIndexInCursor+1
+                else -> currentIndexInCursor + 1
             }
             lastCursor.contents.add(positionToInsert, element)
 
             runBlocking {
                 withRedis(connectionPool) {
-                    runScript(RedisScripts.LIST_INSERT_AT, keys = listOf(name), args = listOf(currentIndex.toString(), serialize(element)))
+                    runScript(
+                        RedisScripts.LIST_INSERT_AT,
+                        keys = listOf(name),
+                        args = listOf(currentIndex.toString(), serialize(element))
+                    )
                 }
             }
         }

@@ -8,9 +8,6 @@ import xyz.haff.siths.protocol.*
 import kotlin.time.Duration
 
 class PipelinedSithsClient(
-    // TODO: Surely we shouldn't take the connection at the constructor, but only at execution! otherwise we'd be locking a
-    // connection without actually using it
-    private val connection: SithsConnection,
     private val commandBuilder: RedisCommandBuilder = RedisCommandBuilder(),
     private val executor: RedisPipelineExecutor = RedisPipelineExecutor(),
 ) : SithsClient<
@@ -46,7 +43,8 @@ class PipelinedSithsClient(
         IPipelinedListSithsClient by PipelinedListSithsClient(executor)
 {
 
-    suspend fun exec(inTransaction: Boolean = false) = executor.exec(connection, inTransaction)
+    suspend fun exec(connection: SithsConnection, inTransaction: Boolean = false)
+        = executor.exec(connection, inTransaction)
 
     override suspend fun set(
         key: String,
