@@ -1,6 +1,7 @@
 package xyz.haff.siths.dstructures
 
 import kotlinx.coroutines.runBlocking
+import xyz.haff.siths.client.SithsDSL
 import xyz.haff.siths.client.pooled.ManagedSithsClient
 import xyz.haff.siths.pipelining.PipelinedSithsClient
 import xyz.haff.siths.client.withRedis
@@ -22,7 +23,7 @@ class SithsList<T : Any>(
     private val deserialize: (String) -> T,
     private val maxCursorSize: Int = 10,
 ) : MutableList<T> {
-    private val client = ManagedSithsClient(connectionPool) // TODO: Use a SithsDSL instead?
+    private val client = SithsDSL(connectionPool)
 
     companion object {
         @JvmStatic
@@ -90,26 +91,23 @@ class SithsList<T : Any>(
 
     override fun add(index: Int, element: T) {
         runBlocking {
-            withRedis(connectionPool) {
-                runScript(
+                client.runScript(
                     RedisScripts.LIST_INSERT_AT,
                     keys = listOf(name),
                     args = listOf(index.toString(), serialize(element))
                 )
-            }
         }
     }
 
     override fun addAll(index: Int, elements: Collection<T>): Boolean {
         runBlocking {
-            withRedis(connectionPool) {
-                runScript(
-                    RedisScripts.LIST_INSERT_AT,
-                    keys = listOf(name),
-                    args = listOf(index.toString()) + elements.toList().map(serialize)
-                )
-            }
+            client.runScript(
+                RedisScripts.LIST_INSERT_AT,
+                keys = listOf(name),
+                args = listOf(index.toString()) + elements.toList().map(serialize)
+            )
         }
+
 
         // XXX: A little hacky... returns whether the passed collection wasn't empty, since only in that case would the list be unchanged
         // (all others, such as index non-existent, should fail with an error)
@@ -169,36 +167,46 @@ class SithsList<T : Any>(
     }
 
     override fun removeAt(index: Int): T = runBlocking {
-            val pipeline = PipelinedSithsClient()
-            val removedElement = pipeline.lindex(name, index)
-            val removeMarker = randomUUID()
-            pipeline.lset(name, index, removeMarker)
-            pipeline.lrem(name, removeMarker, count = 1)
-            connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true) }
-            return@runBlocking deserialize(removedElement.get() ?: throw IndexOutOfBoundsException(index))
+            val removedElement = client.transactional {
+                val result = lindex(name, index)
+                val removeMarker = randomUUID()
+                lset(name, index, removeMarker)
+                lrem(name, removeMarker, count = 1)
+
+                result
+            }
+
+            return@runBlocking deserialize(removedElement ?: throw IndexOutOfBoundsException(index))
     }
 
     override fun retainAll(elements: Collection<T>): Boolean = runBlocking {
-        val temporaryOtherList = randomUUID()
-        val (otherHead, otherTail) = elements.map(serialize).toTypedArray().headAndTail()
+        val wasChanged = client.transactional {
+            val temporaryOtherList = randomUUID()
+            val (otherHead, otherTail) = elements.map(serialize).toTypedArray().headAndTail()
 
-        val pipeline = PipelinedSithsClient()
-        pipeline.rpush(temporaryOtherList, otherHead, *otherTail)
-        // XXX: We can't take advantage of the optimistic checking whether the script if loaded because we want to pipeline it...
-        // we can't just run all operations and wait until running the script
-        val result = pipeline.eval(RedisScripts.LIST_RETAIN_ALL.code, keys = listOf(this@SithsList.name, temporaryOtherList))
-        pipeline.del(temporaryOtherList)
-        connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true)}
+            rpush(temporaryOtherList, otherHead, *otherTail)
+            // XXX: We can't take advantage of the optimistic checking whether the script if loaded because we want to pipeline it...
+            // we can't just run all operations and wait until running the script
+            val result = eval(RedisScripts.LIST_RETAIN_ALL.code, keys = listOf(this@SithsList.name, temporaryOtherList))
+            del(temporaryOtherList)
 
-        return@runBlocking result.get().luaBooleanToBoolean()
+            result
+        }.luaBooleanToBoolean()
+
+
+        return@runBlocking wasChanged
     }
 
     override fun set(index: Int, element: T): T = runBlocking {
-            val pipeline = PipelinedSithsClient()
-            val previousElement = pipeline.lindex(name, index)
-            pipeline.lset(name, index, serialize(element))
-            connectionPool.get().use { conn -> pipeline.exec(conn, inTransaction = true) }
-            return@runBlocking deserialize(previousElement.get() ?: throw IndexOutOfBoundsException(index))
+            val previousElement = client.transactional {
+                val result = lindex(name, index)
+
+                lset(name, index, serialize(element))
+
+                result
+            }
+
+            return@runBlocking deserialize(previousElement ?: throw IndexOutOfBoundsException(index))
     }
 
     /**
