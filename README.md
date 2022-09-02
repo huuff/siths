@@ -3,21 +3,56 @@
 # Siths
 *As in, "The opposite of Jedis"*
 
-A collection of extension functions and utilities for Jedis.
+Asynchronous, coroutines-based Redis client that tries to offer a sensible DSL.
 
-### A small note on Jedis
-Note that I don't particularly endorse Jedis and even advise against it. I'm writing these in a pinch because I'm stuck with Jedis for a while at work. Some of my complaints about Jedis are:
+## Redis API translation layer
+A `SithsClient` is simply a thin translation layer between Kotlin and Redis. It makes the appropriate requests to Redis and parses the RESP responses into Kotlin types. Usual Redis commands such as `get`, `set`, `lpush`, etc. are readily available but also:
 
-* Fundamentally blocking, so not especially suited for coroutines.
-* Too low-level interface (e.g. returning "OK" strings for successful operations).
-* Cumbersome interface with loads of method overloads which surprisingly always have all the overloads but the one you need right now.
+* Commands are camel-cased to make them look more Kotlin-native (e.g. `incrByFloat`)
+* Arguments and responses try to be the most ergonomic Kotlin types, for example, returning a `Duration` instead of a number of seconds for `ttl`. This means that commands that are mostly the same but returning slightly different types are merged (such as `ttl` and `pttl`).
+* Some other convenience methods are added, such as `getOrNull`, `setAny`, etc.
 
-Not to be too hard on Jedis, the low-level interface makes it easier to understand the underlying RESP operations and overloaded methods are the only way of providing methods with highly variable parameters in Java. I just don't think it's suited for Kotlin
+## Siths DSL
+The Siths DSL wraps functionality from lower layers to provide a cleaner interface and remove syntactic distractions. At the most basic level, `withRedis` creates the appropriate clients and signifies that a block is executed in the context of a connection to Redis:
 
-## Utilities
-* Distributed locking (through the `Jedis.acquireLock`, `Jedis.releaseLock`  and `Jedis.withLock` extension methods), mostly copied from *Redis In Action* by Josiah L. Carlson
-* Loading and executing Lua scripts through the `RedisScript` class and `Jedis.runScript` extension methods. These ensure the script is loaded on first use and subsequently called only by SHA1 hash.
-* "DSL" which is actually a bunch of extension methods that wrap more cumbersome operations
-  * `withMulti` and `withWatch` to wrap transactions ensuring they are handled correctly
-  * `hasExpiration` and `setExpiration` to allow working with expiration times with JDK classes.
-  * `setWithParams` to provide with named and default arguments what Jedis does through builders and overloaded methods.
+```kotlin
+withRedis(connectionPool) {
+  set("key", "value")
+
+  val value = get("value")
+}
+```
+
+Furthermore, utility functions are given to automatically wrap and execute a pipeline and transaction, returning the last result in a block:
+
+```kotlin
+dsl.transactional {
+  val lengthBeforeRemoval = llen("list")
+  lrem("list", "elem")
+
+  lengthBeforeRemoval
+}
+```
+
+Some higher-level utilities are also given, such as wrapping a block in a distributed lock acquire-and-release:
+
+```kotlin
+// Prevent that several deployed instances find a key missing and try to fill it simultaneously,
+// performing an expensive computation
+val elem = getOrNull("key") 
+
+if (elem == null) {
+  dsl.withLock("lock name") {
+    set("key", computeValue())
+  }
+}
+```
+
+## Distributed data structures
+Note that since these structures inherit the respective Java collections interfaces, they are blocking.
+
+* `SithsSet` implements `MutableSet`
+* `SithsList` implements `MutableList`
+* `SithsMap` implements `MutableMap`
+
+These also take serialization and deserialization functions to transparently convert them to/from the appropriate Redis types.
