@@ -76,4 +76,6 @@ class StandaloneSithsClient(
 
     override suspend fun expireTime(key: String): ZonedDateTime?
         = connection.runCommand(commandBuilder.expireTime(key)).toNullableZonedDateTime()
+
+    override suspend fun dbSize(): Long = connection.runCommand(commandBuilder.dbSize()).toLong()
 }

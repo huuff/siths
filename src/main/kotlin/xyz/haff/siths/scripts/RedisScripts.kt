@@ -54,7 +54,7 @@ object RedisScripts {
     /**
      * Removes all values in KEYS[1] that are not in KEYS[2]
      */
-    val LIST_RETAIN_ALL = RedisScript("""
+    val LIST_INTER_STORE = RedisScript("""
         local destination = KEYS[1]
         local other = KEYS[2]
         local changed_list = false
@@ -71,5 +71,16 @@ object RedisScripts {
         
         redis.call("lrem", destination, 0, delete_marker)
         return changed_list
+    """.trimIndent())
+
+    /**
+     * Removes all keys that match a pattern
+     * XXX: Does this work in sharded environments? Likely not!
+     * XXX: This calls KEYS! So it will definitely block the client
+     */
+    val PDEL = RedisScript("""
+        for _, key in ipairs(redis.call("KEYS", ARGV[1])) do
+            redis.call("DEL", key)
+        end
     """.trimIndent())
 }

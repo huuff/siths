@@ -87,6 +87,7 @@ class ManagedSithsClient(
     override suspend fun expireTime(key: String): ZonedDateTime?
         = pool.get().use { it.expireTime(key) }
 
+    override suspend fun dbSize(): Long = pool.get().use { it.dbSize() }
     // SET OPERATIONS
 
     override suspend fun sadd(key: String, value: String, vararg rest: String): Long

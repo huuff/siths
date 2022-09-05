@@ -108,6 +108,7 @@ class RedisCommandBuilder : RedisCommandReceiver<
     ): RedisCommand = RedisCommand("EXPIREAT", key, time.toEpochSecond(), expirationCondition)
 
     override suspend fun expireTime(key: String): RedisCommand = RedisCommand("EXPIRETIME", key)
+    override suspend fun dbSize(): RedisCommand = RedisCommand("DBSIZE")
 
     // SET OPERATIONS
 

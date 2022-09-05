@@ -106,4 +106,5 @@ interface RedisCommandReceiver<
 
     suspend fun clientList(): ClientListResponseType
     suspend fun ping(): BooleanResponseType
+    suspend fun dbSize(): LongResponseType
 }

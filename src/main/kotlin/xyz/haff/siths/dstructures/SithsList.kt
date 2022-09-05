@@ -2,12 +2,10 @@ package xyz.haff.siths.dstructures
 
 import kotlinx.coroutines.runBlocking
 import xyz.haff.siths.client.SithsDSL
-import xyz.haff.siths.client.pooled.ManagedSithsClient
 import xyz.haff.siths.pipelining.PipelinedSithsClient
 import xyz.haff.siths.client.withRedis
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
-import xyz.haff.siths.pipelining.RedisPipeline
 import xyz.haff.siths.protocol.SithsConnectionPool
 import xyz.haff.siths.protocol.luaBooleanToBoolean
 import xyz.haff.siths.scripts.RedisScripts
@@ -187,9 +185,10 @@ class SithsList<T : Any>(
             val (otherHead, otherTail) = elements.map(serialize).toTypedArray().headAndTail()
 
             rpush(temporaryOtherList, otherHead, *otherTail)
+
             // XXX: We can't take advantage of the optimistic checking whether the script if loaded because we want to pipeline it...
             // we can't just run all operations and wait until running the script
-            val result = eval(RedisScripts.LIST_RETAIN_ALL.code, keys = listOf(this@SithsList.name, temporaryOtherList))
+            val result = eval(RedisScripts.LIST_INTER_STORE.code, keys = listOf(this@SithsList.name, temporaryOtherList))
             del(temporaryOtherList)
 
             result

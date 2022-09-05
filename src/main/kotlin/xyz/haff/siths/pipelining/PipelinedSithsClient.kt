@@ -189,4 +189,11 @@ class PipelinedSithsClient(
             response = QueuedResponseImpl(RespType<*>::toNullableZonedDateTime)
         )
     )
+
+    override suspend fun dbSize(): QueuedResponse<Long> = executor.addOperation(
+        DeferredCommand(
+            command = commandBuilder.dbSize(),
+            response = QueuedResponseImpl(RespType<*>::toLong)
+        )
+    )
 }
