@@ -1,10 +1,7 @@
 package xyz.haff.siths.command
 
 import xyz.haff.siths.client.api.RedisCommandReceiver
-import xyz.haff.siths.option.ExistenceCondition
-import xyz.haff.siths.option.ExpirationCondition
-import xyz.haff.siths.option.ListEnd
-import xyz.haff.siths.option.RelativePosition
+import xyz.haff.siths.option.*
 import java.time.ZonedDateTime
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -109,6 +106,7 @@ class RedisCommandBuilder : RedisCommandReceiver<
 
     override suspend fun expireTime(key: String): RedisCommand = RedisCommand("EXPIRETIME", key)
     override suspend fun dbSize(): RedisCommand = RedisCommand("DBSIZE")
+    override suspend fun flushDb(mode: SyncMode?) = RedisCommand("FLUSHDB", mode)
 
     // SET OPERATIONS
 

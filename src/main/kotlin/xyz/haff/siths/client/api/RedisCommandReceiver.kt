@@ -2,6 +2,7 @@ package xyz.haff.siths.client.api
 
 import xyz.haff.siths.option.ExistenceCondition
 import xyz.haff.siths.option.ExpirationCondition
+import xyz.haff.siths.option.SyncMode
 import java.time.ZonedDateTime
 import kotlin.time.Duration
 
@@ -107,4 +108,5 @@ interface RedisCommandReceiver<
     suspend fun clientList(): ClientListResponseType
     suspend fun ping(): BooleanResponseType
     suspend fun dbSize(): LongResponseType
+    suspend fun flushDb(mode: SyncMode? = null): UnitResponseType
 }

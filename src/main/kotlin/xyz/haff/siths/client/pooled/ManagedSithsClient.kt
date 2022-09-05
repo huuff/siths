@@ -1,10 +1,7 @@
 package xyz.haff.siths.client.pooled
 
 import xyz.haff.siths.client.api.SithsImmediateClient
-import xyz.haff.siths.option.ExistenceCondition
-import xyz.haff.siths.option.ExpirationCondition
-import xyz.haff.siths.option.ListEnd
-import xyz.haff.siths.option.RelativePosition
+import xyz.haff.siths.option.*
 import xyz.haff.siths.protocol.*
 import java.time.ZonedDateTime
 import kotlin.time.Duration
@@ -88,6 +85,8 @@ class ManagedSithsClient(
         = pool.get().use { it.expireTime(key) }
 
     override suspend fun dbSize(): Long = pool.get().use { it.dbSize() }
+    override suspend fun flushDb(mode: SyncMode?) = pool.get().use { it.flushDb(mode) }
+
     // SET OPERATIONS
 
     override suspend fun sadd(key: String, value: String, vararg rest: String): Long

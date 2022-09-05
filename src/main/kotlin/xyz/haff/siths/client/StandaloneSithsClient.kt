@@ -4,6 +4,7 @@ import xyz.haff.siths.client.api.*
 import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.option.ExistenceCondition
 import xyz.haff.siths.option.ExpirationCondition
+import xyz.haff.siths.option.SyncMode
 import xyz.haff.siths.protocol.*
 import java.time.ZonedDateTime
 import kotlin.time.Duration
@@ -78,4 +79,6 @@ class StandaloneSithsClient(
         = connection.runCommand(commandBuilder.expireTime(key)).toNullableZonedDateTime()
 
     override suspend fun dbSize(): Long = connection.runCommand(commandBuilder.dbSize()).toLong()
+
+    override suspend fun flushDb(mode: SyncMode?) = connection.runCommand(commandBuilder.flushDb(mode)).assertOk()
 }

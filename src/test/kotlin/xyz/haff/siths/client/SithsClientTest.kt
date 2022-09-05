@@ -19,6 +19,7 @@ import xyz.haff.siths.common.randomUUID
 import xyz.haff.siths.makeRedisConnection
 import xyz.haff.siths.makeSithsClient
 import xyz.haff.siths.option.ExpirationCondition
+import xyz.haff.siths.option.SyncMode
 import xyz.haff.siths.protocol.StandaloneSithsConnection
 import xyz.haff.siths.scripts.RedisScript
 import java.time.ZoneId
@@ -268,5 +269,19 @@ class SithsClientTest : FunSpec({
         // ASSERT
         expirationSet shouldBe true
         expirationReceived?.toLocalDate() shouldBe "2050-10-01".asDate
+    }
+
+    test("flushDb") {
+        // ARRANGE
+        siths.set(randomUUID(), "value") // Ensure there's at least one key to see if it gets removed
+
+        // SANITY CHECK
+        siths.dbSize() > 0
+
+        // ACT
+        siths.flushDb(SyncMode.SYNC)
+
+        // ASSERT
+        siths.dbSize() shouldBe 0
     }
 })

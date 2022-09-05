@@ -4,6 +4,7 @@ import xyz.haff.siths.client.api.SithsClient
 import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.option.ExistenceCondition
 import xyz.haff.siths.option.ExpirationCondition
+import xyz.haff.siths.option.SyncMode
 import xyz.haff.siths.protocol.*
 import java.time.ZonedDateTime
 import kotlin.time.Duration
@@ -194,6 +195,13 @@ class PipelinedSithsClient(
         DeferredCommand(
             command = commandBuilder.dbSize(),
             response = QueuedResponseImpl(RespType<*>::toLong)
+        )
+    )
+
+    override suspend fun flushDb(mode: SyncMode?): QueuedResponse<Unit> = executor.addOperation(
+        DeferredCommand(
+            command = commandBuilder.flushDb(mode),
+            response = QueuedResponseImpl(RespType<*>::assertOk)
         )
     )
 }
