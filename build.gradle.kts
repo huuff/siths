@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.6.21"
+    kotlin("jvm") version "1.7.0"
     id("org.jetbrains.kotlinx.kover") version "0.5.0"
     id("maven-publish")
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "xyz.haff"
-version = "0.11.1"
+version = "0.11.2"
 
 repositories {
     mavenCentral()
@@ -95,7 +95,7 @@ nexusPublishing {
 
 val kotestVersion = "5.3.1"
 dependencies {
-    api("io.ktor:ktor-network:2.0.3")
+    implementation("io.ktor:ktor-network:2.1.0")
 
     implementation(kotlin("stdlib"))
     implementation("commons-codec:commons-codec:1.15")
