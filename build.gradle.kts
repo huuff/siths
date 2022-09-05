@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "xyz.haff"
-version = "0.11.0"
+version = "0.11.1"
 
 repositories {
     mavenCentral()
@@ -95,10 +95,10 @@ nexusPublishing {
 
 val kotestVersion = "5.3.1"
 dependencies {
+    api("io.ktor:ktor-network:2.0.3")
+
     implementation(kotlin("stdlib"))
-    implementation("redis.clients:jedis:4.2.3")
     implementation("commons-codec:commons-codec:1.15")
-    implementation("io.ktor:ktor-network:2.0.3")
     implementation("xyz.haff:koy:0.6.0")
 
     testImplementation(kotlin("test"))

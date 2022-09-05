@@ -3,7 +3,6 @@ package xyz.haff.siths
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.testcontainers.containers.GenericContainer
-import redis.clients.jedis.JedisPool
 import xyz.haff.siths.client.pooled.ManagedSithsClient
 import xyz.haff.siths.protocol.RedisConnection
 import xyz.haff.siths.protocol.SithsConnectionPool
@@ -18,7 +17,6 @@ fun makeRedisConnection(container: GenericContainer<*>, password: String? = null
     password = password,
 )
 
-fun makeJedisPool(container: GenericContainer<*>) = JedisPool(container.host, container.firstMappedPort)
 fun makeSithsPool(container: GenericContainer<*>, maxConnections: Int = 10, acquireTimeout: Duration = 10.seconds)
     = SithsConnectionPool(redisConnection = makeRedisConnection(container), maxConnections = maxConnections, acquireTimeout = acquireTimeout)
 
