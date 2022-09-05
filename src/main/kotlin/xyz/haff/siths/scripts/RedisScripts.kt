@@ -1,5 +1,6 @@
 package xyz.haff.siths.scripts
 
+// TODO: Put these in Lua files in resources and load them from there?
 object RedisScripts {
 
     /**

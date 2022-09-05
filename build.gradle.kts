@@ -99,7 +99,7 @@ dependencies {
     implementation("redis.clients:jedis:4.2.3")
     implementation("commons-codec:commons-codec:1.15")
     implementation("io.ktor:ktor-network:2.0.3")
-    implementation("xyz.haff:koy:0.5.0")
+    implementation("xyz.haff:koy:0.6.0")
 
     testImplementation(kotlin("test"))
     testImplementation("org.testcontainers:testcontainers:1.17.3")

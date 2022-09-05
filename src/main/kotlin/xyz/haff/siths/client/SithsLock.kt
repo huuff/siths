@@ -1,6 +1,7 @@
 package xyz.haff.siths.client
 
 import kotlinx.coroutines.delay
+import xyz.haff.koy.control.during
 import xyz.haff.siths.common.RedisLockTimeoutException
 import xyz.haff.siths.common.buildLockKey
 import xyz.haff.siths.protocol.SithsConnectionPool
@@ -17,10 +18,8 @@ class SithsLock(
 
     suspend fun acquire(acquireTimeout: Duration = 10.seconds, lockTimeout: Duration = 10.seconds) {
         val identifier = UUID.randomUUID().toString()
-        val endTime = System.currentTimeMillis() + acquireTimeout.inWholeMilliseconds
 
-        // TODO: Function to run some code for some duration, in koy
-        while (System.currentTimeMillis() < endTime) {
+        during (acquireTimeout) {
             val lockAcquired = withRedis(pool) {
                 runScript(
                     RedisScripts.ACQUIRE_LOCK,
