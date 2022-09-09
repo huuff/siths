@@ -8,6 +8,7 @@ import xyz.haff.siths.common.RedisBrokenConnectionException
 import xyz.haff.siths.pooling.Pool
 import xyz.haff.siths.pooling.PoolStatus
 import xyz.haff.siths.pooling.PooledResource
+import java.io.IOException
 
 /**
  * This Siths connection is pooled. Actually, just a decorator around a StandaloneSithsConnection, that instead of
@@ -36,11 +37,11 @@ class PooledSithsConnection(
         pool.release(identifier)
     }
 
-    private fun handleChannelException(e: Exception): Nothing = when(e) {
-        is ClosedReceiveChannelException, is ClosedSendChannelException -> {
+    private fun handleChannelException(e: Exception): Nothing = when {
+        (e is ClosedReceiveChannelException || e is ClosedSendChannelException || (e is IOException && e.message == "Broken pipe")) -> {
             // Connection is broken, so we notify the pool to discard it and maybe create a new one that works
             resource.close()
-            pool.remove(identifier)
+            status = PoolStatus.BROKEN
             throw RedisBrokenConnectionException(e)
         }
         else -> throw e

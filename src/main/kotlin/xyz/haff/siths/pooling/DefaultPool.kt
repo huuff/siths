@@ -16,9 +16,12 @@ class DefaultPool<ResourceType, PooledResourceType: PooledResource<ResourceType>
     private val resources = mutableMapOf<String, PooledResourceType>()
     private val mutex = Mutex()
 
-    override val currentResources get() = resources.size
+    override val currentResources get() = resources.values.count { it.status != PoolStatus.BROKEN }
     
     override suspend fun get(): PooledResourceType {
+        // First, clean all broken resources
+        resources.forEach { (key, value) -> if (value.status == PoolStatus.BROKEN) { remove(key) } }
+
         val deadline = System.currentTimeMillis() + acquireTimeout.inWholeMilliseconds
 
         while (System.currentTimeMillis() < deadline) {
@@ -43,7 +46,11 @@ class DefaultPool<ResourceType, PooledResourceType: PooledResource<ResourceType>
     }
 
     override fun release(resourceIdentifier: String) {
-        resources[resourceIdentifier]?.status = PoolStatus.FREE
+        resources[resourceIdentifier]?.let {
+            if (it.status == PoolStatus.BUSY) {
+                it.status = PoolStatus.FREE
+            }
+        }
     }
 
     override fun remove(resourceIdentifier: String) {

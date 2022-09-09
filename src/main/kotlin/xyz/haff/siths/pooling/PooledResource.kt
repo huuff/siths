@@ -1,6 +1,6 @@
 package xyz.haff.siths.pooling
 
-enum class PoolStatus { FREE, BUSY }
+enum class PoolStatus { FREE, BUSY, BROKEN }
 
 interface PooledResource<out T>: AutoCloseable {
     val identifier: String

@@ -11,7 +11,7 @@ class SithsClientPool(
 ) : Pool<SithsImmediateClient, PooledSithsClient> {
     private val identifiersToClients = mutableMapOf<String, PooledSithsClient>()
 
-    override val currentResources: Int get() = identifiersToClients.size
+    override val currentResources: Int get() = identifiersToClients.values.count { it.status != PoolStatus.BROKEN }
 
     override suspend fun get(): PooledSithsClient {
         val connection = connectionPool.get()
@@ -31,8 +31,11 @@ class SithsClientPool(
     override fun release(resourceIdentifier: String) {
         connectionPool.release(resourceIdentifier)
 
+
         identifiersToClients[resourceIdentifier]?.let {
-            it.status = PoolStatus.FREE
+            if (it.status == PoolStatus.BUSY) {
+                it.status = PoolStatus.FREE
+            }
         }
     }
 
