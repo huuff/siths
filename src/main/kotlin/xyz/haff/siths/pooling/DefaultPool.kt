@@ -19,13 +19,13 @@ class DefaultPool<ResourceType, PooledResourceType: PooledResource<ResourceType>
     override val currentResources get() = resources.values.count { it.status != PoolStatus.BROKEN }
     
     override suspend fun get(): PooledResourceType {
-        // First, clean all broken resources
-        resources.forEach { (key, value) -> if (value.status == PoolStatus.BROKEN) { remove(key) } }
-
         val deadline = System.currentTimeMillis() + acquireTimeout.inWholeMilliseconds
 
         while (System.currentTimeMillis() < deadline) {
             mutex.withLock {
+                // First, clean all broken resources
+                resources.forEach { (key, value) -> if (value.status == PoolStatus.BROKEN) { remove(key) } }
+
                 if (resources.values.any { it.status == PoolStatus.FREE }) {
                     val connection = resources.values.find { it.status == PoolStatus.FREE }!!
                     connection.status = PoolStatus.BUSY

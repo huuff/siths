@@ -6,6 +6,7 @@ import xyz.haff.siths.pooling.Pool
 import xyz.haff.siths.pooling.PoolStatus
 import xyz.haff.siths.protocol.SithsConnectionPool
 
+// TODO: Am I not removing broken clients here?
 class SithsClientPool(
     private val connectionPool: SithsConnectionPool,
 ) : Pool<SithsImmediateClient, PooledSithsClient> {
@@ -31,7 +32,6 @@ class SithsClientPool(
     override fun release(resourceIdentifier: String) {
         connectionPool.release(resourceIdentifier)
 
-
         identifiersToClients[resourceIdentifier]?.let {
             if (it.status == PoolStatus.BUSY) {
                 it.status = PoolStatus.FREE
@@ -40,7 +40,7 @@ class SithsClientPool(
     }
 
     override fun remove(resourceIdentifier: String) {
-        identifiersToClients - resourceIdentifier
+        identifiersToClients -= resourceIdentifier
     }
 
 }
