@@ -32,6 +32,30 @@ class StandaloneZSetSithsClient(
         )
     ).toLong()
 
+    override suspend fun zadd(
+        key: String,
+        scoreAndMembers: Collection<Pair<Double, String>>,
+        existenceCondition: ExistenceCondition?,
+        comparisonCondition: ComparisonCondition?,
+        returnChanged: Boolean
+    ): Long = connection.runCommand(commandBuilder.zadd(key, scoreAndMembers, existenceCondition, comparisonCondition, returnChanged)).toLong()
+
+    override suspend fun zrangeByRank(
+        key: String,
+        start: Int,
+        stop: Int,
+        reverse: Boolean,
+        limit: Limit?
+    ): Set<String> = connection.runCommand(commandBuilder.zrangeByRank(key, start, stop, reverse, limit)).toStringSet()
+
+    override suspend fun zrangeByRankWithScores(
+        key: String,
+        start: Int,
+        stop: Int,
+        reverse: Boolean,
+        limit: Limit?
+    ): List<Pair<String, Double>> = connection.runCommand(commandBuilder.zrangeByRankWithScores(key, start, stop, reverse, limit)).toStringToDoubleList()
+
     override suspend fun zrangeByScore(
         key: String,
         start: Double,

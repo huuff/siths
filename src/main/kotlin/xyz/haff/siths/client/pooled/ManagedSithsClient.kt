@@ -299,6 +299,8 @@ class ManagedSithsClient(
     override suspend fun hrandFieldWithValues(key: String, count: Int): Map<String, String> =
         pool.get().useSafely { it.hrandFieldWithValues(key, count) }
 
+
+    // ZSET
     override suspend fun zadd(
         key: String,
         scoreAndMember: Pair<Double, String>,
@@ -316,6 +318,29 @@ class ManagedSithsClient(
                 returnChanged = returnChanged,
             )
         }
+
+    override suspend fun zadd(
+        key: String,
+        scoreAndMembers: Collection<Pair<Double, String>>,
+        existenceCondition: ExistenceCondition?,
+        comparisonCondition: ComparisonCondition?,
+        returnChanged: Boolean
+    ): Long = pool.get().useSafely { it.zadd(key, scoreAndMembers, existenceCondition, comparisonCondition, returnChanged) }
+    override suspend fun zrangeByRank(
+        key: String,
+        start: Int,
+        stop: Int,
+        reverse: Boolean,
+        limit: Limit?
+    ): Set<String> = pool.get().useSafely { it.zrangeByRank(key, start, stop, reverse, limit) }
+
+    override suspend fun zrangeByRankWithScores(
+        key: String,
+        start: Int,
+        stop: Int,
+        reverse: Boolean,
+        limit: Limit?
+    ): List<Pair<String, Double>> = pool.get().useSafely { it.zrangeByRankWithScores(key, start, stop, reverse, limit) }
 
     override suspend fun zrangeByScore(
         key: String,

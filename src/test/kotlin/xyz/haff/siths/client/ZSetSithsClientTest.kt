@@ -19,27 +19,55 @@ class ZSetSithsClientTest : FunSpec({
         siths = makeSithsClient(container)
     }
 
-    test("zadd and zrangeByScore") {
-        // ARRANGE
-        val key = randomUUID()
+    context("zrangeByScore") {
+        test("zadd and zrangeByScore") {
+            // ARRANGE
+            val key = randomUUID()
 
-        // ACT
-        siths.zadd(key, 1.0 to "1", 2.0 to "2", 3.0 to "3", 4.0 to "4")
-        val result = siths.zrangeByScore(key, 1.0, 2.0);
+            // ACT
+            siths.zadd(key, 1.0 to "1", 2.0 to "2", 3.0 to "3", 4.0 to "4")
+            val result = siths.zrangeByScore(key, 1.0, 2.0);
 
-        // ASSERT
-        result shouldBe setOf("1", "2")
+            // ASSERT
+            result shouldBe setOf("1", "2")
+        }
+
+        test("zadd and zrangeByScoreWithScores") {
+            // ARRANGE
+            val key = randomUUID()
+
+            // ACT
+            siths.zadd(key, 1.0 to "1", 2.0 to "2", 3.0 to "3", 4.0 to "4")
+            val result = siths.zrangeByScoreWithScores(key, 1.0, 2.0);
+
+            // ASSERT
+            result shouldBe listOf("1" to 1.0, "2" to 2.0)
+        }
     }
 
-    test("zadd and zrangeByScoreWithScores") {
-        // ARRANGE
-        val key = randomUUID()
+    context("zrangeByRank") {
+        test("zadd and zrangeByRank") {
+            // ARRANGE
+            val key = randomUUID()
 
-        // ACT
-        siths.zadd(key, 1.0 to "1", 2.0 to "2", 3.0 to "3", 4.0 to "4")
-        val result = siths.zrangeByScoreWithScores(key, 1.0, 2.0);
+            // ACT
+            siths.zadd(key, 1.0 to "1", 2.0 to "2", 3.0 to "3", 4.0 to "4")
+            val result = siths.zrangeByRank(key, 1, 2);
 
-        // ASSERT
-        result shouldBe listOf("1" to 1.0, "2" to 2.0)
+            // ASSERT
+            result shouldBe setOf("2", "3")
+        }
+
+        test("zadd and zrangeByRankWithScores") {
+            // ARRANGE
+            val key = randomUUID()
+
+            // ACT
+            siths.zadd(key, 1.0 to "1", 2.0 to "2", 3.0 to "3", 4.0 to "4")
+            val result = siths.zrangeByRankWithScores(key, 1, 2);
+
+            // ASSERT
+            result shouldBe listOf("2" to 2.0, "3" to 3.0)
+        }
     }
 })

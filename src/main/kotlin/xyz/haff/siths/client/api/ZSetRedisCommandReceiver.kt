@@ -19,8 +19,32 @@ interface ZSetRedisCommandReceiver<
         returnChanged: Boolean = false,
     ): LongResponseType
 
+    suspend fun zadd(
+        key: String,
+        scoreAndMembers: Collection<Pair<Double, String>>,
+        existenceCondition: ExistenceCondition? = null,
+        comparisonCondition: ComparisonCondition? = null,
+        returnChanged: Boolean = false,
+    ): LongResponseType
+
+    suspend fun zrangeByRank(
+        key: String,
+        start: Int,
+        stop: Int,
+        reverse: Boolean = false,
+        limit: Limit? = null,
+    ): StringSetResponseType
+
+    suspend fun zrangeByRankWithScores(
+        key: String,
+        start: Int,
+        stop: Int,
+        reverse: Boolean = false,
+        limit: Limit? = null
+    ): StringToDoubleListResponseType
+
     // TODO: I'm not considering all the range variations there are for this (open, closed, to infinite, etc.)
-    // TODO: Variants: zrangeByRank, zrangeByRankWithScores, zrangeByLex, zrangeByLexWithScores
+    // TODO: Variants: zrangeByLex, zrangeByLexWithScores
     suspend fun zrangeByScore(
         key: String,
         start: Double,

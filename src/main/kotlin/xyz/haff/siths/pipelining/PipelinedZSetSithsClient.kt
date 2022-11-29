@@ -34,6 +34,44 @@ class PipelinedZSetSithsClient(
         )
     )
 
+    override suspend fun zadd(
+        key: String,
+        scoreAndMembers: Collection<Pair<Double, String>>,
+        existenceCondition: ExistenceCondition?,
+        comparisonCondition: ComparisonCondition?,
+        returnChanged: Boolean
+    ): QueuedResponse<Long> = executor.addOperation(
+        DeferredCommand(
+            command = commandBuilder.zadd(key, scoreAndMembers, existenceCondition, comparisonCondition, returnChanged),
+            response = QueuedResponseImpl(RespType<*>::toLong)
+        )
+    )
+
+    override suspend fun zrangeByRank(
+        key: String,
+        start: Int,
+        stop: Int,
+        reverse: Boolean,
+        limit: Limit?
+    ): QueuedResponse<Set<String>> = executor.addOperation(
+        DeferredCommand(
+            command = commandBuilder.zrangeByRank(key, start, stop, reverse, limit),
+            response = QueuedResponseImpl(RespType<*>::toStringSet)
+        )
+    )
+
+    override suspend fun zrangeByRankWithScores(
+        key: String,
+        start: Int,
+        stop: Int,
+        reverse: Boolean,
+        limit: Limit?
+    ): QueuedResponse<List<Pair<String, Double>>> = executor.addOperation(
+        DeferredCommand(
+            command = commandBuilder.zrangeByRankWithScores(key, start, stop, reverse, limit),
+            response = QueuedResponseImpl(RespType<*>::toStringToDoubleList)
+        )
+    )
     override suspend fun zrangeByScore(
         key: String,
         start: Double,

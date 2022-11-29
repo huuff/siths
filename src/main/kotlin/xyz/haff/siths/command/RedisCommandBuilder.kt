@@ -316,13 +316,41 @@ class RedisCommandBuilder : RedisCommandReceiver<
         existenceCondition: ExistenceCondition?,
         comparisonCondition: ComparisonCondition?,
         returnChanged: Boolean
+    ): RedisCommand = zadd(key, listOf(scoreAndMember, *rest), existenceCondition, comparisonCondition, returnChanged)
+
+    override suspend fun zadd(
+        key: String,
+        scoreAndMembers: Collection<Pair<Double, String>>,
+        existenceCondition: ExistenceCondition?,
+        comparisonCondition: ComparisonCondition?,
+        returnChanged: Boolean
     ): RedisCommand =
         (RedisCommand("ZADD", key)
                 + existenceCondition?.let { RedisCommand(it.name) }
                 + comparisonCondition?.let { RedisCommand(it.name) }
-                + listOf(scoreAndMember, *rest).map { (score, member) -> RedisCommand(score, member)}
-            )
+                + if (returnChanged) { RedisCommand("CH") } else { null }
+                + scoreAndMembers.map { (score, member) -> RedisCommand(score, member)})
 
+    override suspend fun zrangeByRank(
+        key: String,
+        start: Int,
+        stop: Int,
+        reverse: Boolean,
+        limit: Limit?
+    ): RedisCommand = (RedisCommand("ZRANGE", key, start, stop)
+                + if (reverse) { RedisCommand("REV") } else { null }
+                + limit?.let { RedisCommand("LIMIT", it.offset, it.count) })
+
+    override suspend fun zrangeByRankWithScores(
+        key: String,
+        start: Int,
+        stop: Int,
+        reverse: Boolean,
+        limit: Limit?
+    ): RedisCommand = (RedisCommand("ZRANGE", key, start, stop)
+            + if (reverse) { RedisCommand("REV") } else { null }
+            + limit?.let { RedisCommand("LIMIT", it.offset, it.count) }
+            + RedisCommand("WITHSCORES"))
     override suspend fun zrangeByScore(
         key: String,
         start: Double,
