@@ -28,6 +28,8 @@ interface SithsImmediateClient : SithsClient<
         Map<String, Boolean>,
         Map<String, String>,
 
+        List<Pair<String, Double>>,
+
         RedisCursor<String>,
         RedisCursor<Pair<String, String>>,
 
@@ -37,7 +39,7 @@ interface SithsImmediateClient : SithsClient<
         Boolean,
         Unit,
         RespType<*>,
-        >, ListSithsImmediateClient, HashSithsImmediateClient, SetSithsImmediateClient {
+        >, ListSithsImmediateClient, HashSithsImmediateClient, SetSithsImmediateClient, ZSetSithsImmediateClient {
 
 }
 

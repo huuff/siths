@@ -16,7 +16,8 @@ class StandaloneSithsClient(
     SithsImmediateClient,
     ListSithsImmediateClient by StandaloneListSithsClient(connection, commandBuilder),
     SetSithsImmediateClient by StandaloneSetSithsClient(connection, commandBuilder),
-    HashSithsImmediateClient by StandaloneHashSithsClient(connection, commandBuilder)
+    HashSithsImmediateClient by StandaloneHashSithsClient(connection, commandBuilder),
+    ZSetSithsImmediateClient by StandaloneZSetSithsClient(connection, commandBuilder)
 {
 
     override suspend fun set(key: String, value: String, existenceCondition: ExistenceCondition?, timeToLive: Duration?): Unit =
@@ -81,4 +82,6 @@ class StandaloneSithsClient(
     override suspend fun dbSize(): Long = connection.runCommand(commandBuilder.dbSize()).toLong()
 
     override suspend fun flushDb(mode: SyncMode?) = connection.runCommand(commandBuilder.flushDb(mode)).assertOk()
+
+
 }

@@ -7,6 +7,7 @@ import io.kotest.extensions.testcontainers.TestContainerExtension
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
+import xyz.haff.siths.client.api.HashSithsImmediateClient
 import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.common.headAndTail
 import xyz.haff.siths.common.randomUUID
@@ -16,7 +17,7 @@ class HashSithsClientTest : FunSpec({
     val container = install(TestContainerExtension("redis:7.0.4-alpine", LifecycleMode.Root)) {
         withExposedPorts(6379)
     }
-    lateinit var siths: SithsImmediateClient
+    lateinit var siths: HashSithsImmediateClient
 
     beforeAny {
         siths = makeSithsClient(container)

@@ -26,6 +26,8 @@ interface RedisCommandReceiver<
         StringToBooleanMapResponseType,
         StringToStringMapResponseType,
 
+        StringToDoubleListResponseType,
+
         StringCursorResponseType,
         StringPairCursorResponseType,
 
@@ -74,6 +76,10 @@ interface RedisCommandReceiver<
         StringPairCursorResponseType,
 
         BooleanResponseType,
+        >, ZSetRedisCommandReceiver<
+        LongResponseType,
+        StringSetResponseType,
+        StringToDoubleListResponseType,
         >{
     suspend fun set(
         key: String,

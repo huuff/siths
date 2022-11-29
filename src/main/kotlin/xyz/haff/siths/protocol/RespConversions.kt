@@ -241,3 +241,8 @@ fun RespType<*>.toNullableZonedDateTime(): ZonedDateTime? = when (this) {
     }
     else -> handleAsUnexpected()
 }
+
+fun RespType<*>.toStringToDoubleList(): List<Pair<String, Double>> = when (this) {
+    is RespArray -> contentsOfType<RespBulkString>().zipEvensWithOdds().map { (member, score) -> member.value to score.value.toDouble() }
+    else -> handleAsUnexpected()
+}

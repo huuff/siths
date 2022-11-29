@@ -21,5 +21,8 @@ data class RedisCommand(
         this
     }
 
+    // TODO: Test
+    operator fun plus(rest: Iterable<RedisCommand>): RedisCommand = rest.fold(this, RedisCommand::plus)
+
     operator fun plus(pipeline: RedisPipeline) = RedisPipeline(listOf(this) + pipeline.commands)
 }

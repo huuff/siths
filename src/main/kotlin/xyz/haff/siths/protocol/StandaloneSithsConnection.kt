@@ -12,8 +12,6 @@ import java.util.*
 import kotlin.text.Charsets
 import kotlin.text.toByteArray
 
-
-
 /**
  * This connection is "standalone", which means that it isn't associated to any pool. (Or rather, if it is, it has no
  * knowledge thereof!)

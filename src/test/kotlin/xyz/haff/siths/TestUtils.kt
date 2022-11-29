@@ -3,9 +3,13 @@ package xyz.haff.siths
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.testcontainers.containers.GenericContainer
+import xyz.haff.siths.client.StandaloneSithsClient
+import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.client.pooled.ManagedSithsClient
+import xyz.haff.siths.command.RedisCommandBuilder
 import xyz.haff.siths.protocol.RedisConnection
 import xyz.haff.siths.protocol.SithsConnectionPool
+import xyz.haff.siths.protocol.StandaloneSithsConnection
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -26,14 +30,12 @@ fun makeSithsPool(container: GenericContainer<*>, maxConnections: Int = 10, acqu
  */
 fun makeLocalSithsPool() = SithsConnectionPool(RedisConnection(host = "localhost", port = 6379))
 
-
-inline fun threaded(threadNumber: Int, crossinline f: (threadIndex: Int) -> Unit) = (0 until threadNumber).map { threadIndex ->
-    Thread {
-        f(threadIndex)
+suspend fun <T> runInContainer(container: GenericContainer<*>, f: suspend SithsImmediateClient.() -> T): T {
+    return StandaloneSithsConnection.open(makeRedisConnection(container)).use { connection ->
+        val client = StandaloneSithsClient(connection = connection, commandBuilder = RedisCommandBuilder())
+        client.f()
     }
 }
-    .onEach { it.start() }
-    .onEach { it.join() }
 
 suspend inline fun suspended(coroutineNumber: Int, crossinline f: suspend (coroutineIndex: Int) -> Unit) = coroutineScope {
     (0 until coroutineNumber).forEach {

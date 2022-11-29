@@ -12,6 +12,7 @@ import xyz.haff.siths.common.RedisLockTimeoutException
 import xyz.haff.siths.makeSithsPool
 import xyz.haff.siths.protocol.RespNullResponse
 import xyz.haff.siths.protocol.SithsConnectionPool
+import xyz.haff.siths.runInContainer
 import xyz.haff.siths.suspended
 import java.util.*
 import kotlin.time.Duration.Companion.milliseconds
@@ -26,36 +27,43 @@ class SithsLockTest : FunSpec({
     }
 
     test("execution gets interleaved without locking") {
-        val values = Collections.synchronizedList(mutableListOf<String>())
+        // ARRANGE
+        val key = "key"
+        // TODO: How come there's no setAny?
+        runInContainer(container) { set(key, "0") }
 
+        // ACT
         suspended(10) {
             makeSithsPool(container).get().use { redis ->
                 val siths = StandaloneSithsClient(redis)
-                siths.incrBy("key", 1)
+                val value = siths.getLong("key")
                 delay(100)
-                siths.incrBy("key", -1)
-                values += siths.get("key")
+                siths.set(key, (value+1).toString())
             }
         }
 
-        values.distinct().size shouldNotBe 1
+        // ASSERT
+        runInContainer(container) { getLong(key) } shouldNotBe 10
     }
 
     test("execution is orderly with locking") {
-        val values = Collections.synchronizedList(mutableListOf<String>())
+        // ARRANGE
+        val key = "key"
+        runInContainer(container) { set(key, "0") }
 
+        // ACT
         suspended(10) {
             withRedis(makeSithsPool(container)) {
                 withLock("lock") {
-                    incrBy("key", 1)
+                    val value = getLong(key)
                     delay(100)
-                    incrBy("key", -1)
-                    values += get("key")
+                    set(key, (value+1).toString())
                 }
             }
         }
 
-        values.distinct() shouldBe listOf("0")
+        // ASSERT
+        runInContainer(container) { getLong(key) } shouldBe 10
     }
 
     test("acquire times out if it cant acquire the lock") {

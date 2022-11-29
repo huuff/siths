@@ -33,6 +33,7 @@ class RedisCommandBuilder : RedisCommandReceiver<
         RedisCommand,
         RedisCommand,
         RedisCommand,
+        RedisCommand,
         > {
 
     override suspend fun get(key: String) = RedisCommand("GET", key)
@@ -308,5 +309,39 @@ class RedisCommandBuilder : RedisCommandReceiver<
     override suspend fun hrandFieldWithValues(key: String, count: Int): RedisCommand =
         RedisCommand("HRANDFIELD", key, count, "WITHVALUES")
 
+    override suspend fun zadd(
+        key: String,
+        scoreAndMember: Pair<Double, String>,
+        vararg rest: Pair<Double, String>,
+        existenceCondition: ExistenceCondition?,
+        comparisonCondition: ComparisonCondition?,
+        returnChanged: Boolean
+    ): RedisCommand =
+        (RedisCommand("ZADD", key)
+                + existenceCondition?.let { RedisCommand(it.name) }
+                + comparisonCondition?.let { RedisCommand(it.name) }
+                + listOf(scoreAndMember, *rest).map { (score, member) -> RedisCommand(score, member)}
+            )
 
+    override suspend fun zrangeByScore(
+        key: String,
+        start: Double,
+        stop: Double,
+        reverse: Boolean,
+        limit: Limit?
+    ): RedisCommand =
+        (RedisCommand("ZRANGE", key, start, stop, "BYSCORE")
+                + if (reverse) { RedisCommand("REV") } else { null }
+                + limit?.let { RedisCommand("LIMIT", it.offset, it.count) })
+
+    override suspend fun zrangeByScoreWithScores(
+        key: String,
+        start: Double,
+        stop: Double,
+        reverse: Boolean,
+        limit: Limit?
+    ): RedisCommand = (RedisCommand("ZRANGE", key, start, stop, "BYSCORE")
+            + if (reverse) { RedisCommand("REV") } else { null }
+            + limit?.let { RedisCommand("LIMIT", it.offset, it.count) }
+            + RedisCommand("WITHSCORES"))
 }

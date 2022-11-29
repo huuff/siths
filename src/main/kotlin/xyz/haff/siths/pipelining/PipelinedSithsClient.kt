@@ -32,6 +32,8 @@ class PipelinedSithsClient(
         QueuedResponse<Map<String, Boolean>>,
         QueuedResponse<Map<String, String>>,
 
+        QueuedResponse<List<Pair<String, Double>>>,
+
         QueuedResponse<RedisCursor<String>>,
         QueuedResponse<RedisCursor<Pair<String, String>>>,
 
@@ -44,7 +46,9 @@ class PipelinedSithsClient(
         >,
     IPipelinedSetSithsClient by PipelinedSetSithsClient(executor),
     IPipelinedHashSithsClient by PipelinedHashSithsClient(executor),
-    IPipelinedListSithsClient by PipelinedListSithsClient(executor) {
+    IPipelinedListSithsClient by PipelinedListSithsClient(executor),
+    IPipelinedZSetSithsClient by PipelinedZSetSithsClient(executor)
+{
 
     suspend fun exec(connection: SithsConnection, inTransaction: Boolean = false) =
         executor.exec(connection, inTransaction)

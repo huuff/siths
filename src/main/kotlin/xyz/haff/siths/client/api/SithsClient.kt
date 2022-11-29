@@ -28,6 +28,8 @@ interface SithsClient<
         StringToBooleanMapResponseType,
         StringToStringMapResponseType,
 
+        StringToDoubleListResponseType,
+
         StringCursorResponseType,
         StringPairCursorResponseType,
 
@@ -56,6 +58,8 @@ interface SithsClient<
 
         StringToBooleanMapResponseType,
         StringToStringMapResponseType,
+
+        StringToDoubleListResponseType,
 
         StringCursorResponseType,
         StringPairCursorResponseType,
@@ -105,6 +109,10 @@ interface SithsClient<
         StringCursorResponseType,
 
         BooleanResponseType,
+        >, ZSetSithsClient<
+        LongResponseType,
+        StringSetResponseType,
+        StringToDoubleListResponseType,
         > {
 
     suspend fun getOrNull(key: String): NullableStringResponseType
