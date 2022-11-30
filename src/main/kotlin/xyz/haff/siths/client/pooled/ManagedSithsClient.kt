@@ -35,6 +35,20 @@ class ManagedSithsClient(
         connectionPool: SithsConnectionPool
     ) : this(SithsClientPool(connectionPool))
 
+    /**
+     * XXX: This is the only genuine method of ManagedSithsClient, and all the rest just wrap the methods of the underlying
+     * unmanaged client. It runs the given function on the underlying client, and, in the case of errors, marks the client
+     * as broken and retries.
+     * XXX: Is it safe to always retry for a broken connection?
+     */
+    private suspend inline fun <T> runSafely(f: (PooledSithsClient) -> T): T {
+        return try {
+            pool.get().useSafely(f)
+        } catch (e: RedisBrokenConnectionException) {
+            pool.get().useSafely(f)
+        }
+    }
+
     override suspend fun set(
         key: String,
         value: String,
