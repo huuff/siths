@@ -37,10 +37,10 @@ class DefaultPool<ResourceType, PooledResourceType : PooledResource<ResourceType
                 }
 
 
-                if (resources.values.any { it.status == PoolStatus.FREE }) {
-                    val connection = resources.values.find { it.status == PoolStatus.FREE }!!
-                    connection.status = PoolStatus.BUSY
-                    return connection
+                val freeConnection = resources.values.find { it.status == PoolStatus.FREE }
+                if (freeConnection != null) {
+                    freeConnection.status = PoolStatus.BUSY
+                    return freeConnection
                 } else if (currentResources < maxResources) {
                     val connection = createNewResource(this)
                     connection.status = PoolStatus.BUSY

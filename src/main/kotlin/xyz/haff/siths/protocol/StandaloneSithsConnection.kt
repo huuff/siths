@@ -57,7 +57,7 @@ class StandaloneSithsConnection private constructor(
                         throw RedisAuthException(response)
                     }
                 } else if (redisConnection.user != null) {
-                    throw IllegalArgumentException("Can't create a connection with an username but without a password")
+                    throw IllegalArgumentException("Can't create a connection with a username but without a password")
                 }
 
                 val response = it.runCommand(RedisCommand("CLIENT", "SETNAME", name))
