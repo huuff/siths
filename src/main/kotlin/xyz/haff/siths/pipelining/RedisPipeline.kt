@@ -11,4 +11,6 @@ data class RedisPipeline(
 
     operator fun plus(command: RedisCommand) = RedisPipeline(commands + command)
     operator fun plus(other: RedisPipeline) = RedisPipeline(this.commands + other.commands)
+
+    override fun toString() = commands.joinToString(separator = "\n") { it.toString() }
 }

@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "xyz.haff"
-version = "0.12.5"
+version = "0.12.7"
 
 repositories {
     mavenCentral()

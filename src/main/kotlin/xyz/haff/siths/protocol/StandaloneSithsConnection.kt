@@ -12,13 +12,19 @@ import xyz.haff.siths.common.RedisBrokenConnectionException
 import xyz.haff.siths.common.RedisUnexpectedRespResponseException
 import xyz.haff.siths.pipelining.RedisPipeline
 import java.io.IOException
+import java.net.SocketException
 import java.util.*
 import kotlin.text.Charsets
 import kotlin.text.toByteArray
 
 
 private fun Exception.isSocketException(): Boolean {
-    return (this is ClosedReceiveChannelException || this is ClosedSendChannelException || (this is IOException && this.message == "Broken pipe"))
+    return (
+            this is ClosedReceiveChannelException
+                    || this is ClosedSendChannelException
+                    || (this is IOException && this.message == "Broken pipe")
+                    || this is SocketException
+            )
 }
 
 /**
@@ -90,10 +96,18 @@ class StandaloneSithsConnection private constructor(
     }
 
     override suspend fun runPipeline(pipeline: RedisPipeline): List<RespType<*>> {
-        sendChannel.writeFully(pipeline.toResp().toByteArray(Charsets.UTF_8))
-        sendChannel.flush()
+        try {
+            sendChannel.writeFully(pipeline.toResp().toByteArray(Charsets.UTF_8))
+            sendChannel.flush()
 
-        return (1..pipeline.commands.size).map { readResponse() }
+            return (1..pipeline.commands.size).map { readResponse() }
+        } catch (e: Exception) {
+            if (e.isSocketException()) {
+                throw RedisBrokenConnectionException(pipeline, e)
+            } else {
+                throw e
+            }
+        }
     }
 
     override fun close() {
