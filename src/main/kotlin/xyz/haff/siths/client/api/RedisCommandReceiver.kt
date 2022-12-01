@@ -89,7 +89,7 @@ interface RedisCommandReceiver<
     ): UnitResponseType
 
     suspend fun mset(vararg pairs: Pair<String, String>): UnitResponseType
-    suspend fun mget(key: String, vararg rest: String): StringToStringMapResponseType
+    suspend fun mget(keys: Collection<String>): StringToStringMapResponseType
 
     suspend fun get(key: String): StringResponseType
     suspend fun del(key: String, vararg rest: String): LongResponseType

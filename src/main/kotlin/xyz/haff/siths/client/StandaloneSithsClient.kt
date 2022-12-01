@@ -26,8 +26,8 @@ class StandaloneSithsClient(
     override suspend fun mset(vararg pairs: Pair<String, String>)
         = connection.runCommand(commandBuilder.mset(*pairs)).toUnit()
 
-    override suspend fun mget(key: String, vararg rest: String): Map<String, String>
-        = connection.runCommand(commandBuilder.mget(key, *rest)).associateArrayToArguments(key, *rest)
+    override suspend fun mget(keys: Collection<String>): Map<String, String>
+        = connection.runCommand(commandBuilder.mget(keys)).associateArrayToArguments(*keys.toTypedArray())
 
     override suspend fun ttl(key: String): Duration? = connection.runCommand(commandBuilder.ttl(key)).toDurationOrNull()
 

@@ -58,8 +58,8 @@ class ManagedSithsClient(
 
     override suspend fun mset(vararg pairs: Pair<String, String>) = runSafely { it.mset(*pairs) }
 
-    override suspend fun mget(key: String, vararg rest: String): Map<String, String> =
-        runSafely { it.mget(key, *rest) }
+    override suspend fun mget(keys: Collection<String>): Map<String, String> =
+        runSafely { it.mget(keys) }
 
     override suspend fun del(key: String, vararg rest: String): Long = runSafely { it.del(key, *rest) }
 

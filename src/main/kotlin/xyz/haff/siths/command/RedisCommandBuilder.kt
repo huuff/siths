@@ -1,6 +1,7 @@
 package xyz.haff.siths.command
 
 import xyz.haff.siths.client.api.RedisCommandReceiver
+import xyz.haff.siths.common.RedisSyntaxException
 import xyz.haff.siths.option.*
 import java.time.ZonedDateTime
 import kotlin.time.Duration
@@ -10,6 +11,14 @@ private fun countSubCommand(count: Int?) = count?.let { RedisCommand("COUNT", it
 private fun durationToFloatSeconds(duration: Duration?) = duration?.toDouble(DurationUnit.SECONDS) ?: 0.0
 private fun pairsToStringArray(vararg pairs: Pair<String, String>) =
     pairs.flatMap { listOf(it.first, it.second) }.toTypedArray()
+
+private fun <T : Collection<*>>assertNotEmpty(collection: T): T {
+    if (collection.isEmpty()) {
+        throw RedisSyntaxException("This command requires at least one argument")
+    }
+
+    return collection
+}
 
 class RedisCommandBuilder : RedisCommandReceiver<
         // lol
@@ -41,7 +50,8 @@ class RedisCommandBuilder : RedisCommandReceiver<
     override suspend fun mset(vararg pairs: Pair<String, String>): RedisCommand =
         RedisCommand("MSET", *pairsToStringArray(*pairs))
 
-    override suspend fun mget(key: String, vararg rest: String): RedisCommand = RedisCommand("MGET", key, *rest)
+    override suspend fun mget(keys: Collection<String>): RedisCommand
+        = RedisCommand("MGET", *(assertNotEmpty(keys)).toTypedArray())
 
     override suspend fun set(
         key: String,

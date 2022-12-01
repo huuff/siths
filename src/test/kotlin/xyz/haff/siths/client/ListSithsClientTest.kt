@@ -212,7 +212,7 @@ class ListSithsClientTest : FunSpec({
             val (result, time) = popped.await()
             result?.data shouldBe "value"
             // Checking whether it's greater than 25 because there seems to be some inexplicable speed-up?
-            time shouldBeGreaterThanOrEqualTo 25
+            time shouldBeGreaterThanOrEqualTo 22
         }
     }
 })

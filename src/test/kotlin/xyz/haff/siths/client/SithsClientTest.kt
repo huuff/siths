@@ -251,7 +251,7 @@ class SithsClientTest : FunSpec({
         siths.mset(key1 to "value1", key2 to "value2")
 
         // ACT & ASSERT
-        siths.mget(key1, key2, "nonexistent") shouldBe mapOf(
+        siths.mget(listOf(key1, key2, "nonexistent")) shouldBe mapOf(
             key1 to "value1",
             key2 to "value2",
         )

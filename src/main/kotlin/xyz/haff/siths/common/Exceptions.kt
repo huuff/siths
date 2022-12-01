@@ -21,6 +21,8 @@ class RedisBrokenConnectionException : RuntimeException {
     constructor(offendingPipeline: RedisPipeline, cause: Throwable) : super("Broken redis connection when running pipeline $offendingPipeline", cause)
 }
 
+class RedisSyntaxException(message: String): RuntimeException(message)
+
 class RedisPoolOutOfConnectionsException(): RuntimeException("All Redis connections of this pool are currently used")
 
 class RedisAuthException(response: RespType<*>): RuntimeException("Unable to authenticate. Redis response: $response")

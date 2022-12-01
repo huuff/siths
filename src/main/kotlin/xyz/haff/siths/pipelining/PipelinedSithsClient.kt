@@ -81,11 +81,11 @@ class PipelinedSithsClient(
     override suspend fun mset(vararg pairs: Pair<String, String>): QueuedResponse<Unit> =
         executor.addOperation(DeferredCommand(commandBuilder.mset(*pairs), QueuedResponseImpl(RespType<*>::toUnit)))
 
-    override suspend fun mget(key: String, vararg rest: String): QueuedResponse<Map<String, String>> =
+    override suspend fun mget(keys: Collection<String>): QueuedResponse<Map<String, String>> =
         executor.addOperation(
             DeferredCommand(
-                commandBuilder.mget(key, *rest),
-                QueuedResponseImpl({ it.associateArrayToArguments(key, *rest) })
+                commandBuilder.mget(keys),
+                QueuedResponseImpl({ it.associateArrayToArguments(*keys.toTypedArray()) })
             )
         )
 
