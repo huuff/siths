@@ -25,4 +25,8 @@ data class RedisCommand(
     operator fun plus(rest: Iterable<RedisCommand>): RedisCommand = rest.fold(this, RedisCommand::plus)
 
     operator fun plus(pipeline: RedisPipeline) = RedisPipeline(listOf(this) + pipeline.commands)
+
+    override fun toString(): String {
+        return parts.joinToString(separator = " ") { "\"${it.replace("\"", "\\\"")}\"" }
+    }
 }

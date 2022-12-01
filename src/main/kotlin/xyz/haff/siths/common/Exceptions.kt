@@ -1,5 +1,6 @@
 package xyz.haff.siths.common
 
+import xyz.haff.siths.command.RedisCommand
 import xyz.haff.siths.protocol.RespType
 import kotlin.time.Duration
 
@@ -14,7 +15,9 @@ class RedisLockTimeoutException(
 
 class RedisUnexpectedRespResponseException(response: RespType<*>): RuntimeException("Unexpected RESP response: $response")
 
-class RedisBrokenConnectionException(cause: Throwable) : RuntimeException(cause)
+class RedisBrokenConnectionException(offendingCommand: RedisCommand, cause: Throwable) : RuntimeException(
+    "Broken redis connection when running $offendingCommand", cause
+)
 
 class RedisPoolOutOfConnectionsException(): RuntimeException("All Redis connections of this pool are currently used")
 

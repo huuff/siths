@@ -4,13 +4,22 @@ import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.channels.ClosedSendChannelException
 import xyz.haff.siths.command.RedisCommand
 import xyz.haff.siths.common.RedisAuthException
+import xyz.haff.siths.common.RedisBrokenConnectionException
 import xyz.haff.siths.common.RedisUnexpectedRespResponseException
 import xyz.haff.siths.pipelining.RedisPipeline
+import java.io.IOException
 import java.util.*
 import kotlin.text.Charsets
 import kotlin.text.toByteArray
+
+
+private fun Exception.isSocketException(): Boolean {
+    return (this is ClosedReceiveChannelException || this is ClosedSendChannelException || (this is IOException && this.message == "Broken pipe"))
+}
 
 /**
  * This connection is "standalone", which means that it isn't associated to any pool. (Or rather, if it is, it has no
@@ -20,7 +29,7 @@ class StandaloneSithsConnection private constructor(
     private val selectorManager: SelectorManager,
     private val socket: Socket,
     override val identifier: String,
-): SithsConnection {
+) : SithsConnection {
     private val sendChannel = socket.openWriteChannel(autoFlush = false)
     private val receiveChannel = socket.openReadChannel()
 
@@ -47,8 +56,11 @@ class StandaloneSithsConnection private constructor(
 
                 val response = it.runCommand(RedisCommand("CLIENT", "SETNAME", name))
                 if (!response.isOk()) {
-                    if (response is RespError) { response.throwAsException() }
-                    else { throw RedisUnexpectedRespResponseException(response) } // Maybe a better error?
+                    if (response is RespError) {
+                        response.throwAsException()
+                    } else {
+                        throw RedisUnexpectedRespResponseException(response)
+                    } // Maybe a better error?
                 }
             }
         }
@@ -59,13 +71,22 @@ class StandaloneSithsConnection private constructor(
         receiveChannel.awaitContent()
 
         return RespParser(receiveChannel).parse()
+
     }
 
     override suspend fun runCommand(command: RedisCommand): RespType<*> {
-        sendChannel.writeStringUtf8(command.toResp())
-        sendChannel.flush()
+        try {
+            sendChannel.writeStringUtf8(command.toResp())
+            sendChannel.flush()
 
-        return readResponse()
+            return readResponse()
+        } catch (e: Exception) {
+            if (e.isSocketException()) {
+                throw RedisBrokenConnectionException(command, e)
+            } else {
+                throw e
+            }
+        }
     }
 
     override suspend fun runPipeline(pipeline: RedisPipeline): List<RespType<*>> {

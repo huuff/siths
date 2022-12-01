@@ -23,13 +23,13 @@ class PooledSithsConnection(
 
     override suspend fun runCommand(command: RedisCommand): RespType<*> = try {
         resource.runCommand(command)
-    } catch (e: Exception) {
+    } catch (e: RedisBrokenConnectionException) {
         handleChannelException(e)
     }
 
     override suspend fun runPipeline(pipeline: RedisPipeline): List<RespType<*>> = try {
         resource.runPipeline(pipeline)
-    } catch (e: Exception) {
+    } catch (e: RedisBrokenConnectionException) {
         handleChannelException(e)
     }
 
@@ -37,13 +37,10 @@ class PooledSithsConnection(
         pool.release(identifier)
     }
 
-    private fun handleChannelException(e: Exception): Nothing = when {
-        (e is ClosedReceiveChannelException || e is ClosedSendChannelException || (e is IOException && e.message == "Broken pipe")) -> {
-            // Connection is broken, so we notify the pool to discard it and maybe create a new one that works
-            resource.close()
-            status = PoolStatus.BROKEN
-            throw RedisBrokenConnectionException(e)
-        }
-        else -> throw e
+    private fun handleChannelException(e: RedisBrokenConnectionException): Nothing {
+        // Connection is broken, so we notify the pool to discard it and maybe create a new one that works
+        resource.close()
+        status = PoolStatus.BROKEN
+        throw e
     }
 }

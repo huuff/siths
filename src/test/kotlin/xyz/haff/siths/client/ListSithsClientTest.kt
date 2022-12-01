@@ -204,15 +204,15 @@ class ListSithsClientTest : FunSpec({
             // ACT
             val popped = async { timed { siths.brpop(key) } }
             withContext(Dispatchers.IO) {
-                delay(10)
+                delay(30)
                 siths.lpush(key, "value")
             }
 
             // ASSERT
             val (result, time) = popped.await()
             result?.data shouldBe "value"
-            // Checking whether it's greater than 7 because
-            time shouldBeGreaterThanOrEqualTo 7
+            // Checking whether it's greater than 25 because there seems to be some inexplicable speed-up?
+            time shouldBeGreaterThanOrEqualTo 25
         }
     }
 })
