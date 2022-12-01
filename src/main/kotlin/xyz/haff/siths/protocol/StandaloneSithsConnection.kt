@@ -82,7 +82,9 @@ class StandaloneSithsConnection private constructor(
 
     override suspend fun runCommand(command: RedisCommand): RespType<*> {
         try {
-            sendChannel.writeStringUtf8(command.toResp())
+            val resp = command.toResp()
+
+            sendChannel.writeStringUtf8(resp)
             sendChannel.flush()
 
             return readResponse()
@@ -97,7 +99,9 @@ class StandaloneSithsConnection private constructor(
 
     override suspend fun runPipeline(pipeline: RedisPipeline): List<RespType<*>> {
         try {
-            sendChannel.writeStringUtf8(pipeline.toResp())
+            val resp = pipeline.toResp()
+
+            sendChannel.writeStringUtf8(resp)
             sendChannel.flush()
 
             return (1..pipeline.commands.size).map { readResponse() }

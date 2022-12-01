@@ -10,7 +10,7 @@ data class RedisCommand(
     fun toResp(): String = buildString {
         append("*${parts.size}\r\n")
         for (part in parts) {
-            append("$${part.length}\r\n")
+            append("$${part.toByteArray(Charsets.UTF_8).size}\r\n")
             append("${part}\r\n")
         }
     }
