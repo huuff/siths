@@ -10,6 +10,9 @@ data class RedisCommand(
     fun toResp(): String = buildString {
         append("*${parts.size}\r\n")
         for (part in parts) {
+            // TODO: XXX: Did this in a pinch, but converting to a byte array on every iteration might be very wasteful,
+            // considering that we're about to do it again then when sending the command. Maybe I should just try to send a byte array
+            // directly from this method and send that through the socker?
             append("$${part.toByteArray(Charsets.UTF_8).size}\r\n")
             append("${part}\r\n")
         }
