@@ -97,7 +97,7 @@ class StandaloneSithsConnection private constructor(
 
     override suspend fun runPipeline(pipeline: RedisPipeline): List<RespType<*>> {
         try {
-            sendChannel.writeFully(pipeline.toResp().toByteArray(Charsets.UTF_8))
+            sendChannel.writeStringUtf8(pipeline.toResp())
             sendChannel.flush()
 
             return (1..pipeline.commands.size).map { readResponse() }
