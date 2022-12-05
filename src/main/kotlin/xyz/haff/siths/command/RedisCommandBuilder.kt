@@ -382,4 +382,7 @@ class RedisCommandBuilder : RedisCommandReceiver<
             + if (reverse) { RedisCommand("REV") } else { null }
             + limit?.let { RedisCommand("LIMIT", it.offset, it.count) }
             + RedisCommand("WITHSCORES"))
+
+    override suspend fun zremRangeByScore(key: String, min: Double, max: Double): RedisCommand
+        = RedisCommand("ZREMRANGEBYSCORE", key, min, max)
 }

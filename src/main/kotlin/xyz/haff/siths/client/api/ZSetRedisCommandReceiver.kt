@@ -60,4 +60,10 @@ interface ZSetRedisCommandReceiver<
         reverse: Boolean = false,
         limit: Limit? = null,
     ): StringToDoubleListResponseType
+
+    suspend fun zremRangeByScore(
+        key: String,
+        min: Double,
+        max: Double,
+    ): LongResponseType
 }

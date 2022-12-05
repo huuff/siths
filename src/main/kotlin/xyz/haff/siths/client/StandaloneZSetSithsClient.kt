@@ -75,4 +75,7 @@ class StandaloneZSetSithsClient(
     ): List<Pair<String, Double>> = connection.runCommand(
         commandBuilder.zrangeByScoreWithScores(key, start, stop, reverse, limit)
     ).toStringToDoubleList()
+
+    override suspend fun zremRangeByScore(key: String, min: Double, max: Double): Long
+        = connection.runCommand(commandBuilder.zremRangeByScore(key, min, max)).toLong()
 }

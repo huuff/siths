@@ -70,4 +70,16 @@ class ZSetSithsClientTest : FunSpec({
             result shouldBe listOf("2" to 2.0, "3" to 3.0)
         }
     }
+
+    test("zremRangeByScore") {
+        // ARRANGE
+        val key = randomUUID()
+
+        // ACT
+        siths.zadd(key, 1.0 to "1", 2.0 to "2", 3.0 to "3", 4.0 to "4")
+        siths.zremRangeByScore(key, 2.0, 3.0)
+
+        // ASSERT
+        siths.zrangeByRank(key, 0, -1) shouldBe setOf("1", "4")
+    }
 })

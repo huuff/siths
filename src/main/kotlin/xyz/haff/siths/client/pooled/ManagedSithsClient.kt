@@ -371,4 +371,7 @@ class ManagedSithsClient(
         reverse: Boolean,
         limit: Limit?
     ): List<Pair<String, Double>>  = runSafely { it.zrangeByScoreWithScores(key, start, stop, reverse, limit) }
+
+    override suspend fun zremRangeByScore(key: String, min: Double, max: Double): Long
+        = runSafely { it.zremRangeByScore(key, min, max) }
 }

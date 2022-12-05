@@ -97,4 +97,11 @@ class PipelinedZSetSithsClient(
             response = QueuedResponseImpl(RespType<*>::toStringToDoubleList)
         )
     )
+
+    override suspend fun zremRangeByScore(key: String, min: Double, max: Double): QueuedResponse<Long> = executor.addOperation(
+        DeferredCommand(
+            command = commandBuilder.zremRangeByScore(key, min, max),
+            response = QueuedResponseImpl(RespType<*>::toLong)
+        )
+    )
 }
