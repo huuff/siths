@@ -42,10 +42,15 @@ interface ListRedisCommandReceiver<
     suspend fun lpos(key: String, element: String, rank: Int? = null, maxlen: Int? = null): NullableLongResponseType
     suspend fun lpos(key: String, element: String, rank: Int? = null, count: Int, maxlen: Int? = null): LongListResponseType
 
+    // TODO: For lpush and rpush, the vararg methods should be part of the client, while only the list ones should be part of the command receiver
     // PUSH
     suspend fun lpush(key: String, element: String, vararg rest: String): LongResponseType
+
+    suspend fun lpush(key: String, elements: Collection<String>): LongResponseType
     suspend fun lpushx(key: String, element: String, vararg rest: String): LongResponseType
     suspend fun rpush(key: String, element: String, vararg rest: String): LongResponseType
+
+    suspend fun rpush(key: String, elements: Collection<String>): LongResponseType
     suspend fun rpushx(key: String, element: String, vararg rest: String): LongResponseType
 
     // BLOCKING

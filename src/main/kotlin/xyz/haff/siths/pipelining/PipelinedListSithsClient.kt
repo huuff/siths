@@ -72,11 +72,17 @@ class PipelinedListSithsClient(
         )
     )
 
+    override suspend fun lpush(key: String, elements: Collection<String>): QueuedResponse<Long>
+        = executor.addOperation(DeferredCommand(commandBuilder.lpush(key, elements), QueuedResponseImpl(RespType<*>::toLong)))
+
     override suspend fun lpush(key: String, element: String, vararg rest: String): QueuedResponseImpl<Long> =
         executor.addOperation(DeferredCommand(commandBuilder.lpush(key, element, *rest), QueuedResponseImpl(RespType<*>::toLong)))
 
     override suspend fun lpushx(key: String, element: String, vararg rest: String): QueuedResponseImpl<Long> =
         executor.addOperation(DeferredCommand(commandBuilder.lpushx(key, element, *rest), QueuedResponseImpl(RespType<*>::toLong)))
+
+    override suspend fun rpush(key: String, elements: Collection<String>): QueuedResponse<Long>
+        = executor.addOperation(DeferredCommand(commandBuilder.rpush(key, elements), QueuedResponseImpl(RespType<*>::toLong)))
 
     override suspend fun rpush(key: String, element: String, vararg rest: String): QueuedResponseImpl<Long> =
         executor.addOperation(DeferredCommand(commandBuilder.rpush(key, element, *rest), QueuedResponseImpl(RespType<*>::toLong)))

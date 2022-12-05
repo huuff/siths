@@ -211,11 +211,16 @@ class ManagedSithsClient(
     override suspend fun lpush(key: String, element: String, vararg rest: String): Long =
         runSafely { it.lpush(key, element, *rest) }
 
+    override suspend fun lpush(key: String, elements: Collection<String>): Long
+        = runSafely { it.lpush(key, elements) }
     override suspend fun lpushx(key: String, element: String, vararg rest: String): Long =
         runSafely { it.lpushx(key, element, *rest) }
 
     override suspend fun rpush(key: String, element: String, vararg rest: String): Long =
         runSafely { it.rpush(key, element, *rest) }
+
+    override suspend fun rpush(key: String, elements: Collection<String>): Long
+        = runSafely { it.rpush(key, elements) }
 
     override suspend fun rpushx(key: String, element: String, vararg rest: String): Long =
         runSafely { it.rpushx(key, element, *rest) }

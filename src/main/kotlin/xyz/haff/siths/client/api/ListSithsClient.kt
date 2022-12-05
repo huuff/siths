@@ -31,5 +31,6 @@ interface ListSithsClient<
         > {
 
     suspend fun lpushAny(key: String, element: Any, vararg rest: Any): LongResponseType
+
     suspend fun rpushAny(key: String, element: Any, vararg rest: Any): LongResponseType
 }

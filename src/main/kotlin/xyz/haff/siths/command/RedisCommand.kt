@@ -7,6 +7,10 @@ data class RedisCommand(
 ) {
     constructor(vararg parts: Any?) : this(parts.asSequence().filterNotNull().map(Any::toString).toList())
 
+    companion object {
+        fun fromCollection(parts: Collection<String>) = RedisCommand(parts = parts.toList())
+    }
+
     fun toResp(): String = buildString {
         append("*${parts.size}\r\n")
         for (part in parts) {

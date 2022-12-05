@@ -57,11 +57,17 @@ class StandaloneListSithsClient(
     override suspend fun lpush(key: String, element: String, vararg rest: String): Long
             = connection.runCommand(commandBuilder.lpush(key, element, *rest)).toLong()
 
+    override suspend fun lpush(key: String, elements: Collection<String>): Long
+        = connection.runCommand(commandBuilder.lpush(key, elements)).toLong()
+
     override suspend fun lpushx(key: String, element: String, vararg rest: String): Long
             = connection.runCommand(commandBuilder.lpushx(key, element, *rest)).toLong()
 
     override suspend fun rpush(key: String, element: String, vararg rest: String): Long
             = connection.runCommand(commandBuilder.rpush(key, element, *rest)).toLong()
+
+    override suspend fun rpush(key: String, elements: Collection<String>): Long
+        = connection.runCommand(commandBuilder.rpush(key, elements)).toLong()
 
     override suspend fun rpushx(key: String, element: String, vararg rest: String): Long
             = connection.runCommand(commandBuilder.rpushx(key, element, *rest)).toLong()

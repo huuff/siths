@@ -203,14 +203,16 @@ class RedisCommandBuilder : RedisCommandReceiver<
 
     override suspend fun rpop(key: String): RedisCommand = RedisCommand("RPOP", key)
 
-    override suspend fun lpush(key: String, element: String, vararg rest: String): RedisCommand =
-        RedisCommand("LPUSH", key, element, *rest)
-
+    override suspend fun lpush(key: String, elements: Collection<String>): RedisCommand
+        = RedisCommand("LPUSH", key) + RedisCommand.fromCollection(assertNotEmpty(elements))
+    override suspend fun lpush(key: String, element: String, vararg rest: String): RedisCommand = lpush( key, listOf(element, *rest))
     override suspend fun lpushx(key: String, element: String, vararg rest: String): RedisCommand =
         RedisCommand("LPUSHX", key, element, *rest)
 
-    override suspend fun rpush(key: String, element: String, vararg rest: String): RedisCommand =
-        RedisCommand("RPUSH", key, element, *rest)
+    override suspend fun rpush(key: String, elements: Collection<String>): RedisCommand
+        = RedisCommand("RPUSH", key) + RedisCommand.fromCollection(assertNotEmpty( elements))
+
+    override suspend fun rpush(key: String, element: String, vararg rest: String): RedisCommand = rpush(key, listOf(element, *rest))
 
     override suspend fun rpushx(key: String, element: String, vararg rest: String): RedisCommand =
         RedisCommand("RPUSHX", key, element, *rest)
