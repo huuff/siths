@@ -2,7 +2,6 @@ package xyz.haff.siths.client
 
 import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.client.pooled.ManagedSithsClient
-import xyz.haff.siths.client.pooled.SithsClientPool
 import xyz.haff.siths.common.RedisScriptNotLoadedException
 import xyz.haff.siths.pipelining.PipelinedSithsClient
 import xyz.haff.siths.pipelining.QueuedResponse
@@ -13,7 +12,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class SithsDSL(val pool: SithsConnectionPool) :
-    SithsImmediateClient by ManagedSithsClient(pool = SithsClientPool(pool)) {
+    SithsImmediateClient by ManagedSithsClient(pool) {
 
     /**
      * Tries to run script, and, if not loaded, loads it, then runs it again

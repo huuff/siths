@@ -15,7 +15,7 @@ class DefaultPool<ResourceType, PooledResourceType : PooledResource<ResourceType
     private val maxResources: Int = 10,
     private val createNewResource: suspend (Pool<ResourceType, PooledResourceType>) -> PooledResourceType,
 ) : Pool<ResourceType, PooledResourceType> {
-    private val resources = mutableMapOf<String, PooledResourceType>()
+    private var resources = mapOf<String, PooledResourceType>()
     private val mutex = Mutex()
 
     override val currentResources get() = resources.values.count { it.status != PoolStatus.BROKEN }
@@ -27,11 +27,7 @@ class DefaultPool<ResourceType, PooledResourceType : PooledResource<ResourceType
             mutex.withLock {
                 // First, clean all broken resources
                 try {
-                    resources.forEach { (key, value) ->
-                        if (value.status == PoolStatus.BROKEN) {
-                            remove(key)
-                        }
-                    }
+                    resources = resources.filter { it.value.status != PoolStatus.BROKEN }
                 } catch (e: ConcurrentModificationException) {
                     throw PoolHealingException(e)
                 }
@@ -44,7 +40,7 @@ class DefaultPool<ResourceType, PooledResourceType : PooledResource<ResourceType
                 } else if (currentResources < maxResources) {
                     val connection = createNewResource(this)
                     connection.status = PoolStatus.BUSY
-                    resources[connection.identifier] = connection
+                    resources = resources + (connection.identifier to connection)
                     return connection
                 }
             }
@@ -54,15 +50,12 @@ class DefaultPool<ResourceType, PooledResourceType : PooledResource<ResourceType
         throw ExhaustedPoolException(maxResources)
     }
 
+    // TODO: Should maybe be suspend and called in mutex
     override fun release(resourceIdentifier: String) {
         resources[resourceIdentifier]?.let {
             if (it.status == PoolStatus.BUSY) {
                 it.status = PoolStatus.FREE
             }
         }
-    }
-
-    override fun remove(resourceIdentifier: String) {
-        resources -= resourceIdentifier
     }
 }

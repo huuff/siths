@@ -1,5 +1,6 @@
 package xyz.haff.siths.client.pooled
 
+import xyz.haff.siths.client.StandaloneSithsClient
 import xyz.haff.siths.client.api.SithsImmediateClient
 import xyz.haff.siths.common.RedisBrokenConnectionException
 import xyz.haff.siths.option.*
@@ -9,31 +10,21 @@ import java.time.ZonedDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-/**
- * Use a PooledClient as usual, but catch a RedisBrokenConnectionException and mark it as broken so that it's not reused
- * anymore
- */
-private inline fun <T> PooledSithsClient.useSafely(f: (PooledSithsClient) -> T): T = try {
-    this.use { f(this) }
-} catch (e: RedisBrokenConnectionException) {
-    this.status = PoolStatus.BROKEN
-    throw e
-}
 
 // I'm not splitting this client into one for lists, sets, etc. because this has no logic whatsoever. But that might change
 // in the future
+/**
+ * Like a normal standalone siths client, but it automatically finds a connection from the pool, uses it and
+ * closes it as appropriate
+ */
 class ManagedSithsClient(
-    private val pool: SithsClientPool,
+    private val pool: SithsConnectionPool,
 ) : SithsImmediateClient {
     constructor(
         redisConnection: RedisConnection,
         maxConnections: Int = 10,
         acquireTimeout: Duration = 10.seconds
-    ) : this(SithsClientPool(SithsConnectionPool(redisConnection, maxConnections, acquireTimeout)))
-
-    constructor(
-        connectionPool: SithsConnectionPool
-    ) : this(SithsClientPool(connectionPool))
+    ) : this((SithsConnectionPool(redisConnection, maxConnections, acquireTimeout)))
 
     /**
      * XXX: This is the only genuine method of ManagedSithsClient, and all the rest just wrap the methods of the underlying
@@ -41,11 +32,12 @@ class ManagedSithsClient(
      * as broken and retries.
      * XXX: Is it safe to always retry for a broken connection?
      */
-    private suspend inline fun <T> runSafely(f: (PooledSithsClient) -> T): T {
+    // TODO: This creates a new SithsClient for each connection... can't we pool and reuse the clients?
+    private suspend inline fun <T> runSafely(f: (SithsImmediateClient) -> T): T {
         return try {
-            this.pool.get().useSafely(f)
+            this.pool.get().use{ f(StandaloneSithsClient(it)) }
         } catch (e: RedisBrokenConnectionException) {
-            this.pool.get().useSafely(f)
+            this.pool.get().use{ f(StandaloneSithsClient(it)) }
         }
     }
 

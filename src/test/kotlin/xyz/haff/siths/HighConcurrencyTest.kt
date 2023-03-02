@@ -22,7 +22,7 @@ class HighConcurrencyTest : FunSpec({
     }
 
     xtest("high concurrency") {
-        val pool = makeSithsPool(container = container, acquireTimeout = 10.seconds)
+        val pool = makeSithsPool(container = container, acquireTimeout = 100.seconds)
         val siths = SithsDSL(pool)
 
         repeat((0..1000L).count()) { batch ->

@@ -14,8 +14,6 @@ import xyz.haff.siths.pipelining.RedisPipeline
 import java.io.IOException
 import java.net.SocketException
 import java.util.*
-import kotlin.text.Charsets
-import kotlin.text.toByteArray
 
 
 private fun Exception.isSocketException(): Boolean {
@@ -81,6 +79,11 @@ class StandaloneSithsConnection private constructor(
     }
 
     override suspend fun runCommand(command: RedisCommand): RespType<*> {
+        // TODO, HACK, XXX
+        // This is a hack to mitigate https://github.com/huuff/siths/issues/1
+        if (receiveChannel.availableForRead > 0) {
+            throw RedisBrokenConnectionException(command, RuntimeException("This connection in still busy"))
+        }
         try {
             val resp = command.toResp()
 
